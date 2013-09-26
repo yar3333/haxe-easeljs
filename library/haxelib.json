@@ -1,10 +1,10 @@
 {
-  "name": "EaselJS",
+  "name": "easeljs",
   "license": "LGPL",
   "tags": ["html","html5","js"],
-  "description": "Haxe wrapper for same-named js library.",
+  "description": "Haxe wrapper for EaselJS library.",
   "contributors": ["yar3333"],
-  "releasenote": "init.",
+  "releasenote": "EaselJS 0.7.0",
   "version": "1.0.0",
   "url": "https://bitbucket.org/yar3333/easeljs",
   "dependencies": {}
