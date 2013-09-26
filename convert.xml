@@ -1,4 +1,0 @@
-<build>
-    <source path="native/src" parser="yuidoc" />
-    <output path="library" />
-</build>
