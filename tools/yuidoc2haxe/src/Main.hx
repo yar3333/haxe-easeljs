@@ -22,6 +22,7 @@ class Main
 		parser.add("publicPrefix", false, [ "--public-prefix" ], "Write 'public' before class member declarations.");
 		parser.addRepeatable("ignoreFiles", String, [ "-ifile", "--ignore-file" ], "Path to source file to ignore.");
 		parser.addRepeatable("ignoreClasses", String, [ "-iclass", "--ignore-class" ], "Class name to ignore.");
+		parser.addRepeatable("ignoreItems", String, [ "-iitem", "--ignore-items" ], "Class member to ignore.");
 		parser.add("noDescriptions", false, [ "-nd", "--no-descriptions" ], "Do not generate descriptions.");
 		parser.add("nativePackage", "", [ "-np", "--native-package" ], "Native package for @:native meta.");
 		parser.add("generateDeprecated", false, [ "--generate-deprecated" ], "Generate deprecated classes/members.");
@@ -38,6 +39,7 @@ class Main
 				, options.get("publicPrefix")
 				, options.get("ignoreFiles")
 				, options.get("ignoreClasses")
+				, options.get("ignoreItems")
 				, options.get("noDescriptions")
 				, options.get("nativePackage")
 				, options.get("generateDeprecated")
@@ -59,6 +61,7 @@ class Main
 		, publicPrefix : Bool
 		, ignoreFiles : Array<String>
 		, ignoreClasses : Array<String>
+		, ignoreItems : Array<String>
 		, noDescriptions : Bool
 		, nativePackage : String
 		, generateDeprecated : Bool
@@ -78,7 +81,7 @@ class Main
 			
 			var klass : Klass = Reflect.field(root.classes, className);
 			
-			if (ignoreClasses.has(className) || (!generateDeprecated && klass.deprecated))
+			if (isIgnore(ignoreClasses, klass.module, className) || (!generateDeprecated && klass.deprecated))
 			{
 				Lib.println("...SKIP");
 				continue;
@@ -143,7 +146,9 @@ class Main
 						throw "Unknow name for item = " + item;
 					}
 					
-					if (item.name.startsWith("_")) continue; // protected
+					if (isIgnore(ignoreItems, item.getClass(), item.name)) continue;
+					
+					//if (item.name.startsWith("_")) continue; // protected
 					
 					fillItemFieldsFromSuperClass(root, item);
 					
@@ -348,5 +353,22 @@ class Main
 	{
 		if (s == "") return "";
 		return s.substr(0, 1).toUpperCase + s.substr(2);
+	}
+	
+	static function isIgnore(ignores:Array<String>, prefix:String, name:String)
+	{
+		return ignores.exists(function(s)
+		{
+			if (s.indexOf("*") < 0)
+			{
+				var n = s.lastIndexOf(".");
+				return n >= 0 ? s.substr(0, n) == prefix && s.substr(n) == name : s == name;
+			}
+			else
+			{
+				var re = new EReg(s.replace(".", "\\.").replace("*", ".+"), "");
+				return re.match((prefix != null && prefix != "" ? prefix + "." : "") + name);
+			}
+		});
 	}
 }
