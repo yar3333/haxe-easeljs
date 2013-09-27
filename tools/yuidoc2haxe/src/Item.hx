@@ -16,4 +16,5 @@ typedef Item =
 	//, return : { description:String, type:String }
 	, access : String // "protected"
 	, deprecated : Bool
+	//, static : Int
 }
