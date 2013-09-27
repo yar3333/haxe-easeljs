@@ -21,11 +21,14 @@ class Main
 		parser.add("removePathPrefix", "", [ "-rpp", "--remove-path-prefix" ], "Source files path prefix to remove.");
 		parser.add("publicPrefix", false, [ "--public-prefix" ], "Write 'public' before class member declarations.");
 		parser.addRepeatable("ignoreFiles", String, [ "-ifile", "--ignore-file" ], "Path to source file to ignore.");
-		parser.addRepeatable("ignoreClasses", String, [ "-iclass", "--ignore-class" ], "Class name to ignore.");
-		parser.addRepeatable("ignoreItems", String, [ "-iitem", "--ignore-items" ], "Class member to ignore.");
+		parser.addRepeatable("ignoreClasses", String, [ "-iclass", "--ignore-class" ], "Class name to ignore. Masks with '*' is supported.");
+		parser.addRepeatable("ignoreItems", String, [ "-iitem", "--ignore-items" ], "Class member to ignore. Masks with '*' is supported.");
 		parser.add("noDescriptions", false, [ "-nd", "--no-descriptions" ], "Do not generate descriptions.");
 		parser.add("nativePackage", "", [ "-np", "--native-package" ], "Native package for @:native meta.");
 		parser.add("generateDeprecated", false, [ "--generate-deprecated" ], "Generate deprecated classes/members.");
+		parser.add("newLinedBracket", false, [ "--new-lined-bracket" ], "Ouput code style. Generate '{' from the new lne.");
+		parser.add("lessSpaces", false, [ "--less-spaces" ], "Ouput code style. Generate less spaces.");
+		parser.add("sortItems", false, [ "--sort-items" ], "Sort items alphabetically.");
 		
 		var args = Sys.args();
 		
@@ -43,6 +46,9 @@ class Main
 				, options.get("noDescriptions")
 				, options.get("nativePackage")
 				, options.get("generateDeprecated")
+				, options.get("newLinedBracket")
+				, options.get("lessSpaces")
+				, options.get("sortItems")
 			);
 		}
 		else
@@ -65,11 +71,16 @@ class Main
 		, noDescriptions : Bool
 		, nativePackage : String
 		, generateDeprecated : Bool
+		, newLinedBracket : Bool
+		, lessSpaces : Bool
+		, sortItems : Bool
 		
 	) {
 		destDir = Path.addTrailingSlash(destDir.replace("\\", "/"));
 		removePathPrefix = Path.addTrailingSlash(removePathPrefix.replace("\\", "/"));
 		ignoreFiles = ignoreFiles.map(function(p) return p.replace("\\", "/"));
+		var bracket = newLinedBracket ? "\n{" : " {\n";
+		var space = lessSpaces ? "" : " ";
 		
 		var itemDeclarationPrefx = publicPrefix ? "public " : "";
 		
@@ -97,15 +108,9 @@ class Main
 			file = Path.withoutExtension(file) + ".hx";
 			file = destDir + file;
 			
-			
 			var properties = new Array<Item>();
 			var methods = new Array<Item>();
 			var events = new Array<Item>();
-			
-			if (klass.is_constructor == 1)
-			{
-				methods.push(cast { name:"new", "return":{ type:"Void" }, params:klass.params });
-			}
 			
 			for (i in 0...root.classitems.length)
 			{
@@ -148,8 +153,6 @@ class Main
 					
 					if (isIgnore(ignoreItems, item.getClass(), item.name)) continue;
 					
-					//if (item.name.startsWith("_")) continue; // protected
-					
 					fillItemFieldsFromSuperClass(root, item);
 					
 					if (item.itemtype == null)
@@ -183,9 +186,9 @@ class Main
 			{
 				var eventClassName = item.getClass() + capitalize(item.name) + "Event";
 				
-				return "typedef " + eventClassName + " =\n{\n" + item.params.map(function(p)
+				return "typedef " + eventClassName + " =" + bracket + item.params.map(function(p)
 				{
-					return "\tvar " + p.name +" : " + p.type + ";";
+					return "\tvar " + p.name + space + ":" + space + p.type + ";";
 				}
 				).join("\n");
 			}
@@ -197,32 +200,13 @@ class Main
 				{
 					throw "Unknow type for property = " + item;
 				}
-				return "\t" + itemDeclarationPrefx + (item.isStatic() ? "static " : "") + "var " + item.name + " : " + getHaxeType(item.type) + ";";
+				return "\t" + itemDeclarationPrefx + (item.isStatic() ? "static " : "") + "var " + item.name + space + ":" + space + getHaxeType(item.type) + ";";
 			}
 			).join("\n");
 			
 			
-			var methodsCode = methods.map(function(item)
-			{
-				var ret = item.getReturn();
-				if (ret == null)
-				{
-					throw "Unknow return for method = " + item;
-				}
-				if (ret.type == null)
-				{
-					throw "Unknow return type for method = " + item;
-				}
-				try
-				{
-					return "\t" + itemDeclarationPrefx + (item.isStatic() ? "static " : "") + "function " + item.name + paramsToString(item.params) + " : " + getHaxeType(ret.type) + ";";
-				}
-				catch (e:Dynamic)
-				{
-					throw "Unknow param type for method = " + item;
-				}
-			}
-			).join("\n");
+			if (sortItems) methods.sort(function(a, b) return a.name<b.name ? -1 : (a.name>b.name ? 1 : 0));
+			var methodsCode = methods.map(function(item) return method2string(item, itemDeclarationPrefx, space)).join("\n");
 			
 			var eventsCode = events.map(function(item)
 			{
@@ -251,19 +235,19 @@ class Main
 			result.push("");
 			if (eventsDeclarationCode!="") result.push(eventsDeclarationCode);
 			result.push("@:native(\"" + (nativePackage != "" ? nativePackage + "." : "") + klass.name + "\")");
-			result.push("extern class " + klass.name + (klass.getExtends() != null && klass.getExtends() != "" ? " extends " + klass.getExtends() : ""));
-			result.push("{");
+			result.push("extern class " + klass.name + (klass.getExtends() != null && klass.getExtends() != "" ? " extends " + klass.getExtends() : "") + bracket);
 			
 			var innerClassCode = "";
-			if (propertiesCode != "") innerClassCode += propertiesCode + "\n\n";
-			if (methodsCode != "") innerClassCode += methodsCode + "\n\n";
-			if (eventsCode != "") innerClassCode += eventsCode + "\n\n";
+			if (propertiesCode != "")		innerClassCode += propertiesCode + "\n\n";
+			if (klass.is_constructor == 1)	innerClassCode += method2string(cast { name:"new", "return":{ type:"Void" }, params:klass.params }, itemDeclarationPrefx, space) + "\n\n";
+			if (methodsCode != "")			innerClassCode += methodsCode + "\n\n";
+			if (eventsCode != "")			innerClassCode += eventsCode + "\n\n";
 			result.push(innerClassCode.rtrim());
 			
 			result.push("}");
 			
 			FileSystem.createDirectory(destDir + klass.module.toLowerCase());
-			File.saveContent(destDir + klass.module.toLowerCase() + "/" + klass.name + ".hx", result.join("\n"));
+			File.saveContent(destDir + klass.module.toLowerCase() + "/" + klass.name + ".hx", result.join("\n").replace("\n", "\r\n"));
 		}
 	}
 	
@@ -328,6 +312,7 @@ class Main
 		if (type == "Function") return "Dynamic";
 		if (type == "HTMLElement") return "js.html.Element";
 		if (type == "HTMLCanvasElement") return "js.html.CanvasElement";
+		if (type == "CanvasRenderingContext2D") return "js.html.CanvasRenderingContext2D";
 		if (type == "Image") return "js.html.Image";
 		
 		return type;
@@ -338,7 +323,7 @@ class Main
 		if (params != null)
 		{
 			return "(" + params.map(function(p)
-				return p.name + ":" + getHaxeType(p.type)
+				return  (p.optional ? "?" : "") + p.name + ":" + getHaxeType(p.type)
 			).join(", ") + ")";
 		}
 		return "()";
@@ -352,7 +337,7 @@ class Main
 	static function capitalize(s:String)
 	{
 		if (s == "") return "";
-		return s.substr(0, 1).toUpperCase + s.substr(2);
+		return s.substr(0, 1).toUpperCase() + s.substr(2);
 	}
 	
 	static function isIgnore(ignores:Array<String>, prefix:String, name:String)
@@ -370,5 +355,26 @@ class Main
 				return re.match((prefix != null && prefix != "" ? prefix + "." : "") + name);
 			}
 		});
+	}
+	
+	static function method2string(item:Item, itemDeclarationPrefx:String, space:String)
+	{
+		var ret = item.getReturn();
+		if (ret == null)
+		{
+			throw "Unknow return for method = " + item;
+		}
+		if (ret.type == null)
+		{
+			throw "Unknow return type for method = " + item;
+		}
+		try
+		{
+			return "\t" + itemDeclarationPrefx + (item.isStatic() ? "static " : "") + "function " + item.name + paramsToString(item.params) + space + ":" + space + getHaxeType(ret.type) + ";";
+		}
+		catch (e:Dynamic)
+		{
+			throw "Unknow param type for method = " + item;
+		}
 	}
 }
