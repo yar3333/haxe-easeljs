@@ -78,9 +78,10 @@ class Main
 			
 			var klass : Klass = Reflect.field(root.classes, className);
 			
-			if (ignoreClasses.has(klass.module + "." + className) || ignoreClasses.has(className) || (!generateDeprecated && klass.deprecated))
+			if (ignoreClasses.has(className) || (!generateDeprecated && klass.deprecated))
 			{
 				Lib.println("...SKIP");
+				continue;
 			}
 			else
 			{
@@ -94,9 +95,14 @@ class Main
 			file = destDir + file;
 			
 			
-			var properties = [];
-			var methods = [];
-			var events = [];
+			var properties = new Array<Item>();
+			var methods = new Array<Item>();
+			var events = new Array<Item>();
+			
+			if (klass.is_constructor == 1)
+			{
+				methods.push(cast { name:"new", "return":{ type:"Void" }, params:klass.params });
+			}
 			
 			for (i in 0...root.classitems.length)
 			{
@@ -154,6 +160,7 @@ class Main
 					switch (item.itemtype)
 					{
 						case "property":
+							properties.push(item);
 						
 						case "method":
 							methods.push(item);
@@ -185,7 +192,7 @@ class Main
 				{
 					throw "Unknow type for property = " + item;
 				}
-				return "\t" + itemDeclarationPrefx + "var " + item.name + " : " + getHaxeType(item.type) + ";";
+				return "\t" + itemDeclarationPrefx + (item.isStatic() ? "static " : "") + "var " + item.name + " : " + getHaxeType(item.type) + ";";
 			}
 			).join("\n");
 			
@@ -203,7 +210,7 @@ class Main
 				}
 				try
 				{
-					return "\t" + itemDeclarationPrefx + "function " + item.name + paramsToString(item.params) + " : " + getHaxeType(ret.type) + ";";
+					return "\t" + itemDeclarationPrefx + (item.isStatic() ? "static " : "") + "function " + item.name + paramsToString(item.params) + " : " + getHaxeType(ret.type) + ";";
 				}
 				catch (e:Dynamic)
 				{
@@ -230,7 +237,7 @@ class Main
 					}
 				}
 				
-				return "\t" + itemDeclarationPrefx + "inline function add" + capitalize(item.name) + "EventListener(handler:" + eventClassName + "->Void) addEventListener(\"" + item.name + "\", handler);";
+				return "\t" + itemDeclarationPrefx + (item.isStatic() ? "static " : "") + "inline function add" + capitalize(item.name) + "EventListener(handler:" + eventClassName + "->Void) addEventListener(\"" + item.name + "\", handler);";
 			}
 			).join("\n");
 			
@@ -241,9 +248,13 @@ class Main
 			result.push("@:native(\"" + (nativePackage != "" ? nativePackage + "." : "") + klass.name + "\")");
 			result.push("extern class " + klass.name + (klass.getExtends() != null && klass.getExtends() != "" ? " extends " + klass.getExtends() : ""));
 			result.push("{");
-			if (propertiesCode != "") result.push(propertiesCode);
-			if (methodsCode != "") result.push(methodsCode);
-			if (eventsCode != "") result.push(eventsCode);
+			
+			var innerClassCode = "";
+			if (propertiesCode != "") innerClassCode += propertiesCode + "\n\n";
+			if (methodsCode != "") innerClassCode += methodsCode + "\n\n";
+			if (eventsCode != "") innerClassCode += eventsCode + "\n\n";
+			result.push(innerClassCode.rtrim());
+			
 			result.push("}");
 			
 			FileSystem.createDirectory(destDir + klass.module.toLowerCase());
@@ -268,7 +279,7 @@ class Main
 				return;
 			}
 			
-			var superItem = getKlassItem(root, superKlass, item.name);
+			var superItem = getKlassItem(root, superKlass, item.name, item.isStatic());
 			if (superItem != null)
 			{
 				if (item.getReturn() == null) item.setReturn(superItem.getReturn());
@@ -277,7 +288,7 @@ class Main
 		}
 	}
 	
-	static function getKlassItem(root:YuiDoc, klass:Klass, itemName:String) : Item
+	static function getKlassItem(root:YuiDoc, klass:Klass, itemName:String, isStatic:Bool) : Item
 	{
 		for (item in root.classitems)
 		{
@@ -291,7 +302,7 @@ class Main
 				throw "Unknow module for class = " + klass;
 			}
 			
-			if (item.module == klass.module && item.getClass() == klass.name)
+			if (item.module == klass.module && item.getClass() == klass.name /*&& item.isStatic() == isStatic*/)
 			{		
 				return item;
 			}

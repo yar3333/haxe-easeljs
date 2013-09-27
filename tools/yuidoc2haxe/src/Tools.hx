@@ -34,4 +34,9 @@ class ItemTools
 	{
 		return Reflect.setField(item, "return", ret);
 	}
+	
+	public static function isStatic(item:Item) : Bool
+	{
+		return Reflect.hasField(item, "static") && Reflect.field(item, "static") == 1;
+	}
 }
