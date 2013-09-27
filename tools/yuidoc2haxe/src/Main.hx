@@ -1,5 +1,6 @@
 package ;
 
+import hant.CmdOptions;
 import haxe.CallStack;
 import haxe.io.Path;
 import haxe.Json;
@@ -7,101 +8,111 @@ import neko.Lib;
 import sys.FileSystem;
 import sys.io.File;
 using StringTools;
-
-typedef YuiDoc =
-{
-	  project : Dynamic
-	, files: Dynamic
-	, classes: Dynamic<ClassData>
-	, classitems: Array<ClassItem>
-}
-
-typedef ClassData = 
-{
-	  name : String //"Event"
-	, shortname : String // "Event"
-	, classitems : Array<ClassItem> // []
-	, plugins : Array<Dynamic> // []
-	, extensions : Array<Dynamic> // []
-	, plugin_for : Array<Dynamic> // []
-	, extension_for : Array<Dynamic> // []
-	, module : String // "CreateJS"
-	, namespace : String // ""
-	, file : String // "native\\src\\createjs\\events\\Event.js"
-	, line : Int // 46
-	, description : String // "Contains properties and methods shared by all events for use with\n{{#crossLink \"EventDispatcher\"}}{{/crossLink}}.\n\nNote that Event objects are often reused, so you should never\nrely on an event object's state outside of the call stack it was received in.",
-	, params : Array<Param>
-	, is_constructor : Int // 1
-}
-
-typedef ClassItem =
-{
-	  file: String // "native\\src\\createjs\\events\\Event.js"
-    , line: Int // 74
-	, description: String // "The object that generated an event."
-	, itemtype: String // "property", "method", "event"
-	, name: String // "target"
-	, type: String // "Object"
-	//, "default": String // "null"
-	, readonly: String // ""
-	//, "class": String // "Event"
-	, module: String // "CreateJS"
-}
-
-typedef Param = 
-{
-	  name : String //"bubbles",
-	, description : String // "Indicates whether the event will bubble through the display list.",
-	, type : String // "Boolean"
-}
+using Tools;
+using Lambda;
 
 class Main
 {
 	static function main():Void
 	{
+		var parser = new CmdOptions();
+		parser.add("srcJsonFilePath", "out/data.json", [ "-src", "--source" ], "Source yuidoc json file path. Default is 'out/data.json'.");
+		parser.add("destDir", "library", null, "Output directory.");
+		parser.add("removePathPrefix", "", [ "-rpp", "--remove-path-prefix" ], "Source files path prefix to remove.");
+		parser.add("publicPrefix", false, [ "--public-prefix" ], "Write 'public' before class member declarations.");
+		parser.addRepeatable("ignoreFiles", String, [ "-ifile", "--ignore-file" ], "Path to source file to ignore.");
+		parser.addRepeatable("ignoreClasses", String, [ "-iclass", "--ignore-class" ], "Class name to ignore.");
+		parser.add("noDescriptions", false, [ "-nd", "--no-descriptions" ], "Do not generate descriptions.");
+		parser.add("nativePackage", "", [ "-np", "--native-package" ], "Native package for @:native meta.");
+		parser.add("generateDeprecated", false, [ "--generate-deprecated" ], "Generate deprecated classes/members.");
+		
 		var args = Sys.args();
 		
-		if (args.length >= 2 &&  args.length <= 3)
+		if (args.length > 0)
 		{
-			generateLibrary(args[0], args[1], args.length >= 3 ? args[2] : "");
-			
+			var options = parser.parse(args);
+			generateLibrary(
+				  options.get("srcJsonFilePath")
+				, options.get("destDir")
+				, options.get("removePathPrefix")
+				, options.get("publicPrefix")
+				, options.get("ignoreFiles")
+				, options.get("ignoreClasses")
+				, options.get("noDescriptions")
+				, options.get("nativePackage")
+				, options.get("generateDeprecated")
+			);
 		}
 		else
 		{
 			Lib.println("yuidoc2haxe - generated haxe externs from the yuidoc's json.");
-			Lib.println("Usage: yuidoc2haxe <srcJsonFilePath> <destDir> [<pathPrefixToRemove>]");
-			Lib.println("");
+			Lib.println("Usage: yuidoc2haxe [<options>] <outputDirectory>");
+			Lib.println("  Where options:");
+			Lib.println(parser.getHelpMessage("    "));
 		}
 	}
 	
-	static function generateLibrary(srcJsonFilePath:String, destDir:String, pathPrefixToRemove:String)
-	{
+	static function generateLibrary(
+		  srcJsonFilePath : String
+		, destDir : String
+		, removePathPrefix : String
+		, publicPrefix : Bool
+		, ignoreFiles : Array<String>
+		, ignoreClasses : Array<String>
+		, noDescriptions : Bool
+		, nativePackage : String
+		, generateDeprecated : Bool
+		
+	) {
 		destDir = Path.addTrailingSlash(destDir.replace("\\", "/"));
-		pathPrefixToRemove = Path.addTrailingSlash(pathPrefixToRemove.replace("\\", "/"));
+		removePathPrefix = Path.addTrailingSlash(removePathPrefix.replace("\\", "/"));
+		ignoreFiles = ignoreFiles.map(function(p) return p.replace("\\", "/"));
+		
+		var itemDeclarationPrefx = publicPrefix ? "public " : "";
 		
 		var fileContent = File.getContent(srcJsonFilePath);
 		var root : YuiDoc = Json.parse(fileContent);
 		for (className in Reflect.fields(root.classes))
 		{
-			Lib.println("className = " + className);
+			Lib.print(className);
 			
-			var klass : ClassData = Reflect.field(root.classes, className);
+			var klass : Klass = Reflect.field(root.classes, className);
 			
-			var file = Path.withoutExtension(Std.string(klass.file).replace("\\", "/")) + ".hx";
-			if (file.startsWith(pathPrefixToRemove)) file = file.substr(pathPrefixToRemove.length);
-			file = destDir + file;
-			Lib.println("file = " + file);
-			
-			var result = "package " + klass.module.toLowerCase() + ";\n\n";
-			result += "@:native('createjs." + klass.module.toLowerCase() + "." + klass.name + "') extern class " + klass.name + "\n{";
-			
-			for (item in root.classitems)
+			if (ignoreClasses.has(klass.module + "." + className) || ignoreClasses.has(className) || (!generateDeprecated && klass.deprecated))
 			{
-				if (item.file.replace("\\", "/").endsWith("src/easeljs/version.js")) continue;
-				if (item.file.replace("\\", "/").endsWith("src/easeljs/version_movieclip.js")) continue;
+				Lib.println("...SKIP");
+			}
+			else
+			{
+				Lib.println("");
+			}
+			
+			var file = Std.string(klass.file).replace("\\", "/");
+			if (file.startsWith(removePathPrefix)) file = file.substr(removePathPrefix.length);
+			if (ignoreFiles.has(file)) continue;
+			file = Path.withoutExtension(file) + ".hx";
+			file = destDir + file;
+			
+			
+			var properties = [];
+			var methods = [];
+			var events = [];
+			
+			for (i in 0...root.classitems.length)
+			{
+				var item = root.classitems[i];
 				
-				if (item.module == klass.module && Reflect.field(item, "class") == klass.name)
+				var file = Std.string(item.file).replace("\\", "/");
+				if (file.startsWith(removePathPrefix)) file = file.substr(removePathPrefix.length);
+				if (ignoreFiles.has(file)) continue;
+				
+				if (item.access == "private") continue;
+				if (item.access == "protected") continue;
+				
+				if (item.module == klass.module && item.getClass() == klass.name)
 				{
+					if (!generateDeprecated && item.deprecated) continue;
+					
 					var reProperty = new EReg("^property\\s+([_a-z][_a-z0-9]*)\\s*$", "i");
 					
 					if (reProperty.match(Std.string(item.description)))
@@ -113,10 +124,12 @@ class Main
 					if (item.name == null)
 					{
 						if (Std.string(item.description).indexOf("Docced in superclass") >= 0) continue;
-						
-						var nativeLine = File.getContent(item.file).replace("\r", "").split("\n")[item.line-1];
-						if (nativeLine.indexOf("@ignore") >= 0) continue;
-						if (nativeLine.indexOf("docced in super class") >= 0) continue;
+						if (FileSystem.exists(item.file))
+						{
+							var nativeLine = File.getContent(item.file).replace("\r", "").split("\n")[item.line-1];
+							if (nativeLine.indexOf("@ignore") >= 0) continue;
+							if (nativeLine.indexOf("docced in super class") >= 0) continue;
+						}
 					}
 					
 					if (item.name == null)
@@ -126,37 +139,164 @@ class Main
 					
 					if (item.name.startsWith("_")) continue; // protected
 					
-					Lib.println("  item.name = " + item.name);
+					fillItemFieldsFromSuperClass(root, item);
 					
 					if (item.itemtype == null)
 					{
-						if (Reflect.hasField(item, "return"))
+						if (item.getReturn() != null)
 						{
 							item.itemtype = "method";
 						}
 					}
 					
+					var itemCode = "";
+					
 					switch (item.itemtype)
 					{
 						case "property":
-							if (item.type == null)
-							{
-								throw "Unknow type for item = " + item;
-							}
-							result += "\n\tvar " + item.name + " : " + getHaxeType(item.type) + ";";
+						
 						case "method":
+							methods.push(item);
+							
 						case "event":
+							events.push(item);
+						
 						case _:
 							throw "Unknow itemtype for item = " + item;
 					}
 				}
 			}
 			
-			result += "\n}";
+			var eventsDeclarationCode = events.filter(function(item) return item.params != null).map(function(item)
+			{
+				var eventClassName = item.getClass() + capitalize(item.name) + "Event";
+				
+				return "typedef " + eventClassName + " =\n{\n" + item.params.map(function(p)
+				{
+					return "\tvar " + p.name +" : " + p.type + ";";
+				}
+				).join("\n");
+			}
+			).join("\n");
+			
+			var propertiesCode = properties.map(function(item)
+			{
+				if (item.type == null)
+				{
+					throw "Unknow type for property = " + item;
+				}
+				return "\t" + itemDeclarationPrefx + "var " + item.name + " : " + getHaxeType(item.type) + ";";
+			}
+			).join("\n");
+			
+			
+			var methodsCode = methods.map(function(item)
+			{
+				var ret = item.getReturn();
+				if (ret == null)
+				{
+					throw "Unknow return for method = " + item;
+				}
+				if (ret.type == null)
+				{
+					throw "Unknow return type for method = " + item;
+				}
+				try
+				{
+					return "\t" + itemDeclarationPrefx + "function " + item.name + paramsToString(item.params) + " : " + getHaxeType(ret.type) + ";";
+				}
+				catch (e:Dynamic)
+				{
+					throw "Unknow param type for method = " + item;
+				}
+			}
+			).join("\n");
+			
+			var eventsCode = events.map(function(item)
+			{
+				var eventClassName = item.getClass() + capitalize(item.name) + "Event";
+				
+				if (item.params == null)
+				{
+					var reLinkToEvent = ~/See\s+the\s+[{][{]#crossLink\s+"([_a-z][_a-z0-9]*)"[}][}][{][{]\/crossLink[}][}]\s+class\s+for\s+a\s+listing\s+of\s+event\s+properties/i;
+					if (reLinkToEvent.match(item.description))
+					{
+						eventClassName = reLinkToEvent.matched(1);
+					}
+					else
+					{
+						eventClassName = "Dynamic";
+						Lib.println("WARNING: Unknow params for event '" + item.name + "' (" + item.file + " : " + item.line + ")");
+					}
+				}
+				
+				return "\t" + itemDeclarationPrefx + "inline function add" + capitalize(item.name) + "EventListener(handler:" + eventClassName + "->Void) addEventListener(\"" + item.name + "\", handler);";
+			}
+			).join("\n");
+			
+			var result = [];
+			result.push("package " + klass.module.toLowerCase() + ";");
+			result.push("");
+			if (eventsDeclarationCode!="") result.push(eventsDeclarationCode);
+			result.push("@:native(\"" + (nativePackage != "" ? nativePackage + "." : "") + klass.name + "\")");
+			result.push("extern class " + klass.name + (klass.getExtends() != null && klass.getExtends() != "" ? " extends " + klass.getExtends() : ""));
+			result.push("{");
+			if (propertiesCode != "") result.push(propertiesCode);
+			if (methodsCode != "") result.push(methodsCode);
+			if (eventsCode != "") result.push(eventsCode);
+			result.push("}");
 			
 			FileSystem.createDirectory(destDir + klass.module.toLowerCase());
-			File.saveContent(destDir + klass.module.toLowerCase() + "/" + klass.name + ".hx", result);
+			File.saveContent(destDir + klass.module.toLowerCase() + "/" + klass.name + ".hx", result.join("\n"));
 		}
+	}
+	
+	static function fillItemFieldsFromSuperClass(root:YuiDoc, item:Item)
+	{
+		var klass : Klass = Reflect.field(root.classes, item.getClass());
+		var superKlassName = klass.getExtends();
+		while (superKlassName != null && superKlassName != "")
+		{
+			var superKlass : Klass = Reflect.field(root.classes, superKlassName);
+			
+			if (superKlass == null)
+			{
+				if (![ "Array" ].has(superKlassName))
+				{
+					Lib.println("Warning: class '" + superKlassName + "' is not found.");
+				}
+				return;
+			}
+			
+			var superItem = getKlassItem(root, superKlass, item.name);
+			if (superItem != null)
+			{
+				if (item.getReturn() == null) item.setReturn(superItem.getReturn());
+			}
+			superKlassName = superKlass.getExtends();
+		}
+	}
+	
+	static function getKlassItem(root:YuiDoc, klass:Klass, itemName:String) : Item
+	{
+		for (item in root.classitems)
+		{
+			if (!Reflect.hasField(item, "module"))
+			{
+				throw "Unknow module for item = " + item;
+			}
+			
+			if (!Reflect.hasField(klass, "module"))
+			{
+				throw "Unknow module for class = " + klass;
+			}
+			
+			if (item.module == klass.module && item.getClass() == klass.name)
+			{		
+				return item;
+			}
+		}
+		return null;
 	}
 	
 	static function getHaxeType(type:String) : String
@@ -175,5 +315,27 @@ class Main
 		if (type == "Image") return "js.html.Image";
 		
 		return type;
+	}
+	
+	static function paramsToString(params:Array<Param>)
+	{
+		if (params != null)
+		{
+			return "(" + params.map(function(p)
+				return p.name + ":" + getHaxeType(p.type)
+			).join(", ") + ")";
+		}
+		return "()";
+	}
+	
+	static function getItemDescription(item:Item)
+	{
+		
+	}
+	
+	static function capitalize(s:String)
+	{
+		if (s == "") return "";
+		return s.substr(0, 1).toUpperCase + s.substr(2);
 	}
 }
