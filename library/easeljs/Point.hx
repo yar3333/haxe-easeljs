@@ -1,12 +1,31 @@
 package easeljs;
 
+/**
+ * Represents a point on a 2 dimensional x / y coordinate system.
+ * 
+ * <h4>Example</h4>
+ *      var point = new Point(0, 100);
+ */
 @:native("createjs.Point")
-extern class Point {
+extern class Point
+{
+	/**
+	 * X position.
+	 */
+	var x : Float;
+	/**
+	 * Y position.
+	 */
+	var y : Float;
 
-	public function new(?x:Float = 0, ?y:Float = 0):Void;
-	public function clone():Point;
-	public function toString():String;
+	function new(?x:Float, ?y:Float) : Void;
 
-	public var x:Float;
-	public var y:Float;
+	/**
+	 * Copies all properties from the specified point to this point.
+	 */
+	function copy(point:Point) : Point;
+	/**
+	 * Returns a string representation of this object.
+	 */
+	function toString() : String;
 }

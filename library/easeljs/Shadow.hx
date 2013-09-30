@@ -1,15 +1,40 @@
 package easeljs;
 
+/**
+ * This class encapsulates the properties required to define a shadow to apply to a {{#crossLink "DisplayObject"}}{{/crossLink}}
+ * via its <code>shadow</code> property.
+ * 
+ * <h4>Example</h4>
+ *      myImage.shadow = new createjs.Shadow("#000000", 5, 5, 10);
+ */
 @:native("createjs.Shadow")
-extern class Shadow {
+extern class Shadow
+{
+	/**
+	 * An identity shadow object (all properties are set to 0).
+	 */
+	static var identity : Shadow;
+	/**
+	 * property color
+	 */
+	var color : String;
+	/**
+	 * property offsetX
+	 */
+	var offsetX : Float;
+	/**
+	 * property offsetY
+	 */
+	var offsetY : Float;
+	/**
+	 * property blur
+	 */
+	var blur : Float;
 
-	public function new(color:String, offsetX:Float, offsetY:Float, blur:Float):Void;
-	public function clone():Shadow;
-	public function toString():String;
+	function new(color:String, offsetX:Float, offsetY:Float, blur:Float) : Void;
 
-	public var identity:Shadow;
-	public var blur:Float;
-	public var color:String;
-	public var offsetX:Float;
-	public var offsetY:Float;
+	/**
+	 * Returns a string representation of this object.
+	 */
+	function toString() : String;
 }
