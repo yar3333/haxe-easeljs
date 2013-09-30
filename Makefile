@@ -14,4 +14,4 @@ OPTIONS+= --type-map Image-js.html.Image
 
 convert:
 	yuidoc -p -o out native/src
-	neko yuidoc2haxe.n $(OPTIONS) library
+	haxelib run yuidoc2haxe $(OPTIONS) library
