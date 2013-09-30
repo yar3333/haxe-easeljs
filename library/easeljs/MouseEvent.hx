@@ -30,7 +30,7 @@ extern class MouseEvent extends createjs.Event
 	 * event may differ between browsers. This property will be null if the
 	 * EaselJS property was not directly generated from a native MouseEvent.
 	 */
-	var nativeEvent : MouseEvent;
+	var nativeEvent : js.html.MouseEvent;
 	/**
 	 * The unique id for the pointer (touch point or cursor). This will be either -1 for the mouse, or the system
 	 * supplied id value.
