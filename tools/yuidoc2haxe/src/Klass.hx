@@ -19,4 +19,5 @@ typedef Klass =
 	, params : Array<Param>
 	//, static : Int
 	, deprecated : Bool
+	, uses : Array<String>
 }
