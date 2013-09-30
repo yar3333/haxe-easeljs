@@ -1,15 +1,36 @@
 package easeljs;
 
+/**
+ * Represents a rectangle as defined by the points (x, y) and (x+width, y+height).
+ */
 @:native("createjs.Rectangle")
-extern class Rectangle {
+extern class Rectangle
+{
+	/**
+	 * X position.
+	 */
+	var x : Float;
+	/**
+	 * Y position.
+	 */
+	var y : Float;
+	/**
+	 * Width.
+	 */
+	var width : Float;
+	/**
+	 * Height.
+	 */
+	var height : Float;
 
-	public function new(?x:Float = 0, ?y:Float = 0, ?width:Float = 0, ?height:Float = 0):Void;
-	public function clone():Rectangle;
-	public function toString():String;
+	function new(?x:Float, ?y:Float, ?width:Float, ?height:Float) : Void;
 
-	public var height:Float;
-	public var width:Float;
-	public var x:Float;
-	public var y:Float;
-
+	/**
+	 * Copies all properties from the specified rectangle to this rectangle.
+	 */
+	function copy(rectangle:Rectangle) : Rectangle;
+	/**
+	 * Returns a string representation of this object.
+	 */
+	function toString() : String;
 }

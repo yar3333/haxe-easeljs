@@ -1,7 +1,14 @@
 package easeljs;
 
+/**
+ * Global utility for generating sequential unique ID numbers. The UID class uses a static interface (ex. <code>UID.get()</code>)
+ * and should not be instantiated.
+ */
 @:native("createjs.UID")
-extern class UID {
-
-	public static function get():Float;
+extern class UID
+{
+	/**
+	 * Returns the next unique id.
+	 */
+	static function get() : Float;
 }
