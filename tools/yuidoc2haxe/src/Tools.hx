@@ -40,3 +40,11 @@ class ItemTools
 		return Reflect.hasField(item, "static") && Reflect.field(item, "static") == 1;
 	}
 }
+
+class ParamTools
+{
+	public static function isOptional(param:Param) : Bool
+	{
+		return Reflect.hasField(param, "optional") && Reflect.field(param, "optional") || ~/^\s*optional\b/i.match(param.description);
+	}
+}

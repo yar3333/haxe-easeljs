@@ -229,12 +229,9 @@ class Main
 				if (item.name == null)
 				{
 					if (Std.string(item.description).indexOf("Docced in superclass") >= 0) continue;
-					if (FileSystem.exists(item.file))
-					{
-						var nativeLine = File.getContent(item.file).replace("\r", "").split("\n")[item.line-1];
-						if (nativeLine.indexOf("@ignore") >= 0) continue;
-						if (nativeLine.indexOf("docced in super class") >= 0) continue;
-					}
+					var nativeLine = getSourceLine(item);
+					if (nativeLine.indexOf("@ignore") >= 0) continue;
+					if (nativeLine.indexOf("docced in super class") >= 0) continue;
 				}
 				
 				if (item.name == null)
@@ -251,6 +248,22 @@ class Main
 					if (item.getReturn() != null)
 					{
 						item.itemtype = "method";
+					}
+				}
+				
+				if (item.itemtype == "method" && (item.params == null || item.getReturn() == null))
+				{
+					var nativeLine = getSourceLine(item, true);
+					
+					var reChain = ~/\s*([_a-z][_a-z0-9]*[.]+)([_a-z][_a-z0-9]*)\s*[=]\s*([_a-z][_a-z0-9]*[.]+)([_a-z][_a-z0-9]*)\s*;/i;
+					if (reChain.match(nativeLine) && reChain.matched(1) == reChain.matched(3) && reChain.matched(2) == item.name)
+					{
+						var prevItem = getKlassItem(root, klass, reChain.matched(4), item.isStatic());
+						if (prevItem != null)
+						{
+							if (item.params == null) item.params = prevItem.params;
+							if (item.getReturn() == null) item.setReturn(prevItem.getReturn());
+						}
 					}
 				}
 				
@@ -293,6 +306,31 @@ class Main
 		return { properties:properties, methods:methods, events:events };
 	}
 	
+	static function getSourceLine(item:Item, afterComment=false) : String
+	{
+		if (FileSystem.exists(item.file))
+		{
+			var text = File.getContent(item.file).replace("\r", "");
+			
+			if (!afterComment)
+			{
+				return text.split("\n")[item.line - 1];
+			}
+			else
+			{
+				var n = text.split("\n").slice(0, item.line - 1).fold((function(s, n) return n + s.length + 1), 1);
+				text = text.substr(n).ltrim();
+				if (text.startsWith("/*"))
+				{
+					n = text.indexOf("*/");
+					text = text.substr(n + 2).ltrim();
+				}
+				return text.split("\n")[0];
+			}
+		}
+		return "";
+	}
+	
 	static function fillItemFieldsFromSuperClass(root:YuiDoc, item:Item)
 	{
 		var klass : Klass = Reflect.field(root.classes, item.getClass());
@@ -321,6 +359,11 @@ class Main
 				if (item.getReturn().type != superItem.getReturn().type)
 				{
 					item.getReturn().type = superItem.getReturn().type;
+				}
+				
+				if (item.params == null)
+				{
+					item.params = superItem.params;
 				}
 			}
 			
@@ -377,7 +420,7 @@ class Main
 	{
 		if (params != null)
 		{
-			return "(" + params.map(function(p) return (p.optional ? "?" : "") + p.name + ":" + getHaxeType(root, curModule, typeMap, p.type)).join(", ") + ")";
+			return "(" + params.map(function(p) return (p.isOptional() ? "?" : "") + p.name + ":" + getHaxeType(root, curModule, typeMap, p.type)).join(", ") + ")";
 		}
 		return "()";
 	}
@@ -391,7 +434,7 @@ class Main
 	static function capitalize(s:String)
 	{
 		if (s == "") return "";
-		return s.substr(0, 1).toUpperCase() + s.substr(2);
+		return s.substr(0, 1).toUpperCase() + s.substr(1);
 	}
 	
 	static function isIgnore(ignores:Array<String>, prefix:String, name:String)
@@ -451,9 +494,9 @@ class Main
 		var ret = item.getReturn();
 		if (ret == null)
 		{
-			throw "Unknow return for method = " + item;
+			Lib.println("Warning: unknow return for method = " + item.name);
 		}
-		if (ret.type == null)
+		if (ret != null && ret.type == null)
 		{
 			throw "Unknow return type for method = " + item;
 		}
@@ -466,7 +509,7 @@ class Main
 					+ (isMethodOverride(root, item) ? "override " : "") 
 					+ itemDeclarationPrefx 
 					+ (item.isStatic() ? "static " : "") 
-					+ "function " + item.name + getParamsCode(root, item.module, typeMap, item.params) + space + ":" + space + getHaxeType(root, item.module, typeMap, ret.type) + ";";
+					+ "function " + item.name + getParamsCode(root, item.module, typeMap, item.params) + space + ":" + space + (ret != null ? getHaxeType(root, item.module, typeMap, ret.type) : "Void") + ";";
 			}
 			else
 			{
@@ -474,7 +517,7 @@ class Main
 					+ "\t" 
 					+ itemDeclarationPrefx 
 					+ "inline "
-					+ "function " + item.name + "_" + getParamsCode(root, item.module, typeMap, item.params) + space + ":" + space + getHaxeType(root, item.module, typeMap, ret.type) 
+					+ "function " + item.name + "_" + getParamsCode(root, item.module, typeMap, item.params) + space + ":" + space + (ret != null ? getHaxeType(root, item.module, typeMap, ret.type) : "Void")
 					+ " return Reflect.callMethod(this, \"" + item.name + "\", [ " + (item.params != null ? item.params.map(function(p) return p.name).join(", ") : "") + " ]);";
 			}
 		}
