@@ -84,7 +84,7 @@ extern class Text extends DisplayObject
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
-	override function draw(ctx:js.html.CanvasRenderingContext2D, ignoreCache:Bool) : Bool;
+	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
 	 * Returns the measured, untransformed width of the text without wrapping. Use getBounds for a more robust value.
 	 */
