@@ -141,6 +141,10 @@ extern class Matrix2D
 	 */
 	function prependProperties(alpha:Float, shadow:Shadow, compositeOperation:String) : Matrix2D;
 	/**
+	 * Returns a clone of the Matrix2D instance.
+	 */
+	function clone() : Matrix2D;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;

@@ -30,6 +30,10 @@ extern class Rectangle
 	 */
 	function copy(rectangle:Rectangle) : Rectangle;
 	/**
+	 * Returns a clone of the Rectangle instance.
+	 */
+	function clone() : Rectangle;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;

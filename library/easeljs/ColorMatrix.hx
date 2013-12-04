@@ -12,7 +12,7 @@ package easeljs;
  * for an example of how to use ColorMatrix to change a DisplayObject's color.
  */
 @:native("createjs.ColorMatrix")
-extern class ColorMatrix extends Array<Dynamic>
+extern class ColorMatrix
 {
 	function new(brightness:Float, contrast:Float, saturation:Float, hue:Float) : Void;
 
@@ -50,6 +50,10 @@ extern class ColorMatrix extends Array<Dynamic>
 	 */
 	function concat(matrix:Array<Dynamic>) : ColorMatrix;
 	/**
+	 * Returns a clone of this ColorMatrix.
+	 */
+	function clone() : ColorMatrix;
+	/**
 	 * Return a length 25 (5x5) array instance containing this matrix's values.
 	 */
 	function toArray() : Array<Dynamic>;
@@ -57,4 +61,8 @@ extern class ColorMatrix extends Array<Dynamic>
 	 * Copy the specified matrix's values to this matrix.
 	 */
 	function copyMatrix(matrix:Array<Dynamic>) : ColorMatrix;
+	/**
+	 * Returns a string representation of this object.
+	 */
+	function toString() : String;
 }

@@ -77,6 +77,10 @@ extern class Bitmap extends DisplayObject
 	 */
 	override function uncache() : Void;
 	/**
+	 * Returns a clone of the Bitmap instance.
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	override function toString() : String;

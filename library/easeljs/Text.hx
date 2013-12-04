@@ -101,6 +101,10 @@ extern class Text extends DisplayObject
 	 */
 	function getMeasuredHeight() : Float;
 	/**
+	 * Returns a clone of the Text instance.
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	override function toString() : String;

@@ -151,6 +151,10 @@ extern class Stage extends Container
 	 */
 	function enableDOMEvents(?enable:Bool) : Void;
 	/**
+	 * Returns a clone of this Stage.
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	override function toString() : String;

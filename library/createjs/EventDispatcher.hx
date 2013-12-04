@@ -106,7 +106,7 @@ extern class EventDispatcher
 	 * <h4>Example</h4>
 	 * 
 	 *      // Remove all listeners
-	 *      displayObject.removeAllEvenListeners();
+	 *      displayObject.removeAllEventListeners();
 	 * 
 	 *      // Remove all click listeners
 	 *      displayObject.removeAllEventListeners("click");

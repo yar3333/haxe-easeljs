@@ -1,8 +1,8 @@
 package easeljs;
 
 /**
- * This is passed as the parameter to all mouse/pointer/touch related events on {{#crossLink "DisplayObject"}}{{/crossLink}}
- * instances.
+ * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,
+ * see the {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}} event listings.
  */
 @:native("createjs.MouseEvent")
 extern class MouseEvent extends createjs.Event
@@ -41,9 +41,21 @@ extern class MouseEvent extends createjs.Event
 	 * For touch pointers, the first pointer in the current stack will be considered the primary pointer.
 	 */
 	var primary : Bool;
+	/**
+	 * Returns the x position of the mouse in the local coordinate system of the current target (ie. the dispatcher).
+	 */
+	var localX : Float;
+	/**
+	 * Returns the y position of the mouse in the local coordinate system of the current target (ie. the dispatcher).
+	 */
+	var localY : Float;
 
 	function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:easeljs.MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float) : Void;
 
+	/**
+	 * Returns a clone of the MouseEvent instance.
+	 */
+	override function clone() : createjs.Event;
 	/**
 	 * Returns a string representation of this object.
 	 */
@@ -104,7 +116,7 @@ extern class MouseEvent extends createjs.Event
 	 * <h4>Example</h4>
 	 * 
 	 *      // Remove all listeners
-	 *      displayObject.removeAllEvenListeners();
+	 *      displayObject.removeAllEventListeners();
 	 * 
 	 *      // Remove all click listeners
 	 *      displayObject.removeAllEventListeners("click");

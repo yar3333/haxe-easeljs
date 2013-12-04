@@ -55,7 +55,7 @@ extern class DOMElement extends DisplayObject
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
-	override function draw(ctx:js.html.CanvasRenderingContext2D, ignoreCache:Bool) : Bool;
+	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
 	 * Not applicable to DOMElement.
 	 */
@@ -84,6 +84,10 @@ extern class DOMElement extends DisplayObject
 	 * Not applicable to DOMElement.
 	 */
 	override function localToLocal(x:Float, y:Float, target:DisplayObject) : Point;
+	/**
+	 * DOMElement cannot be cloned. Throws an error.
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
 	/**
 	 * Returns a string representation of this object.
 	 */
