@@ -4,7 +4,6 @@ OPTIONS+= -ifile easeljs/version_movieclip.js
 OPTIONS+= -ifile easeljs/version.js
 OPTIONS+= -ifile createjs/utils/IndexOf.js 
 OPTIONS+= -iitem initialize
-OPTIONS+= -iitem clone
 OPTIONS+= -iitem Stage.hitArea
 OPTIONS+= --native-package createjs
 OPTIONS+= --type-map HTMLElement-js.html.Element

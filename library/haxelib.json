@@ -4,8 +4,8 @@
   "tags": ["html","html5","js"],
   "description": "Haxe wrapper for EaselJS library.",
   "contributors": ["yar3333"],
-  "releasenote": "EaselJS 0.7.0",
-  "version": "1.0.0",
+  "releasenote": "Clone methods support.",
+  "version": "1.0.1",
   "url": "https://bitbucket.org/yar3333/easeljs",
   "dependencies": {}
 }

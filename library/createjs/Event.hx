@@ -94,6 +94,10 @@ extern class Event
 	 */
 	function remove() : Void;
 	/**
+	 * Returns a clone of the Event instance.
+	 */
+	function clone() : Event;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;

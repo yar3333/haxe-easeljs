@@ -38,10 +38,20 @@ extern class DisplayObject extends createjs.EventDispatcher
 	/**
 	 * Indicates whether to include this object when running mouse interactions. Setting this to `false` for children
 	 * of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is
-	 * clicked. Note that setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}
+	 * clicked. Setting this property to `false` does not prevent the {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}
 	 * method from returning the child.
+	 * 
+	 * <strong>Note:</strong> In EaselJS 0.7.0, the mouseEnabled property will not work properly with nested Containers. Please
+	 * check out the latest NEXT version in <a href="https://github.com/CreateJS/EaselJS/tree/master/lib">GitHub</a> for an updated version with this issue resolved. The fix will be
+	 * provided in the next release of EaselJS.
 	 */
 	var mouseEnabled : Bool;
+	/**
+	 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
+	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+	 */
+	var tickEnabled : Bool;
 	/**
 	 * An optional name for this display object. Included in {{#crossLink "DisplayObject/toString"}}{{/crossLink}} . Useful for
 	 * debugging.
@@ -381,6 +391,11 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * with a 25px radius circle centered at 0,0 would have bounds of (-25, -25, 50, 50).
 	 */
 	function setBounds(x:Float, y:Float, width:Float, height:Float) : Void;
+	/**
+	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
+	 * reverted to their defaults (for example .parent). Also note that caches are not maintained across clones.
+	 */
+	function clone(?recursive:Bool) : DisplayObject;
 	/**
 	 * Returns a string representation of this object.
 	 */

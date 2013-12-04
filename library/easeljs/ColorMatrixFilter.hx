@@ -24,4 +24,9 @@ package easeljs;
 extern class ColorMatrixFilter extends Filter
 {
 	function new(matrix:Array<Dynamic>) : Void;
+
+	/**
+	 * Returns a clone of this ColorMatrixFilter instance.
+	 */
+	override function clone() : Filter;
 }

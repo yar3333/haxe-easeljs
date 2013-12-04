@@ -25,6 +25,10 @@ extern class Point
 	 */
 	function copy(point:Point) : Point;
 	/**
+	 * Returns a clone of the Point instance.
+	 */
+	function clone() : Point;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;

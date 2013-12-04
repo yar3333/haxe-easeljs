@@ -129,7 +129,7 @@ extern class MovieClip extends Container
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
-	override function draw(ctx:js.html.CanvasRenderingContext2D, ignoreCache:Bool) : Bool;
+	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
 	 * Sets paused to false.
 	 */
@@ -155,6 +155,10 @@ extern class MovieClip extends Container
 	 * for more information.
 	 */
 	function getCurrentLabel() : String;
+	/**
+	 * MovieClip instances cannot be cloned.
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
 	/**
 	 * Returns a string representation of this object.
 	 */

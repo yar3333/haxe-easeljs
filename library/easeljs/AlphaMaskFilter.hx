@@ -41,4 +41,8 @@ extern class AlphaMaskFilter extends Filter
 	 * correctly.</strong>
 	 */
 	override function applyFilter(ctx:js.html.CanvasRenderingContext2D, x:Float, y:Float, width:Float, height:Float, ?targetCtx:js.html.CanvasRenderingContext2D, ?targetX:Float, ?targetY:Float) : Bool;
+	/**
+	 * Returns a clone of this object.
+	 */
+	override function clone() : Filter;
 }

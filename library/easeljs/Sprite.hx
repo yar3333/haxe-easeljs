@@ -85,7 +85,7 @@ extern class Sprite extends DisplayObject
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
-	override function draw(ctx:js.html.CanvasRenderingContext2D, ignoreCache:Bool) : Bool;
+	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should not cache Bitmap instances as it can degrade performance.
@@ -133,6 +133,11 @@ extern class Sprite extends DisplayObject
 	 * Also see the SpriteSheet {{#crossLink "SpriteSheet/getFrameBounds"}}{{/crossLink}} method.
 	 */
 	override function getBounds() : Rectangle;
+	/**
+	 * Returns a clone of the Sprite instance. Note that the same SpriteSheet is shared between cloned
+	 * instances.
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
 	/**
 	 * Returns a string representation of this object.
 	 */

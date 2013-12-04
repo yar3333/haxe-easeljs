@@ -107,6 +107,10 @@ extern class SpriteSheetBuilder extends createjs.EventDispatcher
 	 */
 	function stopAsync() : Void;
 	/**
+	 * SpriteSheetBuilder instances cannot be cloned.
+	 */
+	function clone() : Void;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	override function toString() : String;

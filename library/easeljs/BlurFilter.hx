@@ -37,4 +37,9 @@ extern class BlurFilter extends Filter
 	var quality : Float;
 
 	function new(?blurX:Float, ?blurY:Float, ?quality:Float) : Void;
+
+	/**
+	 * Returns a clone of this object.
+	 */
+	override function clone() : Filter;
 }

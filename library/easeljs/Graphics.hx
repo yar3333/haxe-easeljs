@@ -398,6 +398,10 @@ extern class Graphics
 	 */
 	function decodePath(str:String) : Graphics;
 	/**
+	 * Returns a clone of this Graphics instance.
+	 */
+	function clone() : Graphics;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;

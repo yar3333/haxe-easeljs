@@ -37,4 +37,8 @@ extern class Shadow
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;
+	/**
+	 * Returns a clone of this Shadow instance.
+	 */
+	function clone() : Shadow;
 }

@@ -58,7 +58,7 @@ extern class BitmapText extends DisplayObject
 	 * Returns true if the draw was handled (useful for overriding functionality).
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
-	override function draw(ctx:js.html.CanvasRenderingContext2D, ignoreCache:Bool) : Bool;
+	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.

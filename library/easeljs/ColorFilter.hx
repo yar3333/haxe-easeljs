@@ -54,4 +54,9 @@ extern class ColorFilter extends Filter
 	var alphaOffset : Float;
 
 	function new(?redMultiplier:Float, ?greenMultiplier:Float, ?blueMultiplier:Float, ?alphaMultiplier:Float, ?redOffset:Float, ?greenOffset:Float, ?blueOffset:Float, ?alphaOffset:Float) : Void;
+
+	/**
+	 * Returns a clone of this ColorFilter instance.
+	 */
+	override function clone() : Filter;
 }

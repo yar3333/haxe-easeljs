@@ -41,6 +41,11 @@ extern class Shape extends DisplayObject
 	 */
 	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
+	 * Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to
+	 * their defaults (for example .parent).
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
+	/**
 	 * Returns a string representation of this object.
 	 */
 	override function toString() : String;

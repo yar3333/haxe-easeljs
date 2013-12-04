@@ -45,4 +45,8 @@ extern class Filter
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;
+	/**
+	 * Returns a clone of this Filter instance.
+	 */
+	function clone() : Filter;
 }

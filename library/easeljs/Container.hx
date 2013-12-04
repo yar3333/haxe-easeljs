@@ -32,6 +32,12 @@ extern class Container extends DisplayObject
 	 * trigger a click event on the container.
 	 */
 	var mouseChildren : Bool;
+	/**
+	 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
+	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
+	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+	 */
+	var tickChildren : Bool;
 
 	function new() : Void;
 
@@ -128,10 +134,11 @@ extern class Container extends DisplayObject
 	/**
 	 * Performs an array sort operation on the child list.
 	 * 
-	 * <h4>Example</h4>
-	 *      var sortFunction = function(item1, item2, options) {
-	 *          if (item1 > item2) { return 1; }
-	 *          if (item1 < item2) { return -1; }
+	 * <h4>Example: Display children with a higher y in front.</h4>
+	 * 
+	 *      var sortFunction = function(obj1, obj2, options) {
+	 *          if (obj1.y > obj2.y) { return 1; }
+	 *          if (obj1.y < obj2.y) { return -1; }
 	 *          return 0;
 	 *      }
 	 *      container.sortChildren(sortFunction);
@@ -186,6 +193,11 @@ extern class Container extends DisplayObject
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 */
 	function getObjectUnderPoint(x:Float, y:Float) : DisplayObject;
+	/**
+	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
+	 * reverted to their defaults (for example .parent).
+	 */
+	override function clone(?recursive:Bool) : DisplayObject;
 	/**
 	 * Returns a string representation of this object.
 	 */
