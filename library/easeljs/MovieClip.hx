@@ -149,7 +149,7 @@ extern class MovieClip extends Container
 	/**
 	 * Returns a sorted list of the labels defined on this MovieClip. Shortcut to TweenJS: Timeline.getLabels();
 	 */
-	function getLabels() : Array[Object];
+	function getLabels() : Array<Dynamic>;
 	/**
 	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
 	 * for more information.
