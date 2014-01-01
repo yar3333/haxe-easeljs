@@ -123,7 +123,7 @@ extern class Matrix2D
 	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	 * results.
 	 */
-	function decompose(target:Dynamic) : Matrix2D;
+	function decompose(?target:Dynamic) : Dynamic;
 	/**
 	 * Reinitializes all matrix properties to those specified.
 	 */
