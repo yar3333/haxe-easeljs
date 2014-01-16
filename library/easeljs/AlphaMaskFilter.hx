@@ -30,9 +30,9 @@ extern class AlphaMaskFilter extends Filter
 	/**
 	 * The image (or canvas) to use as the mask.
 	 */
-	var mask : js.html.Image;
+	var mask : Dynamic;
 
-	function new(mask:js.html.Image) : Void;
+	function new(mask:Dynamic) : Void;
 
 	/**
 	 * Applies the filter to the specified context.

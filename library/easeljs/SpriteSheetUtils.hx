@@ -20,5 +20,5 @@ extern class SpriteSheetUtils
 	 * 
 	 * The extractFrame method may cause cross-domain warnings since it accesses pixels directly on the canvas.
 	 */
-	static function extractFrame(spriteSheet:js.html.Image, frameOrAnimation:Dynamic) : js.html.Image;
+	static function extractFrame(spriteSheet:Dynamic, frameOrAnimation:Dynamic) : Dynamic;
 }
