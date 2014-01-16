@@ -9,7 +9,7 @@ OPTIONS+= --native-package createjs
 OPTIONS+= --type-map HTMLElement-js.html.Element
 OPTIONS+= --type-map HTMLCanvasElement-js.html.CanvasElement
 OPTIONS+= --type-map CanvasRenderingContext2D-js.html.CanvasRenderingContext2D
-OPTIONS+= --type-map Image-js.html.Image
+OPTIONS+= --type-map Image-Dynamic
 OPTIONS+= --type-map HtmlMouseEvent-js.html.MouseEvent
 
 convert:

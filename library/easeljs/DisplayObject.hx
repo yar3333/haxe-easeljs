@@ -30,7 +30,7 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}}
 	 * for more information.
 	 */
-	var cacheCanvas : Dynamic;
+	var cacheCanvas : js.html.CanvasElement;
 	/**
 	 * Unique ID for this display object. Makes display objects easier for some uses.
 	 */
