@@ -42,13 +42,13 @@ extern class ButtonHelper
 	 * If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
 	 */
 	var play : Bool;
-
-	function new(target:Dynamic, ?outLabel:String, ?overLabel:String, ?downLabel:String, ?play:Bool, ?hitArea:easeljs.DisplayObject, ?hitLabel:String) : Void;
-
 	/**
 	 * Enables or disables the button functionality on the target.
 	 */
-	function setEnabled(value:Bool) : Void;
+	var enabled : Bool;
+
+	function new(target:Dynamic, ?outLabel:String, ?overLabel:String, ?downLabel:String, ?play:Bool, ?hitArea:easeljs.DisplayObject, ?hitLabel:String) : Void;
+
 	/**
 	 * Returns a string representation of this object.
 	 */

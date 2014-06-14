@@ -97,6 +97,11 @@ typedef SpriteSheetCompleteEvent =
  *      };
  *      var spriteSheet = new createjs.SpriteSheet(data);
  *      var animation = new createjs.Sprite(spriteSheet, "run");
+ * 
+ * 
+ * <strong>Warning:</strong> Images loaded cross-origin will throw cross-origin security errors when interacted with
+ * using a mouse, using methods such as `getObjectUnderPoint`, using filters, or caching. You can get around this by
+ * setting `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`
  */
 @:native("createjs.SpriteSheet")
 extern class SpriteSheet extends createjs.EventDispatcher

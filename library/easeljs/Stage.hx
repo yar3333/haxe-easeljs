@@ -54,6 +54,12 @@ extern class Stage extends Container
 	 */
 	var mouseY : Float;
 	/**
+	 * Indicates whether display objects should be rendered on whole pixels. You can set the
+	 * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
+	 * display objects to false to enable/disable this behaviour on a per instance basis.
+	 */
+	var snapToPixelEnabled : Bool;
+	/**
 	 * Indicates whether the mouse is currently within the bounds of the canvas.
 	 */
 	var mouseInBounds : Bool;
@@ -68,23 +74,31 @@ extern class Stage extends Container
 	 */
 	var mouseMoveOutside : Bool;
 	/**
-	 * NOTE: this name is not final. Feedback is appreciated.
-	 * 
-	 * The stage assigned to this property will have mouse interactions relayed to it after this stage handles them.
-	 * This can be useful in cases where you have multiple canvases layered on top of one another and want your mouse
+	 * Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them.
+	 * This can be useful in cases where you have multiple layered canvases and want user interactions
 	 * events to pass through. For example, this would relay mouse events from topStage to bottomStage:
 	 * 
 	 *      topStage.nextStage = bottomStage;
 	 * 
-	 * Note that each stage handles the interactions independently. As such, you could have a click register on an
-	 * object in the top stage, and another click register in the bottom stage. Consider using a single canvas with
-	 * cached {{#crossLink "Container"}}{{/crossLink}} instances instead of multiple canvases.
+	 * To disable relaying, set nextStage to null.
 	 * 
-	 * MouseOver, MouseOut, RollOver, and RollOut interactions will not be passed through. They must be enabled using
-	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}} for each stage individually.
+	 * MouseOver, MouseOut, RollOver, and RollOut interactions are also passed through using the mouse over settings
+	 * of the top-most stage, but are only processed if the target stage has mouse over interactions enabled.
+	 * Considerations when using roll over in relay targets:<OL>
+	 * <LI> The top-most (first) stage must have mouse over interactions enabled (via enableMouseOver)</LI>
+	 * <LI> All stages that wish to participate in mouse over interaction must enable them via enableMouseOver</LI>
+	 * <LI> All relay targets will share the frequency value of the top-most stage</LI>
+	 * </OL>
+	 * To illustrate, in this example the targetStage would process mouse over interactions at 10hz (despite passing
+	 * 30 as it's desired frequency):
+	 * 	topStage.nextStage = targetStage;
+	 * 	topStage.enableMouseOver(10);
+	 * 	targetStage.enableMouseOver(30);
 	 * 
-	 * In most instances, you will also want to disable DOM events for the next stage to avoid duplicate interactions.
-	 * myNextStage.enableDOMEvents(false);
+	 * If the target stage's canvas is completely covered by this stage's canvas, you may also want to disable its
+	 * DOM events using:
+	 * 
+	 * 	targetStage.enableDOMEvents(false);
 	 */
 	var nextStage : Stage;
 	/**

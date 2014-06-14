@@ -46,10 +46,6 @@ extern class Sprite extends DisplayObject
 	 */
 	var spriteSheet : SpriteSheet;
 	/**
-	 * Whether or not the image should be draw to the canvas at whole pixel coordinates.
-	 */
-	var snapToPixel : Bool;
-	/**
 	 * Specifies the current frame index within the currently playing animation. When playing normally, this will increase
 	 * from 0 to n-1, where n is the number of frames in the current animation.
 	 * 
