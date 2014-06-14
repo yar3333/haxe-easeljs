@@ -10,6 +10,12 @@ package easeljs;
 extern class BitmapText extends DisplayObject
 {
 	/**
+	 * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
+	 * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
+	 * retained, slightly increasing memory use, but reducing instantiation.
+	 */
+	static var maxPoolSize : Float;
+	/**
 	 * The text to display.
 	 */
 	var text : String;
@@ -44,8 +50,8 @@ extern class BitmapText extends DisplayObject
 	var letterSpacing : Float;
 	/**
 	 * If a space character is not defined in the sprite sheet, then empty pixels equal to
-	 * spaceWidth will be inserted instead. If  0, then it will use a value calculated
-	 * by checking for the width of the "1", "E", or "A" character (in that order). If
+	 * spaceWidth will be inserted instead. If 0, then it will use a value calculated
+	 * by checking for the width of the "1", "l", "E", or "A" character (in that order). If
 	 * those characters are not defined, it will use the width of the first frame of the
 	 * sprite sheet.
 	 */
@@ -53,12 +59,6 @@ extern class BitmapText extends DisplayObject
 
 	function new(?text:String, ?spriteSheet:easeljs.SpriteSheet) : Void;
 
-	/**
-	 * Draws the display object into the specified context ignoring it's visible, alpha, shadow, and transform.
-	 * Returns true if the draw was handled (useful for overriding functionality).
-	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
-	 */
-	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
 	 * This does not account for whether it would be visible within the boundaries of the stage.

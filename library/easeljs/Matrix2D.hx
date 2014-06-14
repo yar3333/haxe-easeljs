@@ -55,6 +55,11 @@ extern class Matrix2D
 	 * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
 	 */
 	var compositeOperation : String;
+	/**
+	 * Property representing the value for visible that will be applied to a display object. This is not part of matrix
+	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
+	 */
+	var visible : Bool;
 
 	function new(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float) : Void;
 
@@ -127,7 +132,7 @@ extern class Matrix2D
 	/**
 	 * Reinitializes all matrix properties to those specified.
 	 */
-	function reinitialize(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float, ?alpha:Float, ?shadow:Shadow, ?compositeOperation:String) : Matrix2D;
+	function reinitialize(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float, ?alpha:Float, ?shadow:Shadow, ?compositeOperation:String, ?visible:Bool) : Matrix2D;
 	/**
 	 * Copies all properties from the specified matrix to this matrix.
 	 */
@@ -135,11 +140,11 @@ extern class Matrix2D
 	/**
 	 * Appends the specified visual properties to the current matrix.
 	 */
-	function appendProperties(alpha:Float, shadow:Shadow, compositeOperation:String) : Matrix2D;
+	function appendProperties(alpha:Float, shadow:Shadow, compositeOperation:String, visible:Bool) : Matrix2D;
 	/**
 	 * Prepends the specified visual properties to the current matrix.
 	 */
-	function prependProperties(alpha:Float, shadow:Shadow, compositeOperation:String) : Matrix2D;
+	function prependProperties(alpha:Float, shadow:Shadow, compositeOperation:String, visible:Bool) : Matrix2D;
 	/**
 	 * Returns a clone of the Matrix2D instance.
 	 */

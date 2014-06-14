@@ -118,6 +118,12 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 */
 	var compositeOperation : String;
 	/**
+	 * Indicates whether the display object should be drawn to a whole pixel when
+	 * {{#crossLink "Stage/snapToPixelEnabled"}}{{/crossLink}} is true. To enable/disable snapping on whole
+	 * categories of display objects, set this value on the prototype (Ex. Text.prototype.snapToPixel = true).
+	 */
+	var snapToPixel : Bool;
+	/**
 	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
 	 * event.
 	 */
