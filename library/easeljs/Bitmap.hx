@@ -5,6 +5,7 @@ package easeljs;
  * HTML element, or a string.
  * 
  * <h4>Example</h4>
+ * 
  *      var bitmap = new createjs.Bitmap("imagePath.jpg");
  * 
  * <strong>Notes:</strong>

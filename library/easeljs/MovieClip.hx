@@ -79,6 +79,7 @@ extern class MovieClip extends Container
 	 * instances to the timeline.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
 	 *      var mc = new createjs.MovieClip();
 	 *      mc.timeline.addTween(tween);
@@ -115,6 +116,19 @@ extern class MovieClip extends Container
 	 * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
 	 */
 	var frameBounds : Array<Dynamic>;
+	/**
+	 * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
+	 * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
+	 * framerate.
+	 * 
+	 * For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will
+	 * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
+	 * vary slightly between frames.
+	 * 
+	 * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
+	 * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+	 */
+	var framerate : Float;
 
 	function new(?mode:String, ?startPosition:Float, ?loop:Bool, ?labels:Dynamic) : Void;
 
@@ -146,6 +160,10 @@ extern class MovieClip extends Container
 	 * Advances this movie clip to the specified position or label and sets paused to true.
 	 */
 	function gotoAndStop(positionOrLabel:Dynamic) : Void;
+	/**
+	 * Advances the playhead. This occurs automatically each tick by default.
+	 */
+	function advance(?time:Float) : Void;
 	/**
 	 * Returns a sorted list of the labels defined on this MovieClip. Shortcut to TweenJS: Timeline.getLabels();
 	 */

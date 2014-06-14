@@ -10,6 +10,7 @@ package easeljs;
  * rendering cost.
  * 
  * <h4>Example</h4>
+ * 
  *      var graphics = new createjs.Graphics().beginFill("#ff0000").drawRect(0, 0, 100, 100);
  *      var shape = new createjs.Shape(graphics);
  * 

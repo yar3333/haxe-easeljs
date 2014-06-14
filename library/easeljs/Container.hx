@@ -12,6 +12,7 @@ package easeljs;
  * Containers have some overhead, so you generally shouldn't create a Container to hold a single child.
  * 
  * <h4>Example</h4>
+ * 
  *      var container = new createjs.Container();
  *      container.addChild(bitmapInstance, shapeInstance);
  *      container.x = 100;
@@ -59,6 +60,7 @@ extern class Container extends DisplayObject
 	 * Adds a child to the top of the display list.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      container.addChild(bitmapInstance);
 	 * 
 	 *  You can also add multiple children at once:
@@ -71,6 +73,7 @@ extern class Container extends DisplayObject
 	 * setting its parent to this Container.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      addChildAt(child1, index);
 	 * 
 	 * You can also add multiple children, such as:
@@ -90,6 +93,7 @@ extern class Container extends DisplayObject
 	 * already known.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      container.removeChild(child);
 	 * 
 	 * You can also remove multiple children:
@@ -117,6 +121,7 @@ extern class Container extends DisplayObject
 	 * Removes all children from the display list.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      container.removeAlLChildren();
 	 */
 	function removeAllChildren() : Void;
@@ -124,6 +129,7 @@ extern class Container extends DisplayObject
 	 * Returns the child at the specified index.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      container.getChildAt(2);
 	 */
 	function getChildAt(index:Float) : DisplayObject;
@@ -148,6 +154,7 @@ extern class Container extends DisplayObject
 	 * Returns the index of the specified child in the display list, or -1 if it is not in the display list.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      var index = container.getChildIndex(child);
 	 */
 	function getChildIndex(child:DisplayObject) : Float;
@@ -185,6 +192,8 @@ extern class Container extends DisplayObject
 	 * of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an
 	 * expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
 	 * mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
+	 * 
+	 * Accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	 */
 	function getObjectsUnderPoint(x:Float, y:Float) : Array<Dynamic>;
 	/**

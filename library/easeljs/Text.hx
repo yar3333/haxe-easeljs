@@ -10,6 +10,7 @@ package easeljs;
  * multiple font styles, you will need to create multiple text instances, and position them manually.
  * 
  * <h4>Example</h4>
+ * 
  *      var text = new createjs.Text("Hello World", "20px Arial", "#ff7700");
  *      text.x = 100;
  *      text.textBaseline = "alphabetic";

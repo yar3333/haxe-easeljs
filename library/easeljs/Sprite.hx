@@ -17,6 +17,7 @@ typedef SpriteAnimationendEvent =
  * See the {{#crossLink "SpriteSheet"}}{{/crossLink}} class for more information on setting up frames and animations.
  * 
  * <h4>Example</h4>
+ * 
  *      var instance = new createjs.Sprite(spriteSheet);
  *      instance.gotoAndStop("frameName");
  * 
@@ -68,7 +69,7 @@ extern class Sprite extends DisplayObject
 	 */
 	var framerate : Float;
 
-	function new(spriteSheet:easeljs.SpriteSheet, frameOrAnimation:Dynamic) : Void;
+	function new(spriteSheet:easeljs.SpriteSheet, ?frameOrAnimation:Dynamic) : Void;
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.

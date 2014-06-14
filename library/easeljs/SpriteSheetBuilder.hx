@@ -6,7 +6,7 @@ typedef SpriteSheetBuilderCompleteEvent =
 	var type : String;
 }
 
-typedef SpriteSheetBuilderCompleteEvent =
+typedef SpriteSheetBuilderProgressEvent =
 {
 	var target : Dynamic;
 	var type : String;
@@ -78,20 +78,20 @@ extern class SpriteSheetBuilder extends createjs.EventDispatcher
 	 * transforms to a source object and have them captured in the sprite sheet, simply place it into a {{#crossLink "Container"}}{{/crossLink}}
 	 * and pass in the Container as the source.
 	 */
-	function addFrame(source:DisplayObject, ?sourceRect:Rectangle, ?scale:Float, ?setupFunction:Dynamic, ?setupParams:Array<Dynamic>, ?setupScope:Dynamic) : Float;
+	function addFrame(source:DisplayObject, ?sourceRect:Rectangle, ?scale:Float, ?setupFunction:Dynamic, ?setupData:Dynamic) : Float;
 	/**
 	 * Adds an animation that will be included in the created sprite sheet.
 	 */
 	function addAnimation(name:String, frames:Array<Dynamic>, ?next:String, ?frequency:Float) : Void;
 	/**
-	 * This will take a MovieClip, and add its frames and labels to this builder. Labels will be added as an animation
+	 * This will take a MovieClip instance, and add its frames and labels to this builder. Labels will be added as an animation
 	 * running from the label index to the next label. For example, if there is a label named "foo" at frame 0 and a label
 	 * named "bar" at frame 10, in a MovieClip with 15 frames, it will add an animation named "foo" that runs from frame
 	 * index 0 to 9, and an animation named "bar" that runs from frame index 10 to 14.
 	 * 
 	 * Note that this will iterate through the full MovieClip with actionsEnabled set to false, ending on the last frame.
 	 */
-	function addMovieClip(source:MovieClip, ?sourceRect:Rectangle, ?scale:Float) : Void;
+	function addMovieClip(source:MovieClip, ?sourceRect:Rectangle, ?scale:Float, ?setupFunction:Dynamic, ?setupData:Dynamic, ?labelFunction:Dynamic) : Void;
 	/**
 	 * Builds a SpriteSheet instance based on the current frames.
 	 */
@@ -122,5 +122,5 @@ extern class SpriteSheetBuilder extends createjs.EventDispatcher
 	/**
 	 * Dispatched when an asynchronous build has progress.
 	 */
-	inline function addCompleteEventListener(handler:SpriteSheetBuilderCompleteEvent->Void) : Dynamic return addEventListener("complete", handler);
+	inline function addProgressEventListener(handler:SpriteSheetBuilderProgressEvent->Void) : Dynamic return addEventListener("progress", handler);
 }
