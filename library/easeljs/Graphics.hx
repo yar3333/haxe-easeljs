@@ -7,6 +7,7 @@ package easeljs;
  * context of an Easel display list.
  * 
  * <h4>Example</h4>
+ * 
  *      var g = new createjs.Graphics();
  * 	    g.setStrokeStyle(1);
  * 	    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
@@ -134,7 +135,7 @@ extern class Graphics
 	function draw(ctx:js.html.CanvasRenderingContext2D) : Void;
 	/**
 	 * Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
-	 * stroke descriptions. Used by <code>DisplayObject.clippingPath</code> to draw the clipping path, for example.
+	 * stroke descriptions. Used for <code>DisplayObject.mask</code> to draw the clipping path, for example.
 	 */
 	function drawAsPath(ctx:js.html.CanvasRenderingContext2D) : Void;
 	/**

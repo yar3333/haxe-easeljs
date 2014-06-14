@@ -54,6 +54,11 @@ extern class Stage extends Container
 	 */
 	var mouseY : Float;
 	/**
+	 * Specifies the area of the stage to affect when calling update. This can be use to selectively
+	 * re-render only active regions of the canvas. If null, the whole canvas area is affected.
+	 */
+	var drawRect : Rectangle;
+	/**
 	 * Indicates whether display objects should be rendered on whole pixels. You can set the
 	 * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
 	 * display objects to false to enable/disable this behaviour on a per instance basis.
@@ -116,20 +121,40 @@ extern class Stage extends Container
 	function new(canvas:Dynamic) : Void;
 
 	/**
-	 * Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
-	 * and then render the display list to the canvas. Any parameters passed to `update()` will be passed on to any
-	 * {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
-	 * 
-	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a tick event object (or equivalent) be passed as the first parameter to update(). For example:
-	 * 
-	 *      Ticker.addEventListener("tick", handleTick);
-	 * 	    function handleTick(evtObj) {
-	 * 	     	// do some work here, then update the stage, passing through the event object:
-	 * 	    	myStage.update(evtObj);
-	 * 	    }
+	 * Each time the update method is called, the stage will call {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
+	 * and then render the display list to the canvas.
 	 */
 	function update(?params:Dynamic) : Void;
+	/**
+	 * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
+	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
+	 * 
+	 * Any parameters passed to `tick()` will be included as an array in the "param" property of the event object dispatched
+	 * to {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers. Additionally, if the first parameter
+	 * is a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or has equivalent properties), then the delta,
+	 * time, runTime, and paused properties will be copied to the event object.
+	 * 
+	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
+	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent) be passed as the first parameter
+	 * to tick(). For example:
+	 * 
+	 * 	    Ticker.on("tick", handleTick);
+	 * 	    function handleTick(evtObj) {
+	 * 	    	// do some work here, then update the stage, passing through the tick event object as the first param
+	 * 	    	// and some custom data as the second and third param:
+	 * 	    	myStage.update(evtObj, "hello", 2014);
+	 * 	    }
+	 * 	    
+	 * 	    // ...
+	 * 	    myDisplayObject.on("tick", handleDisplayObjectTick);
+	 * 	    function handleDisplayObjectTick(evt) {
+	 * 	    	console.log(evt.params[0]); // the original tick evtObj
+	 * 	    	console.log(evt.delta, evt.paused); // ex. "17 false"
+	 * 	    	console.log(evt.params[1], evt.params[2]); // "hello 2014"
+	 * 	    }
+	 */
+	override function tick(?params:Dynamic) : Void;
 	/**
 	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
 	 */
@@ -147,6 +172,7 @@ extern class Stage extends Container
 	 * independently of mouse move events via the optional `frequency` parameter.
 	 * 
 	 * <h4>Example</h4>
+	 * 
 	 *      var stage = new createjs.Stage("canvasId");
 	 *      stage.enableMouseOver(10); // 10 updates per second
 	 */
@@ -201,8 +227,8 @@ extern class Stage extends Container
 	 */
 	inline function addMouseenterEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("mouseenter", handler);
 	/**
-	 * Dispatched each update immediately before the tick event is propagated through the display list. Does not fire if
-	 * tickOnUpdate is false.
+	 * Dispatched each update immediately before the tick event is propagated through the display list.
+	 * You can call preventDefault on the event object to cancel propagating the tick event.
 	 */
 	inline function addTickstartEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("tickstart", handler);
 	/**
@@ -212,6 +238,7 @@ extern class Stage extends Container
 	inline function addTickendEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("tickend", handler);
 	/**
 	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
+	 * You can call preventDefault on the event object to cancel the draw.
 	 */
 	inline function addDrawstartEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("drawstart", handler);
 	/**

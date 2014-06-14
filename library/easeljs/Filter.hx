@@ -6,6 +6,7 @@ package easeljs;
  * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
  * 
  * <h4>Example</h4>
+ * 
  *      myInstance.filters = [
  *          new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
  *          new createjs.BlurFilter(5, 5, 10)

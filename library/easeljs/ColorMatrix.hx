@@ -6,6 +6,7 @@ package easeljs;
  * chained calls.
  * 
  * <h4>Example</h4>
+ * 
  *      myColorMatrix.adjustHue(20).adjustBrightness(50);
  * 
  * See {{#crossLink "Filter"}}{{/crossLink}} for an example of how to apply filters, or {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}

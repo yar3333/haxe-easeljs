@@ -10,6 +10,7 @@ package easeljs;
  *     - all children (with the exception of DOMElement) MUST use the same spriteSheet.
  * 
  * <h4>Example</h4>
+ * 
  *      var data = {
  *          images: ["sprites.jpg"],
  *          frames: {width:50, height:50},

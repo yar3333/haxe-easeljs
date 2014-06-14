@@ -124,11 +124,6 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 */
 	var snapToPixel : Bool;
 	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}}
-	 * event.
-	 */
-	var onTick : Dynamic;
-	/**
 	 * An array of Filter objects to apply to this display object. Filters are only applied / updated when {{#crossLink "cache"}}{{/crossLink}}
 	 * or {{#crossLink "updateCache"}}{{/crossLink}} is called on the display object, and only apply to the area that is
 	 * cached.
@@ -295,11 +290,10 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * be used to transform positions between coordinate spaces, such as with {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
 	 * and {{#crossLink "DisplayObject/globalToLocal"}}{{/crossLink}}.
 	 */
-	function getConcatenatedMatrix(?mtx:Matrix2D) : Matrix2D;
+	function getConcatenatedMatrix(?matrix:Matrix2D) : Matrix2D;
 	/**
-	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at
-	 * the specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
-	 * transform properties including regX/Y.
+	 * Tests whether the display object intersects the specified point in local coordinates (ie. draws a pixel with alpha > 0 at
+	 * the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation of the display object.
 	 * 
 	 * <h4>Example</h4>
 	 * 
@@ -312,7 +306,7 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 */
 	function hitTest(x:Float, y:Float) : Bool;
 	/**
-	 * Provides a chainable shortcut method for setting a number of properties on a DisplayObject instance.
+	 * Provides a chainable shortcut method for setting a number of properties on the instance.
 	 * 
 	 * <h4>Example</h4>
 	 * 
