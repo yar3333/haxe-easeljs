@@ -154,7 +154,7 @@ extern class Stage extends Container
 	 * 	    	console.log(evt.params[1], evt.params[2]); // "hello 2014"
 	 * 	    }
 	 */
-	override function tick(?params:Dynamic) : Void;
+	function tick(?params:Dynamic) : Void;
 	/**
 	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
 	 */
