@@ -9,5 +9,5 @@ extern class MovieClipPlugin
 {
 	function new() : Void;
 
-	function tween(tween:Tween, prop:String, value:Dynamic, startValues:Array<Dynamic>, endValues:Array<Dynamic>, ratio:Float, wait:Dynamic, end:Dynamic) : Dynamic;
+	function tween(tween:tweenjs.Tween, prop:String, value:Dynamic, startValues:Array<Dynamic>, endValues:Array<Dynamic>, ratio:Float, wait:Dynamic, end:Dynamic) : Dynamic;
 }

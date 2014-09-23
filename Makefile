@@ -11,6 +11,8 @@ OPTIONS+= --type-map HTMLCanvasElement-js.html.CanvasElement
 OPTIONS+= --type-map CanvasRenderingContext2D-js.html.CanvasRenderingContext2D
 OPTIONS+= --type-map Image-Dynamic
 OPTIONS+= --type-map HtmlMouseEvent-js.html.MouseEvent
+OPTIONS+= --type-map Timeline-tweenjs.Timeline
+OPTIONS+= --type-map Tween-tweenjs.Tween
 
 convert:
 	yuidoc -p -o out native/src
