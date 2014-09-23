@@ -93,7 +93,7 @@ extern class MovieClip extends Container
 	 *          .wait(1).to({_off:true})
 	 *          .wait(1).to({_off:false});
 	 */
-	var timeline : Timeline;
+	var timeline : tweenjs.Timeline;
 	/**
 	 * If true, the MovieClip's position will not advance when ticked.
 	 */
