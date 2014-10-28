@@ -1,5 +1,5 @@
 /function addEventListener/static $0/
-/function addTickEventListener/static function addTickEventListener/
+/function addTickEventListener/static $0/
 /function dispatchEvent/static $0/
 /function hasEventListener/static $0/
 /function off/static $0/
