@@ -1,9 +1,0 @@
-/function addEventListener/static $0/
-/function addTickEventListener/static $0/
-/function dispatchEvent/static $0/
-/function hasEventListener/static $0/
-/function off/static $0/
-/function on/static $0/
-/function removeAllEventListeners/static $0/
-/function removeEventListener/static $0/
-/function willTrigger/static $0/

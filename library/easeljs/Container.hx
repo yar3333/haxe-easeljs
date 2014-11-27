@@ -157,11 +157,11 @@ extern class Container extends DisplayObject
 	 * 
 	 *      var index = container.getChildIndex(child);
 	 */
-	function getChildIndex(child:DisplayObject) : Float;
+	function getChildIndex(child:DisplayObject) : Int;
 	/**
 	 * Returns the number of children in the display list.
 	 */
-	function getNumChildren() : Float;
+	function getNumChildren() : Int;
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
 	 */
