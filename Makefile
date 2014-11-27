@@ -17,4 +17,4 @@ OPTIONS+= --type-map Tween-tweenjs.Tween
 convert:
 	yuidoc -p -o out native/src
 	haxelib run yuidoc2haxe $(OPTIONS) library
-	haxelib run refactor processFile library/easeljs/Ticker.hx postprocessTicker.rules
+	haxelib run refactor process library *.hx postprocess.rules
