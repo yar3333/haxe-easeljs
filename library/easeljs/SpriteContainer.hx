@@ -68,7 +68,7 @@ extern class SpriteContainer extends Container
 	 * 
 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 */
-	override function addChildAt(child:DisplayObject, index:Float) : DisplayObject;
+	override function addChildAt(child:DisplayObject, index:Int) : DisplayObject;
 	/**
 	 * Returns a string representation of this object.
 	 */

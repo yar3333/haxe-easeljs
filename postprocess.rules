@@ -11,5 +11,8 @@ TICKER_STATIC_METHODS = TICKER_STATIC_METHODS|willTrigger
 METHODS_RETURN_INT =                    getChildIndex
 METHODS_RETURN_INT = METHODS_RETURN_INT|getNumChildren
 
+VARS_INT = index
+
 /(extern\s+class\s+Ticker.*)(function\s+(?:TICKER_STATIC_METHODS))/$1static $2/m
 /(function\s+(?:METHODS_RETURN_INT)\s*[(][^)]*[)]\s*:\s*)Float/$1Int/
+/\b(VARS_INT\s*:\s*)Float\b/$1Int/
