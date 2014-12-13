@@ -87,7 +87,7 @@ extern class Container extends DisplayObject
 	 * 
 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 */
-	function addChildAt(child:DisplayObject, index:Float) : DisplayObject;
+	function addChildAt(child:DisplayObject, index:Int) : DisplayObject;
 	/**
 	 * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is
 	 * already known.
@@ -116,7 +116,7 @@ extern class Container extends DisplayObject
 	 * 
 	 * Returns true if the child (or children) was removed, or false if any index was out of range.
 	 */
-	function removeChildAt(index:Float) : Bool;
+	function removeChildAt(index:Int) : Bool;
 	/**
 	 * Removes all children from the display list.
 	 * 
@@ -132,7 +132,7 @@ extern class Container extends DisplayObject
 	 * 
 	 *      container.getChildAt(2);
 	 */
-	function getChildAt(index:Float) : DisplayObject;
+	function getChildAt(index:Int) : DisplayObject;
 	/**
 	 * Returns the child with the specified name.
 	 */
@@ -174,7 +174,7 @@ extern class Container extends DisplayObject
 	/**
 	 * Changes the depth of the specified child. Fails silently if the child is not a child of this container, or the index is out of range.
 	 */
-	function setChildIndex(child:DisplayObject, index:Float) : Void;
+	function setChildIndex(child:DisplayObject, index:Int) : Void;
 	/**
 	 * Returns true if the specified display object either is this container or is a descendent (child, grandchild, etc)
 	 * of this container.

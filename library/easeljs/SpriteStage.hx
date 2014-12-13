@@ -101,7 +101,7 @@ extern class SpriteStage extends Stage
 	 * 
 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 */
-	override function addChildAt(child:DisplayObject, index:Float) : DisplayObject;
+	override function addChildAt(child:DisplayObject, index:Int) : DisplayObject;
 	/**
 	 * Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
 	 * and then render the display list to the canvas using WebGL. If WebGL is not supported in the browser, it will default to a 2D context.

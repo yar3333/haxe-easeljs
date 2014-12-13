@@ -211,6 +211,7 @@ extern class Stage extends Container
 	inline function addStagemousedownEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("stagemousedown", handler);
 	/**
 	 * Dispatched when the user the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+	 * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addStagemouseupEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("stagemouseup", handler);
