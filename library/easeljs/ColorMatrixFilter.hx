@@ -23,10 +23,10 @@ package easeljs;
 @:native("createjs.ColorMatrixFilter")
 extern class ColorMatrixFilter extends Filter
 {
-	function new(matrix:Array<Dynamic>) : Void;
-
 	/**
-	 * Returns a clone of this ColorMatrixFilter instance.
+	 * A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
 	 */
-	override function clone() : Filter;
+	var matrix : Dynamic;
+
+	function new(matrix:Dynamic) : Void;
 }

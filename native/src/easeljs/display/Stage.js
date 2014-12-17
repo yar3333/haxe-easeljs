@@ -36,37 +36,202 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
- * method is called, it will render its display list to its target canvas.
- *
- * <h4>Example</h4>
- * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
- * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
- *
- *      var stage = new createjs.Stage("canvasElementId");
- *      var image = new createjs.Bitmap("imagePath.png");
- *      stage.addChild(image);
- *      createjs.Ticker.addEventListener("tick", handleTick);
- *      function handleTick(event) {
- *          image.x += 10;
- *          stage.update();
- *      }
- *
- * @class Stage
- * @extends Container
- * @constructor
- * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
- * of a canvas object in the current document.
- **/
-var Stage = function(canvas) {
-  this.initialize(canvas);
-};
-var p = Stage.prototype = new createjs.Container();
-Stage.prototype.constructor = Stage;
+
+// constructor:
+	/**
+	 * A stage is the root level {{#crossLink "Container"}}{{/crossLink}} for a display list. Each time its {{#crossLink "Stage/tick"}}{{/crossLink}}
+	 * method is called, it will render its display list to its target canvas.
+	 *
+	 * <h4>Example</h4>
+	 * This example creates a stage, adds a child to it, then uses {{#crossLink "Ticker"}}{{/crossLink}} to update the child
+	 * and redraw the stage using {{#crossLink "Stage/update"}}{{/crossLink}}.
+	 *
+	 *      var stage = new createjs.Stage("canvasElementId");
+	 *      var image = new createjs.Bitmap("imagePath.png");
+	 *      stage.addChild(image);
+	 *      createjs.Ticker.addEventListener("tick", handleTick);
+	 *      function handleTick(event) {
+	 *          image.x += 10;
+	 *          stage.update();
+	 *      }
+	 *
+	 * @class Stage
+	 * @extends Container
+	 * @constructor
+	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object that the Stage will render to, or the string id
+	 * of a canvas object in the current document.
+	 **/
+	function Stage(canvas) {
+		this.Container_constructor();
+	
+	
+	// public properties:
+		/**
+		 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to <code>false</code>
+		 * to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for
+		 * example).
+		 *
+		 * <h4>Example</h4>
+		 *
+		 *      var stage = new createjs.Stage("canvasId");
+		 *      stage.autoClear = false;
+		 *
+		 * @property autoClear
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.autoClear = true;
+	
+		/**
+		 * The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the
+		 * first stage that will be ticked (or they will clear each other's render).
+		 *
+		 * When changing the canvas property you must disable the events on the old canvas, and enable events on the
+		 * new canvas or mouse events will not work as expected. For example:
+		 *
+		 *      myStage.enableDOMEvents(false);
+		 *      myStage.canvas = anotherCanvas;
+		 *      myStage.enableDOMEvents(true);
+		 *
+		 * @property canvas
+		 * @type HTMLCanvasElement | Object
+		 **/
+		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
+	
+		/**
+		 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+		 * position over the canvas, and mouseInBounds will be set to false.
+		 * @property mouseX
+		 * @type Number
+		 * @readonly
+		 **/
+		this.mouseX = 0;
+	
+		/**
+		 * The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
+		 * position over the canvas, and mouseInBounds will be set to false.
+		 * @property mouseY
+		 * @type Number
+		 * @readonly
+		 **/
+		this.mouseY = 0;
+	
+		/**
+		 * Specifies the area of the stage to affect when calling update. This can be use to selectively
+		 * re-draw specific regions of the canvas. If null, the whole canvas area is drawn.
+		 * @property drawRect
+		 * @type {Rectangle}
+		 */
+		this.drawRect = null;
+	
+		/**
+		 * Indicates whether display objects should be rendered on whole pixels. You can set the
+		 * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
+		 * display objects to false to enable/disable this behaviour on a per instance basis.
+		 * @property snapToPixelEnabled
+		 * @type Boolean
+		 * @default false
+		 **/
+		this.snapToPixelEnabled = false;
+	
+		/**
+		 * Indicates whether the mouse is currently within the bounds of the canvas.
+		 * @property mouseInBounds
+		 * @type Boolean
+		 * @default false
+		 **/
+		this.mouseInBounds = false;
+	
+		/**
+		 * If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
+		 * @property tickOnUpdate
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.tickOnUpdate = true;
+	
+		/**
+		 * If true, mouse move events will continue to be called when the mouse leaves the target canvas. See
+		 * {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}}, and {{#crossLink "MouseEvent"}}{{/crossLink}}
+		 * x/y/rawX/rawY.
+		 * @property mouseMoveOutside
+		 * @type Boolean
+		 * @default false
+		 **/
+		this.mouseMoveOutside = false;
+		
+		
+		/**
+		 * Prevents selection of other elements in the html page if the user clicks and drags, or double clicks on the canvas.
+		 * This works by calling `preventDefault()` on any mousedown events (or touch equivalent) originating on the canvas.
+		 * @property preventSelection
+		 * @type Boolean
+		 * @default true
+		 **/
+		this.preventSelection = true;
+	
+		/**
+		 * The hitArea property is not supported for Stage.
+		 * @property hitArea
+		 * @type {DisplayObject}
+		 * @default null
+		 */
+		 
+		 
+	// private properties:
+		/**
+		 * Holds objects with data for each active pointer id. Each object has the following properties:
+		 * x, y, event, target, overTarget, overX, overY, inBounds, posEvtObj (native event that last updated position)
+		 * @property _pointerData
+		 * @type {Object}
+		 * @private
+		 */
+		this._pointerData = {};
+	
+		/**
+		 * Number of active pointers.
+		 * @property _pointerCount
+		 * @type {Object}
+		 * @private
+		 */
+		this._pointerCount = 0;
+	
+		/**
+		 * The ID of the primary pointer.
+		 * @property _primaryPointerID
+		 * @type {Object}
+		 * @private
+		 */
+		this._primaryPointerID = null;
+	
+		/**
+		 * @property _mouseOverIntervalID
+		 * @protected
+		 * @type Number
+		 **/
+		this._mouseOverIntervalID = null;
+		
+		/**
+		 * @property _nextStage
+		 * @protected
+		 * @type Stage
+		 **/
+		this._nextStage = null;
+		
+		/**
+		 * @property _prevStage
+		 * @protected
+		 * @type Stage
+		 **/
+		this._prevStage = null;
+		
+		
+	// initialize:
+		this.enableDOMEvents(true);
+	}
+	var p = createjs.extend(Stage, createjs.Container);
 
 // events:
-
 	/**
 	 * Dispatched when the user moves the mouse over the canvas.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
@@ -82,7 +247,7 @@ Stage.prototype.constructor = Stage;
 	 */
 
 	/**
-	 * Dispatched when the user the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+	 * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
 	 * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 * @event stagemouseup
@@ -132,130 +297,6 @@ Stage.prototype.constructor = Stage;
 	 * @since 0.7.0
 	 */
 
-// public properties:
-	/**
-	 * Indicates whether the stage should automatically clear the canvas before each render. You can set this to <code>false</code>
-	 * to manually control clearing (for generative art, or when pointing multiple stages at the same canvas for
-	 * example).
-	 *
-	 * <h4>Example</h4>
-	 *
-	 *      var stage = new createjs.Stage("canvasId");
-	 *      stage.autoClear = false;
-	 *
-	 * @property autoClear
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.autoClear = true;
-
-	/**
-	 * The canvas the stage will render to. Multiple stages can share a single canvas, but you must disable autoClear for all but the
-	 * first stage that will be ticked (or they will clear each other's render).
-	 *
-	 * When changing the canvas property you must disable the events on the old canvas, and enable events on the
-	 * new canvas or mouse events will not work as expected. For example:
-	 *
-	 *      myStage.enableDOMEvents(false);
-	 *      myStage.canvas = anotherCanvas;
-	 *      myStage.enableDOMEvents(true);
-	 *
-	 * @property canvas
-	 * @type HTMLCanvasElement | Object
-	 **/
-	p.canvas = null;
-
-	/**
-	 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
-	 * position over the canvas, and mouseInBounds will be set to false.
-	 * @property mouseX
-	 * @type Number
-	 * @readonly
-	 **/
-	p.mouseX = 0;
-
-	/**
-	 * The current mouse Y position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
-	 * position over the canvas, and mouseInBounds will be set to false.
-	 * @property mouseY
-	 * @type Number
-	 * @readonly
-	 **/
-	p.mouseY = 0;
-
-	/**
-	 * Specifies the area of the stage to affect when calling update. This can be use to selectively
-	 * re-render only active regions of the canvas. If null, the whole canvas area is affected.
-	 * @property drawRect
-	 * @type {Rectangle}
-	 */
-	p.drawRect = null;
-
-	// TODO: deprecated.
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the "{{#crossLink "Stage/stagemousemove:event"}}{{/crossLink}}
-	 * event.
-	 * @property onMouseMove
-	 * @type Function
-	 * @deprecated Use addEventListener and the "stagemousemove" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "Stage/stagemouseup:event"}}{{/crossLink}}
-	 * event.
-	 * @property onMouseUp
-	 * @type Function
-	 * @deprecated Use addEventListener and the "stagemouseup" event.
-	 */
-	/**
-	 * REMOVED. Use {{#crossLink "EventDispatcher/addEventListener"}}{{/crossLink}} and the {{#crossLink "Stage/stagemousedown:event"}}{{/crossLink}}
-	 * event.
-	 * @property onMouseDown
-	 * @type Function
-	 * @deprecated Use addEventListener and the "stagemousedown" event.
-	 */
-
-	/**
-	 * Indicates whether display objects should be rendered on whole pixels. You can set the
-	 * {{#crossLink "DisplayObject/snapToPixel"}}{{/crossLink}} property of
-	 * display objects to false to enable/disable this behaviour on a per instance basis.
-	 * @property snapToPixelEnabled
-	 * @type Boolean
-	 * @default false
-	 **/
-	p.snapToPixelEnabled = false;
-
-	/**
-	 * Indicates whether the mouse is currently within the bounds of the canvas.
-	 * @property mouseInBounds
-	 * @type Boolean
-	 * @default false
-	 **/
-	p.mouseInBounds = false;
-
-	/**
-	 * If true, tick callbacks will be called on all display objects on the stage prior to rendering to the canvas.
-	 * @property tickOnUpdate
-	 * @type Boolean
-	 * @default true
-	 **/
-	p.tickOnUpdate = true;
-
-	/**
-	 * If true, mouse move events will continue to be called when the mouse leaves the target canvas. See
-	 * {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}}, and {{#crossLink "MouseEvent"}}{{/crossLink}}
-	 * x/y/rawX/rawY.
-	 * @property mouseMoveOutside
-	 * @type Boolean
-	 * @default false
-	 **/
-	p.mouseMoveOutside = false;
-
-	/**
-	 * The hitArea property is not supported for Stage.
-	 * @property hitArea
-	 * @type {DisplayObject}
-	 * @default null
-	 */
 	 
 // getter / setters:
 	/**
@@ -303,90 +344,19 @@ Stage.prototype.constructor = Stage;
 		});
 	} catch (e) {} // TODO: use Log
 
-// private properties:
-
-	/**
-	 * Holds objects with data for each active pointer id. Each object has the following properties:
-	 * x, y, event, target, overTarget, overX, overY, inBounds, posEvtObj (native event that last updated position)
-	 * @property _pointerData
-	 * @type {Object}
-	 * @private
-	 */
-	p._pointerData = null;
-
-	/**
-	 * Number of active pointers.
-	 * @property _pointerCount
-	 * @type {Object}
-	 * @private
-	 */
-	p._pointerCount = 0;
-
-	/**
-	 * The ID of the primary pointer.
-	 * @property _primaryPointerID
-	 * @type {Object}
-	 * @private
-	 */
-	p._primaryPointerID = null;
-
-	/**
-	 * @property _mouseOverIntervalID
-	 * @protected
-	 * @type Number
-	 **/
-	p._mouseOverIntervalID = null;
-	
-	/**
-	 * @property _nextStage
-	 * @protected
-	 * @type Stage
-	 **/
-	p._nextStage = null;
-	
-	/**
-	 * @property _prevStage
-	 * @protected
-	 * @type Stage
-	 **/
-	p._prevStage = null;
-
-// constructor:
-	/**
-	 * @property DisplayObject_initialize
-	 * @type Function
-	 * @private
-	 **/
-	p.Container_initialize = p.initialize;
-
-	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @param {HTMLCanvasElement | String | Object} canvas A canvas object, or the string id of a canvas object in the current document.
-	 * @protected
-	 **/
-	p.initialize = function(canvas) {
-		this.Container_initialize();
-		this.canvas = (typeof canvas == "string") ? document.getElementById(canvas) : canvas;
-		this._pointerData = {};
-		this.enableDOMEvents(true);
-	};
 
 // public methods:
-
 	/**
 	 * Each time the update method is called, the stage will call {{#crossLink "Stage/tick"}}{{/crossLink}}
 	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
 	 * and then render the display list to the canvas.
 	 *
 	 * @method update
-	 * @param {*} [params]* Params to pass to .tick() if .tickOnUpdate is true.
+	 * @param {Object} [props] Props object to pass to `tick()`. Should usually be a {{#crossLink "Ticker"}}{{/crossLink}} event object, or similar object with a delta property.
 	 **/
-	p.update = function(params) {
+	p.update = function(props) {
 		if (!this.canvas) { return; }
-		if (this.tickOnUpdate) { // update this logic in SpriteStage when necessary
-			this.tick.apply(this, arguments);
-		}
+		if (this.tickOnUpdate) { this.tick(props); }
 		if (this.dispatchEvent("drawstart")) { return; }
 		createjs.DisplayObject._snapToPixelEnabled = this.snapToPixelEnabled;
 		var r = this.drawRect, ctx = this.canvas.getContext("2d");
@@ -411,40 +381,41 @@ Stage.prototype.constructor = Stage;
 	 * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
 	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
 	 *
-	 * Any parameters passed to `tick()` will be included as an array in the "param" property of the event object dispatched
-	 * to {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers. Additionally, if the first parameter
-	 * is a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or has equivalent properties), then the delta,
-	 * time, runTime, and paused properties will be copied to the event object.
+	 * If a props object is passed to `tick()`, then all of its properties will be copied to the event object that is
+	 * propagated to listeners.
 	 *
 	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent) be passed as the first parameter
-	 * to tick(). For example:
+	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent object with a delta property) be
+	 * passed as the `props` parameter to `tick()`. For example:
 	 *
-	 * 	    Ticker.on("tick", handleTick);
-	 * 	    function handleTick(evtObj) {
-	 * 	    	// do some work here, then update the stage, passing through the tick event object as the first param
-	 * 	    	// and some custom data as the second and third param:
-	 * 	    	myStage.update(evtObj, "hello", 2014);
-	 * 	    }
-	 * 	    
-	 * 	    // ...
-	 * 	    myDisplayObject.on("tick", handleDisplayObjectTick);
-	 * 	    function handleDisplayObjectTick(evt) {
-	 * 	    	console.log(evt.params[0]); // the original tick evtObj
-	 * 	    	console.log(evt.delta, evt.paused); // ex. "17 false"
-	 * 	    	console.log(evt.params[1], evt.params[2]); // "hello 2014"
-	 * 	    }
+	 * 	Ticker.on("tick", handleTick);
+	 * 	function handleTick(evtObj) {
+	 * 		// clone the event object from Ticker, and add some custom data to it:
+	 * 		var evt = evtObj.clone().set({greeting:"hello", name:"world"});
+	 * 		
+	 * 		// pass it to stage.update():
+	 * 		myStage.update(evt); // subsequently calls tick() with the same param
+	 * 	}
+	 * 	
+	 * 	// ...
+	 * 	myDisplayObject.on("tick", handleDisplayObjectTick);
+	 * 	function handleDisplayObjectTick(evt) {
+	 * 		console.log(evt.delta); // the delta property from the Ticker tick event object
+	 * 		console.log(evt.greeting, evt.name); // custom data: "hello world"
+	 * 	}
 	 * 
 	 * @method tick
-	 * @param {*} [params]* Params to include when ticking descendants. The first param should usually be a tick event.
+	 * @param {Object} [props] An object with properties that should be copied to the event object. Should usually be a Ticker event object, or similar object with a delta property.
 	 **/
-	p.tick = function(params) {
+	p.tick = function(props) {
 		if (!this.tickEnabled || this.dispatchEvent("tickstart")) { return; }
-		var args = arguments.length ? Array.prototype.slice.call(arguments,0) : null;
-		var evt = args&&args[0];
-		var props = evt&&(evt.delta != null) ? {delta:evt.delta, paused:evt.paused, time:evt.time, runTime:evt.runTime } : {};
-		props.params = args;
-		this._tick(props);
+		var evtObj = new createjs.Event("tick");
+		if (props) {
+			for (var n in props) {
+				if (props.hasOwnProperty(n)) { evtObj[n] = props[n]; }
+			}
+		}
+		this._tick(evtObj);
 		this.dispatchEvent("tickend");
 	};
 
@@ -479,52 +450,28 @@ Stage.prototype.constructor = Stage;
 	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
 	 * be specified as the src value of an image element.
 	 * @method toDataURL
-	 * @param {String} backgroundColor The background color to be used for the generated image. The value can be any value HTML color
-	 * value, including HEX colors, rgb and rgba. The default value is a transparent background.
-	 * @param {String} mimeType The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
+	 * @param {String} [backgroundColor] The background color to be used for the generated image. Any valid CSS color
+	 * value is allowed. The default value is a transparent background.
+	 * @param {String} [mimeType="image/png"] The MIME type of the image format to be create. The default is "image/png". If an unknown MIME type
 	 * is passed in, or if the browser does not support the specified MIME type, the default value will be used.
 	 * @return {String} a Base64 encoded image.
 	 **/
 	p.toDataURL = function(backgroundColor, mimeType) {
-		if(!mimeType) {
-			mimeType = "image/png";
-		}
+		var data, ctx = this.canvas.getContext('2d'), w = this.canvas.width, h = this.canvas.height;
 
-		var ctx = this.canvas.getContext('2d');
-		var w = this.canvas.width;
-		var h = this.canvas.height;
-
-		var data;
-
-		if(backgroundColor) {
-
-			//get the current ImageData for the canvas.
+		if (backgroundColor) {
 			data = ctx.getImageData(0, 0, w, h);
-
-			//store the current globalCompositeOperation
 			var compositeOperation = ctx.globalCompositeOperation;
-
-			//set to draw behind current content
 			ctx.globalCompositeOperation = "destination-over";
-
-			//set background color
+			
 			ctx.fillStyle = backgroundColor;
-
-			//draw background on entire canvas
 			ctx.fillRect(0, 0, w, h);
 		}
 
-		//get the image data from the canvas
-		var dataURL = this.canvas.toDataURL(mimeType);
+		var dataURL = this.canvas.toDataURL(mimeType||"image/png");
 
 		if(backgroundColor) {
-			//clear the canvas
-			ctx.clearRect (0, 0, w+1, h+1);
-
-			//restore it with original settings
 			ctx.putImageData(data, 0, 0);
-
-			//reset the globalCompositeOperation to what it was
 			ctx.globalCompositeOperation = compositeOperation;
 		}
 
@@ -603,14 +550,11 @@ Stage.prototype.constructor = Stage;
 	};
 
 	/**
-	 * Returns a clone of this Stage.
+	 * Stage instances cannot be cloned.
 	 * @method clone
-	 * @return {Stage} A clone of the current Container instance.
 	 **/
 	p.clone = function() {
-		var o = new Stage(null);
-		this.cloneProps(o);
-		return o;
+		throw("Stage cannot be cloned.");
 	};
 
 	/**
@@ -622,8 +566,8 @@ Stage.prototype.constructor = Stage;
 		return "[Stage (name="+  this.name +")]";
 	};
 
-	// private methods:
 
+// private methods:
 	/**
 	 * @method _getElementRect
 	 * @protected
@@ -659,13 +603,7 @@ Stage.prototype.constructor = Stage;
 	 **/
 	p._getPointerData = function(id) {
 		var data = this._pointerData[id];
-		if (!data) {
-			data = this._pointerData[id] = {x:0,y:0};
-			// if it's the first new touch, then make it the primary pointer id:
-			if (this._primaryPointerID == null) { this._primaryPointerID = id; }
-			// if it's the mouse (id == -1) or the first new touch, then make it the primary pointer id:
-		    if (this._primaryPointerID == null || this._primaryPointerID == -1) { this._primaryPointerID = id; }
-		}
+		if (!data) { data = this._pointerData[id] = {x:0,y:0}; }
 		return data;
 	};
 
@@ -696,7 +634,7 @@ Stage.prototype.constructor = Stage;
 		var inBounds = o.inBounds;
 		this._updatePointerPosition(id, e, pageX, pageY);
 		if (inBounds || o.inBounds || this.mouseMoveOutside) {
-			if (id == -1 && o.inBounds == !inBounds) {
+			if (id === -1 && o.inBounds == !inBounds) {
 				this._dispatchMouseEvent(this, (inBounds ? "mouseleave" : "mouseenter"), false, id, o, e);
 			}
 			
@@ -737,7 +675,7 @@ Stage.prototype.constructor = Stage;
 		o.rawX = pageX;
 		o.rawY = pageY;
 
-		if (id == this._primaryPointerID) {
+		if (id === this._primaryPointerID || id === -1) {
 			this.mouseX = o.x;
 			this.mouseY = o.y;
 			this.mouseInBounds = o.inBounds;
@@ -765,7 +703,8 @@ Stage.prototype.constructor = Stage;
 		var nextStage = this._nextStage, o = this._getPointerData(id);
 		if (this._prevStage && owner === undefined) { return; } // redundant listener.
 		
-		this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e);
+		if (o.down) { this._dispatchMouseEvent(this, "stagemouseup", false, id, o, e); }
+		o.down = false;
 		
 		var target=null, oTarget = o.target;
 		if (!owner && (oTarget || nextStage)) { target = this._getObjectsUnderPoint(o.x, o.y, null, true); }
@@ -799,11 +738,13 @@ Stage.prototype.constructor = Stage;
 	 * @param {Stage} owner Indicates that the event has already been captured & handled by the indicated stage.
 	 **/
 	p._handlePointerDown = function(id, e, pageX, pageY, owner) {
+		if (this.preventSelection) { e.preventDefault(); }
+		if (this._primaryPointerID == null || id === -1) { this._primaryPointerID = id; } // mouse always takes over.
+		
 		if (pageY != null) { this._updatePointerPosition(id, e, pageX, pageY); }
 		var target = null, nextStage = this._nextStage, o = this._getPointerData(id);
 
-		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e); }
-		
+		if (o.inBounds) { this._dispatchMouseEvent(this, "stagemousedown", false, id, o, e); o.down = true; }
 		
 		if (!owner) {
 			target = o.target = this._getObjectsUnderPoint(o.x, o.y, null, true);
@@ -829,11 +770,11 @@ Stage.prototype.constructor = Stage;
 			nextStage&&nextStage._testMouseOver(clear, owner, eventTarget);
 			return;
 		}
-		
+		var o = this._getPointerData(-1);
 		// only update if the mouse position has changed. This provides a lot of optimization, but has some trade-offs.
-		if (this._primaryPointerID != -1 || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
+		if (!o || (!clear && this.mouseX == this._mouseOverX && this.mouseY == this._mouseOverY && this.mouseInBounds)) { return; }
 		
-		var o = this._getPointerData(-1), e = o.posEvtObj;
+		var e = o.posEvtObj;
 		var isEventTarget = eventTarget || e&&(e.target == this.canvas);
 		var target=null, common = -1, cursor="", t, i, l;
 		
@@ -911,14 +852,15 @@ Stage.prototype.constructor = Stage;
 		// TODO: might be worth either reusing MouseEvent instances, or adding a willTrigger method to avoid GC.
 		if (!target || (!bubbles && !target.hasEventListener(type))) { return; }
 		/*
-		// TODO: account for stage transformations:
+		// TODO: account for stage transformations?
 		this._mtx = this.getConcatenatedMatrix(this._mtx).invert();
 		var pt = this._mtx.transformPoint(o.x, o.y);
-		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent(type, bubbles, false, pt.x, pt.y, nativeEvent, pointerId, pointerId==this._primaryPointerID || pointerId==-1, o.rawX, o.rawY);
 		*/
-		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId==this._primaryPointerID, o.rawX, o.rawY);
+		var evt = new createjs.MouseEvent(type, bubbles, false, o.x, o.y, nativeEvent, pointerId, pointerId === this._primaryPointerID || pointerId === -1, o.rawX, o.rawY);
 		target.dispatchEvent(evt);
 	};
 
-createjs.Stage = Stage;
+
+	createjs.Stage = createjs.promote(Stage, "Container");
 }());

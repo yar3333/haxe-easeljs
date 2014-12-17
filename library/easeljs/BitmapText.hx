@@ -3,18 +3,15 @@ package easeljs;
 /**
  * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
  * using new line characters, but automatic wrapping is not supported. See the 
- * {{#crossLink "BitmapText/spriteSheet:attribute"}}{{/crossLink}}
+ * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
  * property for more information on defining glyphs.
+ * 
+ * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+ * As such, methods like addChild and removeChild are disabled.
  */
 @:native("createjs.BitmapText")
 extern class BitmapText extends DisplayObject
 {
-	/**
-	 * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
-	 * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
-	 * retained, slightly increasing memory use, but reducing instantiation.
-	 */
-	static var maxPoolSize : Float;
 	/**
 	 * The text to display.
 	 */
@@ -56,6 +53,12 @@ extern class BitmapText extends DisplayObject
 	 * sprite sheet.
 	 */
 	var spaceWidth : Float;
+	/**
+	 * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
+	 * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
+	 * retained, slightly increasing memory use, but reducing instantiation.
+	 */
+	static var maxPoolSize : Float;
 
 	function new(?text:String, ?spriteSheet:easeljs.SpriteSheet) : Void;
 
@@ -65,4 +68,24 @@ extern class BitmapText extends DisplayObject
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	override function isVisible() : Bool;
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 */
+	function addChild() : Void;
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 */
+	function addChildAt() : Void;
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 */
+	function removeChild() : Void;
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 */
+	function removeChildAt() : Void;
+	/**
+	 * <strong>Disabled in BitmapText.</strong>
+	 */
+	function removeAllChildren() : Void;
 }

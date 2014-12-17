@@ -12,10 +12,6 @@ package easeljs;
 extern class Shadow
 {
 	/**
-	 * An identity shadow object (all properties are set to 0).
-	 */
-	static var identity : Shadow;
-	/**
 	 * property color
 	 */
 	var color : String;
@@ -31,6 +27,10 @@ extern class Shadow
 	 * property blur
 	 */
 	var blur : Float;
+	/**
+	 * An identity shadow object (all properties are set to 0).
+	 */
+	static var identity : Shadow;
 
 	function new(color:String, offsetX:Float, offsetY:Float, blur:Float) : Void;
 

@@ -1,19 +1,19 @@
 package easeljs;
 
 /**
- * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
+ * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
+ * 
+ * This matrix can be visualized as:
+ * 
+ * 	[ a  c  tx
+ * 	  b  d  ty
+ * 	  0  0  1  ]
+ * 
+ * Note the locations of b and c.
  */
 @:native("createjs.Matrix2D")
 extern class Matrix2D
 {
-	/**
-	 * An identity matrix, representing a null transformation.
-	 */
-	static var identity : Matrix2D;
-	/**
-	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
-	 */
-	static var DEG_TO_RAD : Float;
 	/**
 	 * Position (0, 0) in a 3x3 affine transformation matrix.
 	 */
@@ -39,60 +39,74 @@ extern class Matrix2D
 	 */
 	var ty : Float;
 	/**
-	 * Property representing the alpha that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values.
+	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
 	 */
-	var alpha : Float;
+	static var DEG_TO_RAD : Float;
 	/**
-	 * Property representing the shadow that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values.
+	 * An identity matrix, representing a null transformation.
 	 */
-	var shadow : Shadow;
-	/**
-	 * Property representing the compositeOperation that will be applied to a display object. This is not part of
-	 * matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated
-	 * compositeOperation values. You can find a list of valid composite operations at:
-	 * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
-	 */
-	var compositeOperation : String;
-	/**
-	 * Property representing the value for visible that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
-	 */
-	var visible : Bool;
+	static var identity : Matrix2D;
 
 	function new(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float) : Void;
 
 	/**
-	 * Concatenates the specified matrix properties with this matrix. All parameters are required.
+	 * Sets the specified values on this instance.
 	 */
-	function prepend(a:Float, b:Float, c:Float, d:Float, tx:Float, ty:Float) : Matrix2D;
+	function setValues(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float) : Matrix2D;
 	/**
-	 * Appends the specified matrix properties with this matrix. All parameters are required.
+	 * Appends the specified matrix properties to this matrix. All parameters are required.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
 	 */
 	function append(a:Float, b:Float, c:Float, d:Float, tx:Float, ty:Float) : Matrix2D;
 	/**
-	 * Prepends the specified matrix with this matrix.
+	 * Prepends the specified matrix properties to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
+	 * All parameters are required.
 	 */
-	function prependMatrix(matrix:Matrix2D) : Matrix2D;
+	function prepend(a:Float, b:Float, c:Float, d:Float, tx:Float, ty:Float) : Matrix2D;
 	/**
-	 * Appends the specified matrix with this matrix.
+	 * Appends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
 	 */
 	function appendMatrix(matrix:Matrix2D) : Matrix2D;
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and prepends them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
-	 * mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * Prepends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
+	 * For example, you could calculate the combined transformation for a child object using:
+	 * 
+	 * 	var o = myDisplayObject;
+	 * 	var mtx = o.getMatrix();
+	 * 	while (o = o.parent) {
+	 * 		// prepend each parent's transformation in turn:
+	 * 		o.prependMatrix(o.getMatrix());
+	 * 	}
 	 */
-	function prependTransform(x:Float, y:Float, scaleX:Float, scaleY:Float, rotation:Float, skewX:Float, skewY:Float, ?regX:Float, ?regY:Float) : Matrix2D;
+	function prependMatrix(matrix:Matrix2D) : Matrix2D;
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and appends them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
-	 * mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * Generates matrix properties from the specified display object transform properties, and appends them to this matrix.
+	 * For example, you can use this to generate a matrix representing the transformations of a display object:
+	 * 
+	 * 	var mtx = new Matrix2D();
+	 * 	mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	 */
 	function appendTransform(x:Float, y:Float, scaleX:Float, scaleY:Float, rotation:Float, skewX:Float, skewY:Float, ?regX:Float, ?regY:Float) : Matrix2D;
 	/**
-	 * Applies a rotation transformation to the matrix.
+	 * Generates matrix properties from the specified display object transform properties, and prepends them to this matrix.
+	 * For example, you could calculate the combined transformation for a child object using:
+	 * 
+	 * 	var o = myDisplayObject;
+	 * 	var mtx = new createjs.Matrix2D();
+	 * 	do  {
+	 * 		// prepend each parent's transformation in turn:
+	 * 		mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+	 * 	} while (o = o.parent);
+	 * 	
+	 * 	Note that the above example would not account for {{#crossLink "DisplayObject/transformMatrix:property"}}{{/crossLink}}
+	 * 	values. See {{#crossLink "Matrix2D/prependMatrix"}}{{/crossLink}} for an example that does.
+	 */
+	function prependTransform(x:Float, y:Float, scaleX:Float, scaleY:Float, rotation:Float, skewX:Float, skewY:Float, ?regX:Float, ?regY:Float) : Matrix2D;
+	/**
+	 * Applies a clockwise rotation transformation to the matrix.
 	 */
 	function rotate(angle:Float) : Matrix2D;
 	/**
@@ -120,31 +134,23 @@ extern class Matrix2D
 	 */
 	function isIdentity() : Bool;
 	/**
+	 * Returns true if this matrix is equal to the specified matrix (all property values are equal).
+	 */
+	function equals(matrix:Matrix2D) : Bool;
+	/**
 	 * Transforms a point according to this matrix.
 	 */
 	function transformPoint(x:Float, y:Float, ?pt:Dynamic) : Point;
 	/**
-	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that this these values
+	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that these values
 	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	 * results.
 	 */
 	function decompose(?target:Dynamic) : Dynamic;
 	/**
-	 * Reinitializes all matrix properties to those specified.
-	 */
-	function reinitialize(?a:Float, ?b:Float, ?c:Float, ?d:Float, ?tx:Float, ?ty:Float, ?alpha:Float, ?shadow:Shadow, ?compositeOperation:String, ?visible:Bool) : Matrix2D;
-	/**
 	 * Copies all properties from the specified matrix to this matrix.
 	 */
 	function copy(matrix:Matrix2D) : Matrix2D;
-	/**
-	 * Appends the specified visual properties to the current matrix.
-	 */
-	function appendProperties(alpha:Float, shadow:Shadow, compositeOperation:String, visible:Bool) : Matrix2D;
-	/**
-	 * Prepends the specified visual properties to the current matrix.
-	 */
-	function prependProperties(alpha:Float, shadow:Shadow, compositeOperation:String, visible:Bool) : Matrix2D;
 	/**
 	 * Returns a clone of the Matrix2D instance.
 	 */

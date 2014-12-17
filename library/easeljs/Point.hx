@@ -22,6 +22,10 @@ extern class Point
 	function new(?x:Float, ?y:Float) : Void;
 
 	/**
+	 * Sets the specified values on this instance.
+	 */
+	function setValues(?x:Float, ?y:Float) : Point;
+	/**
 	 * Copies all properties from the specified point to this point.
 	 */
 	function copy(point:Point) : Point;

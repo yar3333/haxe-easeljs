@@ -1,9 +1,8 @@
 package easeljs;
 
 /**
- * Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}},
- * or can be used directly as the matrix for a ColorMatrixFilter. Most methods return the instance to facilitate
- * chained calls.
+ * Provides helper functions for assembling a matrix for use with the {{#crossLink "ColorMatrixFilter"}}{{/crossLink}}.
+ * Most methods return the instance to facilitate chained calls.
  * 
  * <h4>Example</h4>
  * 
@@ -17,6 +16,10 @@ extern class ColorMatrix
 {
 	function new(brightness:Float, contrast:Float, saturation:Float, hue:Float) : Void;
 
+	/**
+	 * Resets the instance with the specified values.
+	 */
+	function setColor(brightness:Float, contrast:Float, saturation:Float, hue:Float) : ColorMatrix;
 	/**
 	 * Resets the matrix to identity values.
 	 */
@@ -61,7 +64,7 @@ extern class ColorMatrix
 	/**
 	 * Copy the specified matrix's values to this matrix.
 	 */
-	function copyMatrix(matrix:Array<Dynamic>) : ColorMatrix;
+	function copy(matrix:Array<Dynamic>) : ColorMatrix;
 	/**
 	 * Returns a string representation of this object.
 	 */

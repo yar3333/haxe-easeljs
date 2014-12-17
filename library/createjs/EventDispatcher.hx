@@ -124,7 +124,7 @@ extern class EventDispatcher
 	 *      var event = new createjs.Event("progress");
 	 *      this.dispatchEvent(event);
 	 */
-	function dispatchEvent(eventObj:Dynamic, ?target:Dynamic) : Bool;
+	function dispatchEvent(eventObj:Dynamic) : Bool;
 	/**
 	 * Indicates whether there is at least one listener for the specified event type.
 	 */

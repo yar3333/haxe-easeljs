@@ -102,6 +102,13 @@ extern class Text extends DisplayObject
 	 */
 	function getMeasuredHeight() : Float;
 	/**
+	 * Returns an object with width, height, and lines properties. The width and height are the visual width and height
+	 * of the drawn text. The lines property contains an array of strings, one for
+	 * each line of text that will be drawn, accounting for line breaks and wrapping. These strings have trailing
+	 * whitespace removed.
+	 */
+	function getMetrics() : Dynamic;
+	/**
 	 * Returns a clone of the Text instance.
 	 */
 	override function clone(?recursive:Bool) : DisplayObject;

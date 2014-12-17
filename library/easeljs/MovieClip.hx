@@ -43,20 +43,6 @@ package easeljs;
 extern class MovieClip extends Container
 {
 	/**
-	 * The MovieClip will advance independently of its parent, even if its parent is paused.
-	 * This is the default mode.
-	 */
-	static var INDEPENDENT : String;
-	/**
-	 * The MovieClip will only display a single frame (as determined by the startPosition property).
-	 */
-	static var SINGLE_FRAME : String;
-	/**
-	 * The MovieClip will be advanced only when its parent advances and will be synched to the position of
-	 * the parent MovieClip.
-	 */
-	static var SYNCHED : String;
-	/**
 	 * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
 	 * See each constant for a description of the behaviour.
 	 */
@@ -129,6 +115,30 @@ extern class MovieClip extends Container
 	 * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
 	 */
 	var framerate : Float;
+	/**
+	 * The MovieClip will advance independently of its parent, even if its parent is paused.
+	 * This is the default mode.
+	 */
+	static var INDEPENDENT : String;
+	/**
+	 * The MovieClip will only display a single frame (as determined by the startPosition property).
+	 */
+	static var SINGLE_FRAME : String;
+	/**
+	 * The MovieClip will be advanced only when its parent advances and will be synched to the position of
+	 * the parent MovieClip.
+	 */
+	static var SYNCHED : String;
+	/**
+	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
+	 * Shortcut to TweenJS: Timeline.getLabels();
+	 */
+	var labels : Array<Dynamic>;
+	/**
+	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
+	 * for more information.
+	 */
+	var currentLabel : String;
 
 	function new(?mode:String, ?startPosition:Float, ?loop:Bool, ?labels:Dynamic) : Void;
 
@@ -164,15 +174,6 @@ extern class MovieClip extends Container
 	 * Advances the playhead. This occurs automatically each tick by default.
 	 */
 	function advance(?time:Float) : Void;
-	/**
-	 * Returns a sorted list of the labels defined on this MovieClip. Shortcut to TweenJS: Timeline.getLabels();
-	 */
-	function getLabels() : Array<Dynamic>;
-	/**
-	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
-	 * for more information.
-	 */
-	function getCurrentLabel() : String;
 	/**
 	 * MovieClip instances cannot be cloned.
 	 */

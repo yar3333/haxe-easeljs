@@ -75,15 +75,15 @@ extern class DOMElement extends DisplayObject
 	/**
 	 * Not applicable to DOMElement.
 	 */
-	override function localToGlobal(x:Float, y:Float) : Point;
+	override function localToGlobal(x:Float, y:Float, ?pt:Dynamic) : Point;
 	/**
 	 * Not applicable to DOMElement.
 	 */
-	override function globalToLocal(x:Float, y:Float) : Point;
+	override function globalToLocal(x:Float, y:Float, ?pt:Dynamic) : Point;
 	/**
 	 * Not applicable to DOMElement.
 	 */
-	override function localToLocal(x:Float, y:Float, target:DisplayObject) : Point;
+	override function localToLocal(x:Float, y:Float, target:DisplayObject, ?pt:Dynamic) : Point;
 	/**
 	 * DOMElement cannot be cloned. Throws an error.
 	 */

@@ -36,34 +36,73 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrixes.
- * @class Matrix2D
- * @param {Number} [a=1] Specifies the a property for the new matrix.
- * @param {Number} [b=0] Specifies the b property for the new matrix.
- * @param {Number} [c=0] Specifies the c property for the new matrix.
- * @param {Number} [d=1] Specifies the d property for the new matrix.
- * @param {Number} [tx=0] Specifies the tx property for the new matrix.
- * @param {Number} [ty=0] Specifies the ty property for the new matrix.
- * @constructor
- **/
-var Matrix2D = function(a, b, c, d, tx, ty) {
-  this.initialize(a, b, c, d, tx, ty);
-};
-var p = Matrix2D.prototype;
-Matrix2D.prototype.constructor = Matrix2D;
 
-// static public properties:
-
+// constructor:
 	/**
-	 * An identity matrix, representing a null transformation.
-	 * @property identity
-	 * @static
-	 * @type Matrix2D
-	 * @readonly
+	 * Represents an affine transformation matrix, and provides tools for constructing and concatenating matrices.
+	 *
+	 * This matrix can be visualized as:
+	 *
+	 * 	[ a  c  tx
+	 * 	  b  d  ty
+	 * 	  0  0  1  ]
+	 *
+	 * Note the locations of b and c.
+	 *
+	 * @class Matrix2D
+	 * @param {Number} [a=1] Specifies the a property for the new matrix.
+	 * @param {Number} [b=0] Specifies the b property for the new matrix.
+	 * @param {Number} [c=0] Specifies the c property for the new matrix.
+	 * @param {Number} [d=1] Specifies the d property for the new matrix.
+	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
+	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
+	 * @constructor
 	 **/
-	Matrix2D.identity = null; // set at bottom of class definition.
+	function Matrix2D(a, b, c, d, tx, ty) {
+		this.setValues(a,b,c,d,tx,ty);
+		
+	// public properties:
+		// assigned in the setValues method.
+		/**
+		 * Position (0, 0) in a 3x3 affine transformation matrix.
+		 * @property a
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (0, 1) in a 3x3 affine transformation matrix.
+		 * @property b
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (1, 0) in a 3x3 affine transformation matrix.
+		 * @property c
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (1, 1) in a 3x3 affine transformation matrix.
+		 * @property d
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (2, 0) in a 3x3 affine transformation matrix.
+		 * @property tx
+		 * @type Number
+		 **/
+	
+		/**
+		 * Position (2, 1) in a 3x3 affine transformation matrix.
+		 * @property ty
+		 * @type Number
+		 **/
+	}
+	var p = Matrix2D.prototype;
 
+
+// constants:
 	/**
 	 * Multiplier for converting degrees to radians. Used internally by Matrix2D.
 	 * @property DEG_TO_RAD
@@ -75,87 +114,21 @@ Matrix2D.prototype.constructor = Matrix2D;
 	Matrix2D.DEG_TO_RAD = Math.PI/180;
 
 
-// public properties:
+// static public properties:
 	/**
-	 * Position (0, 0) in a 3x3 affine transformation matrix.
-	 * @property a
-	 * @type Number
+	 * An identity matrix, representing a null transformation.
+	 * @property identity
+	 * @static
+	 * @type Matrix2D
+	 * @readonly
 	 **/
-	p.a = 1;
-
-	/**
-	 * Position (0, 1) in a 3x3 affine transformation matrix.
-	 * @property b
-	 * @type Number
-	 **/
-	p.b = 0;
-
-	/**
-	 * Position (1, 0) in a 3x3 affine transformation matrix.
-	 * @property c
-	 * @type Number
-	 **/
-	p.c = 0;
-
-	/**
-	 * Position (1, 1) in a 3x3 affine transformation matrix.
-	 * @property d
-	 * @type Number
-	 **/
-	p.d = 1;
-
-	/**
-	 * Position (2, 0) in a 3x3 affine transformation matrix.
-	 * @property tx
-	 * @type Number
-	 **/
-	p.tx = 0;
-
-	/**
-	 * Position (2, 1) in a 3x3 affine transformation matrix.
-	 * @property ty
-	 * @type Number
-	 **/
-	p.ty = 0;
-
-	/**
-	 * Property representing the alpha that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated alpha values.
-	 * @property alpha
-	 * @type Number
-	 **/
-	p.alpha = 1;
-
-	/**
-	 * Property representing the shadow that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated shadow values.
-	 * @property shadow
-	 * @type Shadow
-	 **/
-	p.shadow  = null;
-
-	/**
-	 * Property representing the compositeOperation that will be applied to a display object. This is not part of
-	 * matrix operations, but is used for operations like getConcatenatedMatrix to provide concatenated
-	 * compositeOperation values. You can find a list of valid composite operations at:
-	 * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
-	 * @property compositeOperation
-	 * @type String
-	 **/
-	p.compositeOperation = null;
+	Matrix2D.identity = null; // set at bottom of class definition.
 	
-	/**
-	 * Property representing the value for visible that will be applied to a display object. This is not part of matrix
-	 * operations, but is used for operations like getConcatenatedMatrix to provide concatenated visible values.
-	 * @property visible
-	 * @type Boolean
-	 **/
-	p.visible = true;
 
-// constructor:
+// public methods:
 	/**
-	 * Initialization method. Can also be used to reinitialize the instance.
-	 * @method initialize
+	 * Sets the specified values on this instance. 
+	 * @method setValues
 	 * @param {Number} [a=1] Specifies the a property for the new matrix.
 	 * @param {Number} [b=0] Specifies the b property for the new matrix.
 	 * @param {Number} [c=0] Specifies the c property for the new matrix.
@@ -164,7 +137,8 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
 	 * @return {Matrix2D} This instance. Useful for chaining method calls.
 	*/
-	p.initialize = function(a, b, c, d, tx, ty) {
+	p.setValues = function(a, b, c, d, tx, ty) {
+		// don't forget to update docs in the constructor if these change:
 		this.a = (a == null) ? 1 : a;
 		this.b = b || 0;
 		this.c = c || 0;
@@ -174,35 +148,9 @@ Matrix2D.prototype.constructor = Matrix2D;
 		return this;
 	};
 
-// public methods:
 	/**
-	 * Concatenates the specified matrix properties with this matrix. All parameters are required.
-	 * @method prepend
-	 * @param {Number} a
-	 * @param {Number} b
-	 * @param {Number} c
-	 * @param {Number} d
-	 * @param {Number} tx
-	 * @param {Number} ty
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	 **/
-	p.prepend = function(a, b, c, d, tx, ty) {
-		var tx1 = this.tx;
-		if (a != 1 || b != 0 || c != 0 || d != 1) {
-			var a1 = this.a;
-			var c1 = this.c;
-			this.a  = a1*a+this.b*c;
-			this.b  = a1*b+this.b*d;
-			this.c  = c1*a+this.d*c;
-			this.d  = c1*b+this.d*d;
-		}
-		this.tx = tx1*a+this.ty*c+tx;
-		this.ty = tx1*b+this.ty*d+ty;
-		return this;
-	};
-
-	/**
-	 * Appends the specified matrix properties with this matrix. All parameters are required.
+	 * Appends the specified matrix properties to this matrix. All parameters are required.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
 	 * @method append
 	 * @param {Number} a
 	 * @param {Number} b
@@ -217,86 +165,80 @@ Matrix2D.prototype.constructor = Matrix2D;
 		var b1 = this.b;
 		var c1 = this.c;
 		var d1 = this.d;
-
-		this.a  = a*a1+b*c1;
-		this.b  = a*b1+b*d1;
-		this.c  = c*a1+d*c1;
-		this.d  = c*b1+d*d1;
-		this.tx = tx*a1+ty*c1+this.tx;
-		this.ty = tx*b1+ty*d1+this.ty;
+		if (a != 1 || b != 0 || c != 0 || d != 1) {
+			this.a  = a1*a+c1*b;
+			this.b  = b1*a+d1*b;
+			this.c  = a1*c+c1*d;
+			this.d  = b1*c+d1*d;
+		}
+		this.tx = a1*tx+c1*ty+this.tx;
+		this.ty = b1*tx+d1*ty+this.ty;
 		return this;
 	};
 
 	/**
-	 * Prepends the specified matrix with this matrix.
-	 * @method prependMatrix
-	 * @param {Matrix2D} matrix
+	 * Prepends the specified matrix properties to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
+	 * All parameters are required.
+	 * @method prepend
+	 * @param {Number} a
+	 * @param {Number} b
+	 * @param {Number} c
+	 * @param {Number} d
+	 * @param {Number} tx
+	 * @param {Number} ty
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
-	p.prependMatrix = function(matrix) {
-		this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-		this.prependProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation, matrix.visible);
+	p.prepend = function(a, b, c, d, tx, ty) {
+		var a1 = this.a;
+		var c1 = this.c;
+		var tx1 = this.tx;
+
+		this.a  = a*a1+c*this.b;
+		this.b  = b*a1+d*this.b;
+		this.c  = a*c1+c*this.d;
+		this.d  = b*c1+d*this.d;
+		this.tx = a*tx1+c*this.ty+tx;
+		this.ty = b*tx1+d*this.ty+ty;
 		return this;
 	};
 
 	/**
-	 * Appends the specified matrix with this matrix.
+	 * Appends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(this matrix) * (specified matrix)`.
 	 * @method appendMatrix
 	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.appendMatrix = function(matrix) {
-		this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
-		this.appendProperties(matrix.alpha, matrix.shadow,  matrix.compositeOperation, matrix.visible);
-		return this;
+		return this.append(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and prepends them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
-	 * mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
-	 * @method prependTransform
-	 * @param {Number} x
-	 * @param {Number} y
-	 * @param {Number} scaleX
-	 * @param {Number} scaleY
-	 * @param {Number} rotation
-	 * @param {Number} skewX
-	 * @param {Number} skewY
-	 * @param {Number} regX Optional.
-	 * @param {Number} regY Optional.
+	 * Prepends the specified matrix to this matrix.
+	 * This is the equivalent of multiplying `(specified matrix) * (this matrix)`.
+	 * For example, you could calculate the combined transformation for a child object using:
+	 * 
+	 * 	var o = myDisplayObject;
+	 * 	var mtx = o.getMatrix();
+	 * 	while (o = o.parent) {
+	 * 		// prepend each parent's transformation in turn:
+	 * 		o.prependMatrix(o.getMatrix());
+	 * 	}
+	 * @method prependMatrix
+	 * @param {Matrix2D} matrix
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
-	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
-		if (rotation%360) {
-			var r = rotation*Matrix2D.DEG_TO_RAD;
-			var cos = Math.cos(r);
-			var sin = Math.sin(r);
-		} else {
-			cos = 1;
-			sin = 0;
-		}
-
-		if (regX || regY) {
-			// append the registration offset:
-			this.tx -= regX; this.ty -= regY;
-		}
-		if (skewX || skewY) {
-			// TODO: can this be combined into a single prepend operation?
-			skewX *= Matrix2D.DEG_TO_RAD;
-			skewY *= Matrix2D.DEG_TO_RAD;
-			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
-			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
-		} else {
-			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
-		}
-		return this;
+	p.prependMatrix = function(matrix) {
+		return this.prepend(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
-	 * Generates matrix properties from the specified display object transform properties, and appends them with this matrix.
-	 * For example, you can use this to generate a matrix from a display object: var mtx = new Matrix2D();
-	 * mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
+	 * Generates matrix properties from the specified display object transform properties, and appends them to this matrix.
+	 * For example, you can use this to generate a matrix representing the transformations of a display object:
+	 * 
+	 * 	var mtx = new Matrix2D();
+	 * 	mtx.appendTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation);
 	 * @method appendTransform
 	 * @param {Number} x
 	 * @param {Number} y
@@ -320,7 +262,7 @@ Matrix2D.prototype.constructor = Matrix2D;
 		}
 
 		if (skewX || skewY) {
-			// TODO: can this be combined into a single append?
+			// TODO: can this be combined into a single append operation?
 			skewX *= Matrix2D.DEG_TO_RAD;
 			skewY *= Matrix2D.DEG_TO_RAD;
 			this.append(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
@@ -328,9 +270,9 @@ Matrix2D.prototype.constructor = Matrix2D;
 		} else {
 			this.append(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
 		}
-
+		
 		if (regX || regY) {
-			// prepend the registration offset:
+			// append the registration offset:
 			this.tx -= regX*this.a+regY*this.c; 
 			this.ty -= regX*this.b+regY*this.d;
 		}
@@ -338,32 +280,81 @@ Matrix2D.prototype.constructor = Matrix2D;
 	};
 
 	/**
-	 * Applies a rotation transformation to the matrix.
+	 * Generates matrix properties from the specified display object transform properties, and prepends them to this matrix.
+	 * For example, you could calculate the combined transformation for a child object using:
+	 * 
+	 * 	var o = myDisplayObject;
+	 * 	var mtx = new createjs.Matrix2D();
+	 * 	do  {
+	 * 		// prepend each parent's transformation in turn:
+	 * 		mtx.prependTransform(o.x, o.y, o.scaleX, o.scaleY, o.rotation, o.skewX, o.skewY, o.regX, o.regY);
+	 * 	} while (o = o.parent);
+	 * 	
+	 * 	Note that the above example would not account for {{#crossLink "DisplayObject/transformMatrix:property"}}{{/crossLink}}
+	 * 	values. See {{#crossLink "Matrix2D/prependMatrix"}}{{/crossLink}} for an example that does.
+	 * @method prependTransform
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} scaleX
+	 * @param {Number} scaleY
+	 * @param {Number} rotation
+	 * @param {Number} skewX
+	 * @param {Number} skewY
+	 * @param {Number} regX Optional.
+	 * @param {Number} regY Optional.
+	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
+	 **/
+	p.prependTransform = function(x, y, scaleX, scaleY, rotation, skewX, skewY, regX, regY) {
+		if (rotation%360) {
+			var r = rotation*Matrix2D.DEG_TO_RAD;
+			var cos = Math.cos(r);
+			var sin = Math.sin(r);
+		} else {
+			cos = 1;
+			sin = 0;
+		}
+
+		if (regX || regY) {
+			// prepend the registration offset:
+			this.tx -= regX; this.ty -= regY;
+		}
+		if (skewX || skewY) {
+			// TODO: can this be combined into a single prepend operation?
+			skewX *= Matrix2D.DEG_TO_RAD;
+			skewY *= Matrix2D.DEG_TO_RAD;
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, 0, 0);
+			this.prepend(Math.cos(skewY), Math.sin(skewY), -Math.sin(skewX), Math.cos(skewX), x, y);
+		} else {
+			this.prepend(cos*scaleX, sin*scaleX, -sin*scaleY, cos*scaleY, x, y);
+		}
+		return this;
+	};
+
+	/**
+	 * Applies a clockwise rotation transformation to the matrix.
 	 * @method rotate
-	 * @param {Number} angle The angle in radians. To use degrees, multiply by <code>Math.PI/180</code>.
+	 * @param {Number} angle The angle to rotate by, in degrees. To use a value in radians, multiply it by `180/Math.PI`.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.rotate = function(angle) {
+		angle = angle*Matrix2D.DEG_TO_RAD;
 		var cos = Math.cos(angle);
 		var sin = Math.sin(angle);
 
 		var a1 = this.a;
-		var c1 = this.c;
-		var tx1 = this.tx;
+		var b1 = this.b;
 
-		this.a = a1*cos-this.b*sin;
-		this.b = a1*sin+this.b*cos;
-		this.c = c1*cos-this.d*sin;
-		this.d = c1*sin+this.d*cos;
-		this.tx = tx1*cos-this.ty*sin;
-		this.ty = tx1*sin+this.ty*cos;
+		this.a = a1*cos+this.c*sin;
+		this.b = b1*cos+this.d*sin;
+		this.c = -a1*sin+this.c*cos;
+		this.d = -b1*sin+this.d*cos;
 		return this;
 	};
 
 	/**
 	 * Applies a skew transformation to the matrix.
 	 * @method skew
-	 * @param {Number} skewX The amount to skew horizontally in degrees.
+	 * @param {Number} skewX The amount to skew horizontally in degrees. To use a value in radians, multiply it by `180/Math.PI`.
 	 * @param {Number} skewY The amount to skew vertically in degrees.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
@@ -377,17 +368,17 @@ Matrix2D.prototype.constructor = Matrix2D;
 	/**
 	 * Applies a scale transformation to the matrix.
 	 * @method scale
-	 * @param {Number} x The amount to scale horizontally
-	 * @param {Number} y The amount to scale vertically
+	 * @param {Number} x The amount to scale horizontally. E.G. a value of 2 will double the size in the X direction, and 0.5 will halve it.
+	 * @param {Number} y The amount to scale vertically.
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.scale = function(x, y) {
 		this.a *= x;
+		this.b *= x;
+		this.c *= y;
 		this.d *= y;
-		this.c *= x;
-		this.b *= y;
-		this.tx *= x;
-		this.ty *= y;
+		//this.tx *= x;
+		//this.ty *= y;
 		return this;
 	};
 
@@ -399,8 +390,8 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.translate = function(x, y) {
-		this.tx += x;
-		this.ty += y;
+		this.tx += this.a*x + this.c*y;
+		this.ty += this.b*x + this.d*y;
 		return this;
 	};
 
@@ -410,10 +401,8 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	 **/
 	p.identity = function() {
-		this.alpha = this.a = this.d = 1;
+		this.a = this.d = 1;
 		this.b = this.c = this.tx = this.ty = 0;
-		this.shadow = this.compositeOperation = null;
-		this.visible = true;
 		return this;
 	};
 
@@ -445,7 +434,17 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * @return {Boolean}
 	 **/
 	p.isIdentity = function() {
-		return this.tx == 0 && this.ty == 0 && this.a == 1 && this.b == 0 && this.c == 0 && this.d == 1;
+		return this.tx === 0 && this.ty === 0 && this.a === 1 && this.b === 0 && this.c === 0 && this.d === 1;
+	};
+	
+	/**
+	 * Returns true if this matrix is equal to the specified matrix (all property values are equal).
+	 * @method equals
+	 * @param {Matrix2D} matrix The matrix to compare.
+	 * @return {Boolean}
+	 **/
+	p.equals = function(matrix) {
+		return this.tx === matrix.tx && this.ty === matrix.ty && this.a === matrix.a && this.b === matrix.b && this.c === matrix.c && this.d === matrix.d;
 	};
 
 	/**
@@ -464,12 +463,12 @@ Matrix2D.prototype.constructor = Matrix2D;
 	};
 
 	/**
-	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that this these values
+	 * Decomposes the matrix into transform properties (x, y, scaleX, scaleY, and rotation). Note that these values
 	 * may not match the transform properties you used to generate the matrix, though they will produce the same visual
 	 * results.
 	 * @method decompose
-	 * @param {Object} [target=null] The object to apply the transform properties to. If null, then a new object will be returned.
-	 * @return {Object} Object with result properties.
+	 * @param {Object} target The object to apply the transform properties to. If null, then a new object will be returned.
+	 * @return {Object} The target, or a new generic object with the transform properties applied.
 	*/
 	p.decompose = function(target) {
 		// TODO: it would be nice to be able to solve for whether the matrix can be decomposed into only scale/rotation even when scale is negative
@@ -482,7 +481,8 @@ Matrix2D.prototype.constructor = Matrix2D;
 		var skewX = Math.atan2(-this.c, this.d);
 		var skewY = Math.atan2(this.b, this.a);
 
-		if (skewX == skewY) {
+		var delta = Math.abs(1-skewX/skewY);
+		if (delta < 0.00001) { // effectively identical, can use rotation:
 			target.rotation = skewY/Matrix2D.DEG_TO_RAD;
 			if (this.a < 0 && this.d >= 0) {
 				target.rotation += (target.rotation <= 0) ? 180 : -180;
@@ -494,30 +494,6 @@ Matrix2D.prototype.constructor = Matrix2D;
 		}
 		return target;
 	};
-
-	/**
-	 * Reinitializes all matrix properties to those specified.
-	 * @method reinitialize
-	 * @param {Number} [a=1] Specifies the a property for the new matrix.
-	 * @param {Number} [b=0] Specifies the b property for the new matrix.
-	 * @param {Number} [c=0] Specifies the c property for the new matrix.
-	 * @param {Number} [d=1] Specifies the d property for the new matrix.
-	 * @param {Number} [tx=0] Specifies the tx property for the new matrix.
-	 * @param {Number} [ty=0] Specifies the ty property for the new matrix.
-	 * @param {Number} [alpha=1] desired alpha value
-	 * @param {Shadow} [shadow=null] desired shadow value
-	 * @param {String} [compositeOperation=null] desired composite operation value
-	 * @param {Boolean} [visible=true] desired visible value
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	*/
-	p.reinitialize = function(a, b, c, d, tx, ty, alpha, shadow, compositeOperation, visible) {
-		this.initialize(a,b,c,d,tx,ty);
-		this.alpha = alpha == null ? 1 : alpha;
-		this.shadow = shadow;
-		this.compositeOperation = compositeOperation;
-		this.visible = visible == null ? true : visible;
-		return this;
-	};
 	
 	/**
 	 * Copies all properties from the specified matrix to this matrix.
@@ -526,41 +502,7 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
 	*/
 	p.copy = function(matrix) {
-		return this.reinitialize(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty, matrix.alpha, matrix.shadow, matrix.compositeOperation, matrix.visible);
-	};
-
-	/**
-	 * Appends the specified visual properties to the current matrix.
-	 * @method appendProperties
-	 * @param {Number} alpha desired alpha value
-	 * @param {Shadow} shadow desired shadow value
-	 * @param {String} compositeOperation desired composite operation value
-	 * @param {Boolean} visible desired visible value
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	*/
-	p.appendProperties = function(alpha, shadow, compositeOperation, visible) {
-		this.alpha *= alpha;
-		this.shadow = shadow || this.shadow;
-		this.compositeOperation = compositeOperation || this.compositeOperation;
-		this.visible = this.visible && visible;
-		return this;
-	};
-
-	/**
-	 * Prepends the specified visual properties to the current matrix.
-	 * @method prependProperties
-	 * @param {Number} alpha desired alpha value
-	 * @param {Shadow} shadow desired shadow value
-	 * @param {String} compositeOperation desired composite operation value
-	 * @param {Boolean} visible desired visible value
-	 * @return {Matrix2D} This matrix. Useful for chaining method calls.
-	*/
-	p.prependProperties = function(alpha, shadow, compositeOperation, visible) {
-		this.alpha *= alpha;
-		this.shadow = this.shadow || shadow;
-		this.compositeOperation = this.compositeOperation || compositeOperation;
-		this.visible = this.visible && visible;
-		return this;
+		return this.setValues(matrix.a, matrix.b, matrix.c, matrix.d, matrix.tx, matrix.ty);
 	};
 
 	/**
@@ -569,7 +511,7 @@ Matrix2D.prototype.constructor = Matrix2D;
 	 * @return {Matrix2D} a clone of the Matrix2D instance.
 	 **/
 	p.clone = function() {
-		return (new Matrix2D()).copy(this);
+		return new Matrix2D(this.a, this.b, this.c, this.d, this.tx, this.ty);
 	};
 
 	/**
@@ -584,5 +526,6 @@ Matrix2D.prototype.constructor = Matrix2D;
 	// this has to be populated after the class is defined:
 	Matrix2D.identity = new Matrix2D();
 
-createjs.Matrix2D = Matrix2D;
+
+	createjs.Matrix2D = Matrix2D;
 }());

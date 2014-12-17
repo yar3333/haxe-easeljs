@@ -18,11 +18,6 @@ typedef DisplayObjectTickEvent =
 extern class DisplayObject extends createjs.EventDispatcher
 {
 	/**
-	 * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
-	 * with cross domain content.
-	 */
-	static var suppressCrossDomainErrors : Bool;
-	/**
 	 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
 	 */
 	var alpha : Float;
@@ -32,9 +27,14 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 */
 	var cacheCanvas : js.html.CanvasElement;
 	/**
+	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
+	 * determine if the cache has changed since a previous check.
+	 */
+	var cacheID : Int;
+	/**
 	 * Unique ID for this display object. Makes display objects easier for some uses.
 	 */
-	var id : Float;
+	var id : Int;
 	/**
 	 * Indicates whether to include this object when running mouse interactions. Setting this to `false` for children
 	 * of a {{#crossLink "Container"}}{{/crossLink}} will cause events on the Container to not fire when that child is
@@ -111,6 +111,11 @@ extern class DisplayObject extends createjs.EventDispatcher
 	var x : Float;
 	var y : Float;
 	/**
+	 * If set, defines the transformation for this display object, overriding all other transformation properties
+	 * (x, y, rotation, scale, skew).
+	 */
+	var transformMatrix : Matrix2D;
+	/**
 	 * The composite operation indicates how the pixels of this display object will be composited with the elements
 	 * behind it. If `null`, this property is inherited from the parent container. For more information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
@@ -129,11 +134,6 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * cached.
 	 */
 	var filters : Array<Dynamic>;
-	/**
-	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
-	 * determine if the cache has changed since a previous check.
-	 */
-	var cacheID : Float;
 	/**
 	 * A Shape instance that defines a vector mask (clipping path) for this display object.  The shape's transformation
 	 * will be applied relative to the display object's parent coordinates (as if it were a child of the parent).
@@ -158,6 +158,15 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * use this property. Setting a non-null cursor on a Container will override the cursor set on its descendants.
 	 */
 	var cursor : String;
+	/**
+	 * Suppresses errors generated when using features like hitTest, mouse events, and {{#crossLink "getObjectsUnderPoint"}}{{/crossLink}}
+	 * with cross domain content.
+	 */
+	static var suppressCrossDomainErrors : Bool;
+	/**
+	 * Returns the Stage instance that this display object will be rendered on, or null if it has not been added to one.
+	 */
+	var stage : Stage;
 
 	function new() : Void;
 
@@ -228,10 +237,6 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 */
 	function getCacheDataURL() : String;
 	/**
-	 * Returns the stage that this display object will be rendered on, or null if it has not been added to one.
-	 */
-	function getStage() : Stage;
-	/**
 	 * Transforms the specified x and y position from the coordinate space of the display object
 	 * to the global (stage) coordinate space. For example, this could be used to position an HTML label
 	 * over a specific point on a nested display object. Returns a Point instance with x and y properties
@@ -245,7 +250,7 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 *      var point = myDisplayObject.localToGlobal(100, 100);
 	 *      // Results in x=400, y=300
 	 */
-	function localToGlobal(x:Float, y:Float) : Point;
+	function localToGlobal(x:Float, y:Float, ?pt:Dynamic) : Point;
 	/**
 	 * Transforms the specified x and y position from the global (stage) coordinate space to the
 	 * coordinate space of the display object. For example, this could be used to determine
@@ -260,7 +265,7 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 *      var point = myDisplayObject.globalToLocal(100, 100);
 	 *      // Results in x=-200, y=-100
 	 */
-	function globalToLocal(x:Float, y:Float) : Point;
+	function globalToLocal(x:Float, y:Float, ?pt:Dynamic) : Point;
 	/**
 	 * Transforms the specified x and y position from the coordinate space of this display object to the coordinate
 	 * space of the target display object. Returns a Point instance with x and y properties correlating to the
@@ -270,7 +275,7 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 *      var pt = this.localToGlobal(x, y);
 	 *      pt = target.globalToLocal(pt.x, pt.y);
 	 */
-	function localToLocal(x:Float, y:Float, target:DisplayObject) : Point;
+	function localToLocal(x:Float, y:Float, target:DisplayObject, ?pt:Dynamic) : Point;
 	/**
 	 * Shortcut method to quickly set the transform properties on the display object. All parameters are optional.
 	 * Omitted parameters will have the default value set.
@@ -281,16 +286,21 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 */
 	function setTransform(?x:Float, ?y:Float, ?scaleX:Float, ?scaleY:Float, ?rotation:Float, ?skewX:Float, ?skewY:Float, ?regX:Float, ?regY:Float) : DisplayObject;
 	/**
-	 * Returns a matrix based on this object's transform.
+	 * Returns a matrix based on this object's current transform.
 	 */
 	function getMatrix(?matrix:Matrix2D) : Matrix2D;
 	/**
-	 * Generates a concatenated Matrix2D object representing the combined transform of the display object and all of its
+	 * Generates a Matrix2D object representing the combined transform of the display object and all of its
 	 * parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}). This can
 	 * be used to transform positions between coordinate spaces, such as with {{#crossLink "DisplayObject/localToGlobal"}}{{/crossLink}}
 	 * and {{#crossLink "DisplayObject/globalToLocal"}}{{/crossLink}}.
 	 */
 	function getConcatenatedMatrix(?matrix:Matrix2D) : Matrix2D;
+	/**
+	 * Generates a DisplayProps object representing the combined display properties of the  object and all of its
+	 * parent Containers up to the highest level ancestor (usually the {{#crossLink "Stage"}}{{/crossLink}}).
+	 */
+	function getConcatenatedDisplayProps(?props:DisplayProps) : DisplayProps;
 	/**
 	 * Tests whether the display object intersects the specified point in local coordinates (ie. draws a pixel with alpha > 0 at
 	 * the specified position). This ignores the alpha, shadow, hitArea, mask, and compositeOperation of the display object.
@@ -311,8 +321,7 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * <h4>Example</h4>
 	 * 
 	 *      var myGraphics = new createjs.Graphics().beginFill("#ff0000").drawCircle(0, 0, 25);
-	 *      var shape = stage.addChild(new Shape())
-	 *          .set({graphics:myGraphics, x:100, y:100, alpha:0.5});
+	 *      var shape = stage.addChild(new Shape()).set({graphics:myGraphics, x:100, y:100, alpha:0.5});
 	 */
 	function set(props:Dynamic) : DisplayObject;
 	/**
@@ -393,7 +402,8 @@ extern class DisplayObject extends createjs.EventDispatcher
 	function setBounds(x:Float, y:Float, width:Float, height:Float) : Void;
 	/**
 	 * Returns a clone of this DisplayObject. Some properties that are specific to this instance's current context are
-	 * reverted to their defaults (for example .parent). Also note that caches are not maintained across clones.
+	 * reverted to their defaults (for example .parent). Caches are not maintained across clones, and some elements
+	 * are copied by reference (masks, individual filter instances, hit area)
 	 */
 	function clone(?recursive:Bool) : DisplayObject;
 	/**
@@ -476,6 +486,14 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * operations.
 	 */
 	inline function addPressupEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("pressup", handler);
+	/**
+	 * Dispatched when the display object is added to a parent container.
+	 */
+	inline function addAddedEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("added", handler);
+	/**
+	 * Dispatched when the display object is removed from its parent container.
+	 */
+	inline function addRemovedEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("removed", handler);
 	/**
 	 * Dispatched on each display object on a stage whenever the stage updates. This occurs immediately before the
 	 * rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects on

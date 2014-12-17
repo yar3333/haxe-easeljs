@@ -8,6 +8,12 @@ typedef SpriteAnimationendEvent =
 	var next : String;
 }
 
+typedef SpriteChangeEvent =
+{
+	var target : Dynamic;
+	var type : String;
+}
+
 /**
  * Displays a frame or sequence of frames (ie. an animation) from a SpriteSheet instance. A sprite sheet is a series of
  * images (usually animation frames) combined into a single image. For example, an animation consisting of 8 100x100
@@ -84,18 +90,18 @@ extern class Sprite extends DisplayObject
 	 */
 	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
 	/**
-	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	 * You should not cache Sprite instances as it can degrade performance.
 	 */
 	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float) : Void;
 	/**
-	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	 * You should not cache Sprite instances as it can degrade performance.
 	 */
 	override function updateCache(compositeOperation:String) : Void;
 	/**
-	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
-	 * You should not cache Bitmap instances as it can degrade performance.
+	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
+	 * You should not cache Sprite instances as it can degrade performance.
 	 */
 	override function uncache() : Void;
 	/**
@@ -144,4 +150,9 @@ extern class Sprite extends DisplayObject
 	 * Dispatched when an animation reaches its ends.
 	 */
 	inline function addAnimationendEventListener(handler:SpriteAnimationendEvent->Void) : Dynamic return addEventListener("animationend", handler);
+	/**
+	 * Dispatched any time the current frame changes. For example, this could be due to automatic advancement on a tick,
+	 * or calling gotoAndPlay() or gotoAndStop().
+	 */
+	inline function addChangeEventListener(handler:SpriteChangeEvent->Void) : Dynamic return addEventListener("change", handler);
 }
