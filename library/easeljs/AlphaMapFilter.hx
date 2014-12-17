@@ -34,9 +34,4 @@ extern class AlphaMapFilter extends Filter
 	var alphaMap : Dynamic;
 
 	function new(alphaMap:Dynamic) : Void;
-
-	/**
-	 * Returns a clone of this object.
-	 */
-	override function clone() : Filter;
 }

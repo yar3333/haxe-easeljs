@@ -1,11 +1,17 @@
 OPTIONS+= -src out/data.json
 OPTIONS+= --remove-path-prefix native/src
+OPTIONS+= --native-package createjs
+
 OPTIONS+= -ifile easeljs/version_movieclip.js
 OPTIONS+= -ifile easeljs/version.js
-OPTIONS+= -ifile createjs/utils/IndexOf.js 
+OPTIONS+= -ifile createjs/utils/indexOf.js 
+OPTIONS+= -ifile createjs/utils/extend.js 
+OPTIONS+= -ifile createjs/utils/promote.js 
+
 OPTIONS+= -iitem initialize
-OPTIONS+= -iitem Stage.hitArea
-OPTIONS+= --native-package createjs
+OPTIONS+= -iitem Filter._applyFilter
+OPTIONS+= -iclass Graphics.*
+
 OPTIONS+= --type-map HTMLElement-js.html.Element
 OPTIONS+= --type-map HTMLCanvasElement-js.html.CanvasElement
 OPTIONS+= --type-map CanvasRenderingContext2D-js.html.CanvasRenderingContext2D

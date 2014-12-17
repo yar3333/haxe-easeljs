@@ -36,60 +36,51 @@ this.createjs = this.createjs||{};
 (function() {
 	"use strict";
 
-/**
- * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
- * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
- * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
- *
- * <h4>Example</h4>
- *
- *      myInstance.filters = [
- *          new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
- *          new createjs.BlurFilter(5, 5, 10)
- *      ];
- *      myInstance.cache(0,0, 100, 100);
- *
- * Note that each filter can implement a {{#crossLink "Filter/getBounds"}}{{/crossLink}} method, which returns the
- * margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BlurFilter"}}{{/crossLink}}
- * will cause an object to feather outwards, resulting in a margin around the shape.
- *
- * <h4>EaselJS Filters</h4>
- * EaselJS comes with a number of pre-built filters. Note that individual filters are not compiled into the minified
- * version of EaselJS. To use them, you must include them manually in the HTML.
- * <ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
- *      <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
- *      <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
- *      <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
- *      <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
- * </ul>
- *
- * @class Filter
- * @constructor
- **/
-var Filter = function() {
-  this.initialize();
-};
-var p = Filter.prototype;
-Filter.prototype.constructor = Filter;
 
 // constructor:
 	/**
-	 * Initialization method.
-	 * @method initialize
-	 * @protected
+	 * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
+	 * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
+	 * {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}}. Note that the filters must be applied before caching.
+	 *
+	 * <h4>Example</h4>
+	 *
+	 *      myInstance.filters = [
+	 *          new createjs.ColorFilter(0, 0, 0, 1, 255, 0, 0),
+	 *          new createjs.BlurFilter(5, 5, 10)
+	 *      ];
+	 *      myInstance.cache(0,0, 100, 100);
+	 *
+	 * Note that each filter can implement a {{#crossLink "Filter/getBounds"}}{{/crossLink}} method, which returns the
+	 * margins that need to be applied in order to fully display the filter. For example, the {{#crossLink "BlurFilter"}}{{/crossLink}}
+	 * will cause an object to feather outwards, resulting in a margin around the shape.
+	 *
+	 * <h4>EaselJS Filters</h4>
+	 * EaselJS comes with a number of pre-built filters. Note that individual filters are not compiled into the minified
+	 * version of EaselJS. To use them, you must include them manually in the HTML.
+	 * <ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
+	 *      <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
+	 *      <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
+	 *      <li>{{#crossLink "ColorFilter"}}{{/crossLink}}: Color transform a display object</li>
+	 *      <li>{{#crossLink "ColorMatrixFilter"}}{{/crossLink}}: Transform an image using a {{#crossLink "ColorMatrix"}}{{/crossLink}}</li>
+	 * </ul>
+	 *
+	 * @class Filter
+	 * @constructor
 	 **/
-	p.initialize = function() {}
+	function Filter() {}
+	var p = Filter.prototype;
+	
 
 // public methods:
 	/**
-	 * Returns a rectangle with values indicating the margins required to draw the filter or null.
-	 * For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
-	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
+	 * Provides padding values for this filter. That is, how much the filter will extend the visual bounds of an object it is applied to.
 	 * @method getBounds
-	 * @return {Rectangle} a rectangle object indicating the margins required to draw the filter or null if the filter does not effect bounds.
+	 * @param {Rectangle} [rect] If specified, the provided Rectangle instance will be expanded by the padding amounts and returned.
+	 * @return {Rectangle} If a `rect` param was provided, it is returned. If not, either a new rectangle with the padding values, or null if no padding is required for this filter.
 	 **/
-	p.getBounds = function() {
-		return null;
+	p.getBounds = function(rect) {
+		return rect;
 	};
 
 	/**
@@ -105,7 +96,22 @@ Filter.prototype.constructor = Filter;
 	 * @param {Number} [targetY] The y position to draw the result to. Defaults to the value passed to y.
 	 * @return {Boolean} If the filter was applied successfully.
 	 **/
-	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {}
+	p.applyFilter = function(ctx, x, y, width, height, targetCtx, targetX, targetY) {
+		// this is the default behaviour because most filters access pixel data. It is overridden when not needed.
+		targetCtx = targetCtx || ctx;
+		if (targetX == null) { targetX = x; }
+		if (targetY == null) { targetY = y; }
+		try {
+			var imageData = ctx.getImageData(x, y, width, height);
+		} catch (e) {
+			return false;
+		}
+		if (this._applyFilter(imageData)) {
+			targetCtx.putImageData(imageData, targetX, targetY);
+			return true;
+		}
+		return false;
+	};
 
 	/**
 	 * Returns a string representation of this object.
@@ -124,6 +130,15 @@ Filter.prototype.constructor = Filter;
 	p.clone = function() {
 		return new Filter();
 	};
+	
+// private methods:
+	/**
+	 * @method _applyFilter
+	 * @param {ImageData} imageData Target ImageData instance.
+	 * @return {Boolean}
+	 **/
+	p._applyFilter = function(imageData) { return true; };
 
-createjs.Filter = Filter;
+
+	createjs.Filter = Filter;
 }());

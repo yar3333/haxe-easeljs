@@ -33,11 +33,9 @@ extern class Filter
 	function new() : Void;
 
 	/**
-	 * Returns a rectangle with values indicating the margins required to draw the filter or null.
-	 * For example, a filter that will extend the drawing area 4 pixels to the left, and 7 pixels to the right
-	 * (but no pixels up or down) would return a rectangle with (x=-4, y=0, width=11, height=0).
+	 * Provides padding values for this filter. That is, how much the filter will extend the visual bounds of an object it is applied to.
 	 */
-	function getBounds() : Rectangle;
+	function getBounds(?rect:Rectangle) : Rectangle;
 	/**
 	 * Applies the filter to the specified context.
 	 */

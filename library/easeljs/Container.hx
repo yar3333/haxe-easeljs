@@ -39,6 +39,10 @@ extern class Container extends DisplayObject
 	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
 	 */
 	var tickChildren : Bool;
+	/**
+	 * Returns the number of children in the container.
+	 */
+	var numChildren : Int;
 
 	function new() : Void;
 
@@ -159,10 +163,6 @@ extern class Container extends DisplayObject
 	 */
 	function getChildIndex(child:DisplayObject) : Int;
 	/**
-	 * Returns the number of children in the display list.
-	 */
-	function getNumChildren() : Int;
-	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
 	 */
 	function swapChildrenAt(index1:Float, index2:Float) : Void;
@@ -193,15 +193,22 @@ extern class Container extends DisplayObject
 	 * expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
 	 * mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
 	 * 
+	 * By default this method evaluates all display objects. By setting the `mode` parameter to `1`, the `mouseEnabled`
+	 * and `mouseChildren` properties will be respected.
+	 * Setting it to `2` additionally excludes display objects that do not have active mouse event listeners
+	 * or a `cursor` property. That is, only objects that would normally intercept mouse interaction will be included.
+	 * This can significantly improve performance in some cases by reducing the number of
+	 * display objects that need to be tested.
+	 * 
 	 * Accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	 */
-	function getObjectsUnderPoint(x:Float, y:Float) : Array<Dynamic>;
+	function getObjectsUnderPoint(x:Float, y:Float, mode:Int=0) : Array<DisplayObject>;
 	/**
-	 * Similar to {{#crossLink "Container/getObjectsUnderPoint()"}}{{/crossLink}}, but returns only the top-most display
-	 * object. This runs significantly faster than <code>getObjectsUnderPoint()<code>, but is still an expensive
+	 * Similar to {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}}, but returns only the top-most display
+	 * object. This runs significantly faster than <code>getObjectsUnderPoint()</code>, but is still potentially an expensive
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 */
-	function getObjectUnderPoint(x:Float, y:Float) : DisplayObject;
+	function getObjectUnderPoint(x:Float, y:Float, mode:Int=0) : DisplayObject;
 	/**
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent).

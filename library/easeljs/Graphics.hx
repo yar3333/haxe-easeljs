@@ -2,30 +2,55 @@ package easeljs;
 
 /**
  * The Graphics class exposes an easy to use API for generating vector drawing instructions and drawing them to a
- * specified context. Note that you can use Graphics without any dependency on the Easel framework by calling {{#crossLink "DisplayObject/draw"}}{{/crossLink}}
+ * specified context. Note that you can use Graphics without any dependency on the EaselJS framework by calling {{#crossLink "Graphics/draw"}}{{/crossLink}}
  * directly, or it can be used with the {{#crossLink "Shape"}}{{/crossLink}} object to draw vector graphics within the
- * context of an Easel display list.
+ * context of an EaselJS display list.
  * 
- * <h4>Example</h4>
+ * There are two approaches to working with Graphics object: calling methods on a Graphics instance (the "Graphics API"), or
+ * instantiating Graphics command objects and adding them to the graphics queue via {{#crossLink "Graphics/append"}}{{/crossLink}}.
+ * The former abstracts the latter, simplifying beginning and ending paths, fills, and strokes.
  * 
  *      var g = new createjs.Graphics();
- * 	    g.setStrokeStyle(1);
- * 	    g.beginStroke(createjs.Graphics.getRGB(0,0,0));
- * 	    g.beginFill(createjs.Graphics.getRGB(255,0,0));
- * 	    g.drawCircle(0,0,3);
+ *      g.setStrokeStyle(1);
+ *      g.beginStroke("#000000");
+ *      g.beginFill("red");
+ *      g.drawCircle(0,0,30);
  * 
- * 	    var s = new createjs.Shape(g);
- * 	    	s.x = 100;
- * 	    	s.y = 100;
+ * All drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
+ * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill:
  * 
- * 	    stage.addChild(s);
- * 	    stage.update();
+ *      myGraphics.beginStroke("red").beginFill("blue").drawRect(20, 20, 100, 50);
  * 
- * Note that all drawing methods in Graphics return the Graphics instance, so they can be chained together. For example,
- * the following line of code would generate the instructions to draw a rectangle with a red stroke and blue fill, then
- * render it to the specified context2D:
+ * Each graphics API call generates a command object (see below). The last command to be created can be accessed via
+ * {{#crossLink "Graphics/command:property"}}{{/crossLink}}:
  * 
- *      myGraphics.beginStroke("#F00").beginFill("#00F").drawRect(20, 20, 100, 50).draw(myContext2D);
+ *      var fillCommand = myGraphics.beginFill("red").command;
+ *      // ... later, update the fill style/color:
+ *      fillCommand.style = "blue";
+ *      // or change it to a bitmap fill:
+ *      fillCommand.bitmap(myImage);
+ * 
+ * For more direct control of rendering, you can instantiate and append command objects to the graphics queue directly. In this case, you
+ * need to manage path creation manually, and ensure that fill/stroke is applied to a defined path:
+ * 
+ *      // start a new path. Graphics.beginCmd is a reusable BeginPath instance:
+ *      myGraphics.append(createjs.Graphics.beginCmd);
+ *      // we need to define the path before applying the fill:
+ *      var circle = new createjs.Graphics.Circle(0,0,30);
+ *      myGraphics.append(circle);
+ *      // fill the path we just defined:
+ *      var fill = new createjs.Graphics.Fill("red");
+ *      myGraphics.append(fill);
+ * 
+ * These approaches can be used together, for example to insert a custom command:
+ * 
+ *      myGraphics.beginFill("red");
+ *      var customCommand = new CustomSpiralCommand(etc);
+ *      myGraphics.append(customCommand);
+ *      myGraphics.beginFill("blue");
+ *      myGraphics.drawCircle(0, 0, 30);
+ * 
+ * See {{#crossLink "Graphics/append"}}{{/crossLink}} for more info on creating custom commands.
  * 
  * <h4>Tiny API</h4>
  * The Graphics class also includes a "tiny API", which is one or two-letter methods that are shortcuts for all of the
@@ -65,16 +90,24 @@ package easeljs;
  * 
  * Here is the above example, using the tiny API instead.
  * 
- *      myGraphics.s("#F00").f("#00F").r(20, 20, 100, 50).draw(myContext2D);
+ *      myGraphics.s("red").f("blue").r(20, 20, 100, 50);
  */
 @:native("createjs.Graphics")
 extern class Graphics
 {
 	/**
-	 * Exposes the Command class used internally by Graphics. Useful for extending the Graphics class or injecting
-	 * functionality.
+	 * Holds a reference to the last command that was created or appended. For example, you could retain a reference
+	 * to a Fill command in order to dynamically update the color later by using:
+	 * 		myFill = myGraphics.beginFill("red").command;
+	 * 		// update color later:
+	 * 		myFill.style = "yellow";
 	 */
-	static var Command : Dynamic;
+	var command : Dynamic;
+	/**
+	 * A reusable instance of {{#crossLink "Graphics/BeginPath"}}{{/crossLink}} to avoid
+	 * unnecessary instantiation.
+	 */
+	static var beginCmd : Dynamic;
 	/**
 	 * Map of Base64 characters to values. Used by {{#crossLink "Graphics/decodePath"}}{{/crossLink}}.
 	 */
@@ -97,6 +130,13 @@ extern class Graphics
 	 *      myGraphics.ss(16, 0, 2);
 	 */
 	static var STROKE_JOINTS_MAP : Array<Dynamic>;
+	/**
+	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
+	 * Modifying the returned array directly is not recommended, and is likely to result in unexpected behaviour.
+	 * 
+	 * This property is mainly intended for introspection of the instructions (ex. for graphics export).
+	 */
+	var instructions : Array<Dynamic>;
 
 	function new() : Void;
 
@@ -132,10 +172,12 @@ extern class Graphics
 	 * 
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
-	function draw(ctx:js.html.CanvasRenderingContext2D) : Void;
+	function draw(ctx:js.html.CanvasRenderingContext2D, ?data:Dynamic) : Void;
 	/**
 	 * Draws only the path described for this Graphics instance, skipping any non-path instructions, including fill and
 	 * stroke descriptions. Used for <code>DisplayObject.mask</code> to draw the clipping path, for example.
+	 * 
+	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	function drawAsPath(ctx:js.html.CanvasRenderingContext2D) : Void;
 	/**
@@ -284,7 +326,7 @@ extern class Graphics
 	function curveTo(cpx:Float, cpy:Float, x:Float, y:Float) : Graphics;
 	/**
 	 * Maps the familiar ActionScript <code>drawRect()</code> method to the functionally similar {{#crossLink "Graphics/rect"}}{{/crossLink}}
-	 * method.
+	 *  method.
 	 */
 	function drawRect(x:Float, y:Float, w:Float, h:Float) : Graphics;
 	/**
@@ -321,40 +363,6 @@ extern class Graphics
 	 */
 	function drawEllipse(x:Float, y:Float, w:Float, h:Float) : Graphics;
 	/**
-	 * Provides a method for injecting arbitrary Context2D (aka Canvas) API calls into a Graphics queue. The specified
-	 * callback function will be called in sequence with other drawing instructions. The callback will be executed in the
-	 * scope of the target canvas's Context2D object, and will be passed the data object as a parameter.
-	 * 
-	 * This is an advanced feature. It can allow for powerful functionality, like injecting output from tools that
-	 * export Context2D instructions, executing raw canvas calls within the context of the display list, or dynamically
-	 * modifying colors or stroke styles within a Graphics instance over time, but it is not intended for general use.
-	 * 
-	 * Within a Graphics queue, each path begins by applying the fill and stroke styles and settings, followed by
-	 * drawing instructions, followed by the fill() and/or stroke() commands. This means that within a path, inject() can
-	 * update the fill & stroke styles, but for it to be applied in a predictable manner, you must have begun a fill or
-	 * stroke (as appropriate) normally via the Graphics API. For example:
-	 * 
-	 * 	function setColor(color) {
-	 * 		this.fillStyle = color;
-	 * 	}
-	 * 
-	 * 	// this will not draw anything - no fill was begun, so fill() is not called:
-	 * 	myGraphics.inject(setColor, "red").drawRect(0,0,100,100);
-	 * 
-	 * 	// this will draw the rect in green:
-	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100);
-	 * 
-	 * 	// this will draw both rects in blue, because there is only a single path
-	 * 	// so the second inject overwrites the first:
-	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
-	 * 		.inject(setColor, "blue").drawRect(100,0,100,100);
-	 * 
-	 * 	// this will draw the first rect in green, and the second in blue:
-	 * 	myGraphics.beginFill("#000").inject(setColor, "green").drawRect(0,0,100,100)
-	 * 		.beginFill("#000").inject(setColor, "blue").drawRect(100,0,100,100);
-	 */
-	function inject(callback:Dynamic, data:Dynamic) : Graphics;
-	/**
 	 * Draws a star if pointSize is greater than 0, or a regular polygon if pointSize is 0 with the specified number of
 	 * points. For example, the following code will draw a familiar 5 pointed star shape centered at 100, 100 and with a
 	 * radius of 50:
@@ -365,6 +373,28 @@ extern class Graphics
 	 * A tiny API method "dp" also exists.
 	 */
 	function drawPolyStar(x:Float, y:Float, radius:Float, sides:Float, pointSize:Float, angle:Float) : Graphics;
+	/**
+	 * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
+	 * that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
+	 * {{#crossLink "Graphics/draw"}}{{/crossLink}}. The latter will usually be the Shape instance that called draw.
+	 * 
+	 * This method is used internally by Graphics methods, such as drawCircle, but can also be used directly to insert
+	 * built-in or custom graphics commands. For example:
+	 * 
+	 * 		// attach data to our shape, so we can access it during the draw:
+	 * 		myShape.color = "red";
+	 * 
+	 * 		// append a Circle command object:
+	 * 		myShape.graphics.append(new Graphics.Circle(50, 50, 30));
+	 * 
+	 * 		// append a custom command object with an exec method that sets the fill style
+	 * 		// based on the shape's data, and then fills the circle.
+	 * 		myShape.graphics.append({exec:function(ctx, shape) {
+	 * 			ctx.fillStyle = shape.color;
+	 * 			ctx.fill();
+	 * 		}});
+	 */
+	function append(command:Dynamic, clean:Bool) : Graphics;
 	/**
 	 * Decodes a compact encoded path string into a series of draw instructions.
 	 * This format is not intended to be human readable, and is meant for use by authoring tools.
@@ -399,7 +429,46 @@ extern class Graphics
 	 */
 	function decodePath(str:String) : Graphics;
 	/**
-	 * Returns a clone of this Graphics instance.
+	 * Stores all graphics commands so they won't be executed in future draws. Calling store() a second time adds to
+	 * the existing store. This also affects `drawAsPath()`.
+	 * 
+	 * This is useful in cases where you are creating vector graphics in an iterative manner (ex. generative art), so
+	 * that only new graphics need to be drawn (which can provide huge performance benefits), but you wish to retain all
+	 * of the vector instructions for later use (ex. scaling, modifying, or exporting).
+	 * 
+	 * Note that calling store() will force the active path (if any) to be ended in a manner similar to changing
+	 * the fill or stroke.
+	 * 
+	 * For example, consider a application where the user draws lines with the mouse. As each line segment (or collection of
+	 * segments) are added to a Shape, it can be rasterized using {{#crossLink "DisplayObject/updateCache"}}{{/crossLink}},
+	 * and then stored, so that it can be redrawn at a different scale when the application is resized, or exported to SVG.
+	 * 
+	 * 	// set up cache:
+	 * 	myShape.cache(0,0,500,500,scale);
+	 * 
+	 * 	// when the user drags, draw a new line:
+	 * 	myShape.graphics.moveTo(oldX,oldY).lineTo(newX,newY);
+	 * 	// then draw it into the existing cache:
+	 * 	myShape.updateCache("source-over");
+	 * 	// store the new line, so it isn't redrawn next time:
+	 * 	myShape.store();
+	 * 
+	 * 	// then, when the window resizes, we can re-render at a different scale:
+	 * 	// first, unstore all our lines:
+	 * 	myShape.unstore();
+	 * 	// then cache using the new scale:
+	 * 	myShape.cache(0,0,500,500,newScale);
+	 * 	// finally, store the existing commands again:
+	 * 	myShape.store();
+	 */
+	function store() : Graphics;
+	/**
+	 * Unstores any graphics commands that were previously stored using {{#crossLink "Graphics/store"}}{{/crossLink}}
+	 * so that they will be executed in subsequent draw calls.
+	 */
+	function unstore() : Graphics;
+	/**
+	 * Returns a clone of this Graphics instance. Note that the individual command objects are not cloned.
 	 */
 	function clone() : Graphics;
 	/**

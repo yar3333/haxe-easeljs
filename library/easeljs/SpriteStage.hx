@@ -103,23 +103,6 @@ extern class SpriteStage extends Stage
 	 */
 	override function addChildAt(child:DisplayObject, index:Int) : DisplayObject;
 	/**
-	 * Each time the update method is called, the stage will tick all descendants (see: {{#crossLink "DisplayObject/tick"}}{{/crossLink}})
-	 * and then render the display list to the canvas using WebGL. If WebGL is not supported in the browser, it will default to a 2D context.
-	 * 
-	 * Any parameters passed to `update()` will be passed on to any
-	 * {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers.
-	 * 
-	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a tick event object (or equivalent) be passed as the first parameter to update(). For example:
-	 * 
-	 *      Ticker.addEventListener("tick", handleTick);
-	 *      function handleTick(evtObj) {
-	 *          // do some work here, then update the stage, passing through the event object:
-	 *          myStage.update(evtObj);
-	 *      }
-	 */
-	override function update(?params:Dynamic) : Void;
-	/**
 	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
 	 */
 	override function clear() : Void;

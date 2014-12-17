@@ -25,11 +25,13 @@ package easeljs;
 extern class Bitmap extends DisplayObject
 {
 	/**
-	 * The image to render. This can be an Image, a Canvas, or a Video.
+	 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
+	 * mobile browsers) support drawing video to a canvas.
 	 */
 	var image : Dynamic;
 	/**
 	 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
+	 * Note that video sources must have a width / height set to work correctly with `sourceRect`.
 	 */
 	var sourceRect : Rectangle;
 

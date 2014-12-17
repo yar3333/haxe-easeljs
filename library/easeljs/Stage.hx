@@ -55,7 +55,7 @@ extern class Stage extends Container
 	var mouseY : Float;
 	/**
 	 * Specifies the area of the stage to affect when calling update. This can be use to selectively
-	 * re-render only active regions of the canvas. If null, the whole canvas area is affected.
+	 * re-draw specific regions of the canvas. If null, the whole canvas area is drawn.
 	 */
 	var drawRect : Rectangle;
 	/**
@@ -78,6 +78,15 @@ extern class Stage extends Container
 	 * x/y/rawX/rawY.
 	 */
 	var mouseMoveOutside : Bool;
+	/**
+	 * Prevents selection of other elements in the html page if the user clicks and drags, or double clicks on the canvas.
+	 * This works by calling `preventDefault()` on any mousedown events (or touch equivalent) originating on the canvas.
+	 */
+	var preventSelection : Bool;
+	/**
+	 * The hitArea property is not supported for Stage.
+	 */
+	//var hitArea : DisplayObject;
 	/**
 	 * Specifies a target stage that will have mouse / touch interactions relayed to it after this stage handles them.
 	 * This can be useful in cases where you have multiple layered canvases and want user interactions
@@ -125,36 +134,35 @@ extern class Stage extends Container
 	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false,
 	 * and then render the display list to the canvas.
 	 */
-	function update(?params:Dynamic) : Void;
+	function update(?props:Dynamic) : Void;
 	/**
 	 * Propagates a tick event through the display list. This is automatically called by {{#crossLink "Stage/update"}}{{/crossLink}}
 	 * unless {{#crossLink "Stage/tickOnUpdate:property"}}{{/crossLink}} is set to false.
 	 * 
-	 * Any parameters passed to `tick()` will be included as an array in the "param" property of the event object dispatched
-	 * to {{#crossLink "DisplayObject/tick:event"}}{{/crossLink}} event handlers. Additionally, if the first parameter
-	 * is a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or has equivalent properties), then the delta,
-	 * time, runTime, and paused properties will be copied to the event object.
+	 * If a props object is passed to `tick()`, then all of its properties will be copied to the event object that is
+	 * propagated to listeners.
 	 * 
 	 * Some time-based features in EaselJS (for example {{#crossLink "Sprite/framerate"}}{{/crossLink}} require that
-	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent) be passed as the first parameter
-	 * to tick(). For example:
+	 * a {{#crossLink "Ticker/tick:event"}}{{/crossLink}} event object (or equivalent object with a delta property) be
+	 * passed as the `props` parameter to `tick()`. For example:
 	 * 
-	 * 	    Ticker.on("tick", handleTick);
-	 * 	    function handleTick(evtObj) {
-	 * 	    	// do some work here, then update the stage, passing through the tick event object as the first param
-	 * 	    	// and some custom data as the second and third param:
-	 * 	    	myStage.update(evtObj, "hello", 2014);
-	 * 	    }
-	 * 	    
-	 * 	    // ...
-	 * 	    myDisplayObject.on("tick", handleDisplayObjectTick);
-	 * 	    function handleDisplayObjectTick(evt) {
-	 * 	    	console.log(evt.params[0]); // the original tick evtObj
-	 * 	    	console.log(evt.delta, evt.paused); // ex. "17 false"
-	 * 	    	console.log(evt.params[1], evt.params[2]); // "hello 2014"
-	 * 	    }
+	 * 	Ticker.on("tick", handleTick);
+	 * 	function handleTick(evtObj) {
+	 * 		// clone the event object from Ticker, and add some custom data to it:
+	 * 		var evt = evtObj.clone().set({greeting:"hello", name:"world"});
+	 * 		
+	 * 		// pass it to stage.update():
+	 * 		myStage.update(evt); // subsequently calls tick() with the same param
+	 * 	}
+	 * 	
+	 * 	// ...
+	 * 	myDisplayObject.on("tick", handleDisplayObjectTick);
+	 * 	function handleDisplayObjectTick(evt) {
+	 * 		console.log(evt.delta); // the delta property from the Ticker tick event object
+	 * 		console.log(evt.greeting, evt.name); // custom data: "hello world"
+	 * 	}
 	 */
-	function tick(?params:Dynamic) : Void;
+	function tick(?props:Dynamic) : Void;
 	/**
 	 * Clears the target canvas. Useful if {{#crossLink "Stage/autoClear:property"}}{{/crossLink}} is set to `false`.
 	 */
@@ -163,7 +171,7 @@ extern class Stage extends Container
 	 * Returns a data url that contains a Base64-encoded image of the contents of the stage. The returned data url can
 	 * be specified as the src value of an image element.
 	 */
-	function toDataURL(backgroundColor:String, mimeType:String) : String;
+	function toDataURL(?backgroundColor:String, ?mimeType:String) : String;
 	/**
 	 * Enables or disables (by passing a frequency of 0) mouse over ({{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}
 	 * and {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}) and roll over events ({{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}
@@ -191,7 +199,7 @@ extern class Stage extends Container
 	 */
 	function enableDOMEvents(?enable:Bool) : Void;
 	/**
-	 * Returns a clone of this Stage.
+	 * Stage instances cannot be cloned.
 	 */
 	override function clone(?recursive:Bool) : DisplayObject;
 	/**
@@ -210,7 +218,7 @@ extern class Stage extends Container
 	 */
 	inline function addStagemousedownEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("stagemousedown", handler);
 	/**
-	 * Dispatched when the user the user releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
+	 * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
 	 * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */

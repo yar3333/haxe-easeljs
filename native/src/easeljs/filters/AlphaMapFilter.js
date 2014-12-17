@@ -35,6 +35,9 @@ this.createjs = this.createjs || {};
 
 (function () {
 	"use strict";
+	
+	
+// constructor:
 	/**
 	 * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
 	 * be copied from the red channel of the map, and the RGB channels will be copied from the target.
@@ -64,86 +67,73 @@ this.createjs = this.createjs || {};
 	 * @param {Image|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
 	 * result. This should be exactly the same dimensions as the target.
 	 **/
-	var AlphaMapFilter = function (alphaMap) {
-		this.initialize(alphaMap);
-	};
-	var p = AlphaMapFilter.prototype = new createjs.Filter();
-	AlphaMapFilter.prototype.constructor = AlphaMapFilter;
-
-// constructor:
-	/** @ignore */
-	p.initialize = function (alphaMap) {
+	function AlphaMapFilter(alphaMap) {
+	
+	
+	// public properties:
+		/**
+		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
+		 * dimensions as the target.
+		 * @property alphaMap
+		 * @type Image|HTMLCanvasElement
+		 **/
 		this.alphaMap = alphaMap;
-	};
+		
+		
+	// private properties:
+		/**
+		 * @property _alphaMap
+		 * @protected
+		 * @type Image|HTMLCanvasElement
+		 **/
+		this._alphaMap = null;
+		
+		/**
+		 * @property _mapData
+		 * @protected
+		 * @type Uint8ClampedArray
+		 **/
+		this._mapData = null;
+	}
+	var p = createjs.extend(AlphaMapFilter, createjs.Filter);
 
-// public properties:
-
-	/**
-	 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
-	 * dimensions as the target.
-	 * @property alphaMap
-	 * @type Image|HTMLCanvasElement
-	 **/
-	p.alphaMap = null;
-
-// private properties:
-	p._alphaMap = null;
-	p._mapData = null;
 
 // public methods:
-
-	p.applyFilter = function (ctx, x, y, width, height, targetCtx, targetX, targetY) {
-		if (!this.alphaMap) {
-			return true;
-		}
-		if (!this._prepAlphaMap()) {
-			return false;
-		}
-		targetCtx = targetCtx || ctx;
-		if (targetX == null) {
-			targetX = x;
-		}
-		if (targetY == null) {
-			targetY = y;
-		}
-
-		try {
-			var imageData = ctx.getImageData(x, y, width, height);
-		} catch (e) {
-			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
-			return false;
-		}
-		var data = imageData.data;
-		var map = this._mapData;
-		var l = data.length;
-		for(var i = 0; i < l; i += 4) {
-			data[i + 3] = map[i] || 0;
-		}
-		targetCtx.putImageData(imageData, targetX, targetY);
-		return true;
-	};
-
-	/**
-	 * Returns a clone of this object.
-	 * @method clone
-	 * @return {AlphaMapFilter} A clone of the current AlphaMapFilter instance.
-	 **/
+	/** docced in super class **/
 	p.clone = function () {
-		return new AlphaMapFilter(this.alphaMap);
+		var o = new AlphaMapFilter(this.alphaMap);
+		o._alphaMap = this._alphaMap;
+		o._mapData = this._mapData;
+		return o;
 	};
 
+	/** docced in super class **/
 	p.toString = function () {
 		return "[AlphaMapFilter]";
 	};
 
+
 // private methods:
+	/** docced in super class **/
+	p._applyFilter = function (imageData) {
+		if (!this.alphaMap) { return true; }
+		if (!this._prepAlphaMap()) { return false; }
+		
+		// TODO: update to support scenarios where the target has different dimensions.
+		var data = imageData.data;
+		var map = this._mapData;
+		for(var i=0, l=data.length; i<l; i += 4) { data[i + 3] = map[i] || 0; }
+		
+		return true;
+	};
+
+	/**
+	 * @method _prepAlphaMap
+	 * @protected
+	 **/
 	p._prepAlphaMap = function () {
-		if (!this.alphaMap) {
-			return false;
-		}
-		if (this.alphaMap == this._alphaMap && this._mapData) {
-			return true;
-		}
+		if (!this.alphaMap) { return false; }
+		if (this.alphaMap == this._alphaMap && this._mapData) { return true; }
 
 		this._mapData = null;
 		var map = this._alphaMap = this.alphaMap;
@@ -165,10 +155,11 @@ this.createjs = this.createjs || {};
 			//if (!this.suppressCrossDomainErrors) throw new Error("unable to access local image data: " + e);
 			return false;
 		}
+		
 		this._mapData = imgData.data;
 		return true;
 	};
 
-	createjs.AlphaMapFilter = AlphaMapFilter;
 
+	createjs.AlphaMapFilter = createjs.promote(AlphaMapFilter, "Filter");
 }());
