@@ -17,6 +17,11 @@ typedef DisplayObjectTickEvent =
 @:native("createjs.DisplayObject")
 extern class DisplayObject extends createjs.EventDispatcher
 {
+	static function __init__() : Void
+	{
+		untyped __js__("createjs.DisplayObject.prototype.setBounds = function(x, y, width, height) { this._bounds = x != null ? (this._bounds || new createjs.Rectangle()).setValues(x, y, width, height) : null; };");
+	}
+	
 	/**
 	 * The alpha (transparency) for this display object. 0 is fully transparent, 1 is fully opaque.
 	 */
