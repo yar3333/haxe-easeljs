@@ -1,25 +1,10 @@
 import easeljs.Shape;
 import easeljs.Stage;
+import easeljs.Matrix2D;
+import haxe.Timer;
 import js.Browser;
 import js.html.CanvasElement;
 import js.html.CanvasRenderingContext2D;
-
-class MyShape extends Shape
-{
-	override public function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool):Bool 
-	{
-		trace("draw cacheCanvas = " + (cacheCanvas != null) + "; ignoreCache = " + ignoreCache);
-		
-		if (cacheCanvas == null)
-		{
-			trace("cache");
-			cache(0, 0, 100, 100);
-		}
-		
-		trace("inner draw cacheCanvas = " + (cacheCanvas != null) + "; ignoreCache = " + ignoreCache);
-		return super.draw(ctx, ignoreCache);
-	}
-}
 
 class Main
 {
@@ -29,16 +14,32 @@ class Main
 		
 		var stage = new Stage(canvas);
 		
-		var shape = new MyShape();
+		var shape = new Shape();
 		stage.addChild(shape);
 		
 		shape.graphics
 			.beginStroke("red")
-			.moveTo(0, 0)
-			.lineTo(100, 100)
+			.rect(-100, -50, 100, 50)
 			.endStroke();
+			
+		shape.x = 200;
+		shape.y = 200;
 		
-		trace("update");
-		stage.update();
+		var timer = new Timer(50);
+		timer.run = function()
+		{
+			var matrix = shape.getMatrix();
+			
+			var m = new Matrix2D()
+				//.translate(-200, -200)
+				.rotate(1);
+				//.translate(200, 200);
+			
+			matrix.prependMatrix(m);
+			//matrix.appendMatrix(m);
+			shape.set(matrix.decompose());
+			
+			stage.update();
+		};
 	}
 }
