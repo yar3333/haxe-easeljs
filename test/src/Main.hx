@@ -19,7 +19,7 @@ class Main
 		
 		shape.graphics
 			.beginStroke("red")
-			.rect(-100, -50, 100, 50)
+			.rect(-100, -50, 200, 100)
 			.endStroke();
 			
 		shape.x = 200;
@@ -29,16 +29,9 @@ class Main
 		timer.run = function()
 		{
 			var matrix = shape.getMatrix();
-			
-			var m = new Matrix2D()
-				//.translate(-200, -200)
-				.rotate(1);
-				//.translate(200, 200);
-			
-			matrix.prependMatrix(m);
-			//matrix.appendMatrix(m);
+			var m = new Matrix2D().appendTransform(0, 0, 1, 1, 1, 0, 0);
+			matrix.appendMatrix(m);
 			shape.set(matrix.decompose());
-			
 			stage.update();
 		};
 	}
