@@ -421,33 +421,33 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addMousedownEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("mousedown", handler, useCapture);
-	inline function removeMousedownEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("mousedown", handler, useCapture);
+	inline function removeMousedownEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Void removeEventListener("mousedown", handler, useCapture);
 	/**
 	 * Dispatched when the user presses their left mouse button and then releases it while over the display object.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addClickEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("click", handler, useCapture);
-	inline function removeClickEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("click", handler, useCapture);
+	inline function removeClickEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Void removeEventListener("click", handler, useCapture);
 	/**
 	 * Dispatched when the user double clicks their left mouse button over this display object.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addDblclickEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("dblclick", handler, useCapture);
-	inline function removeDblclickEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("dblclick", handler, useCapture);
+	inline function removeDblclickEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Void removeEventListener("dblclick", handler, useCapture);
 	/**
 	 * Dispatched when the user's mouse enters this display object. This event must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}. See also {{#crossLink "DisplayObject/rollover:event"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addMouseoverEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("mouseover", handler, useCapture);
-	inline function removeMouseoverEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("mouseover", handler, useCapture);
+	inline function removeMouseoverEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Void removeEventListener("mouseover", handler, useCapture);
 	/**
 	 * Dispatched when the user's mouse leaves this display object. This event must be enabled using 
 	 * {{#crossLink "Stage/enableMouseOver"}}{{/crossLink}}. See also {{#crossLink "DisplayObject/rollout:event"}}{{/crossLink}}.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addMouseoutEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("mouseout", handler, useCapture);
-	inline function removeMouseoutEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("mouseout", handler, useCapture);
+	inline function removeMouseoutEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Void removeEventListener("mouseout", handler, useCapture);
 	/**
 	 * This event is similar to {{#crossLink "DisplayObject/mouseover:event"}}{{/crossLink}}, with the following
 	 * differences: it does not bubble, and it considers {{#crossLink "Container"}}{{/crossLink}} instances as an
@@ -466,7 +466,7 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addRolloverEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("rollover", handler, useCapture);
-	inline function removeRolloverEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("rollover", handler, useCapture);
+	inline function removeRolloverEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Void removeEventListener("rollover", handler, useCapture);
 	/**
 	 * This event is similar to {{#crossLink "DisplayObject/mouseout:event"}}{{/crossLink}}, with the following
 	 * differences: it does not bubble, and it considers {{#crossLink "Container"}}{{/crossLink}} instances as an
@@ -485,31 +485,31 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
 	inline function addRolloutEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("rollout", handler, useCapture);
-	inline function removeRolloutEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("rollout", handler, useCapture);
+	inline function removeRolloutEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Void removeEventListener("rollout", handler, useCapture);
 	/**
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressmove
 	 * event will be generated on that object whenever the mouse moves until the mouse press is released. This can be
 	 * useful for dragging and similar operations.
 	 */
 	inline function addPressmoveEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("pressmove", handler, useCapture);
-	inline function removePressmoveEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("pressmove", handler, useCapture);
+	inline function removePressmoveEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("pressmove", handler, useCapture);
 	/**
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressup event
 	 * will be generated on that object when that mouse press is released. This can be useful for dragging and similar
 	 * operations.
 	 */
 	inline function addPressupEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("pressup", handler, useCapture);
-	inline function removePressupEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("pressup", handler, useCapture);
+	inline function removePressupEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("pressup", handler, useCapture);
 	/**
 	 * Dispatched when the display object is added to a parent container.
 	 */
 	inline function addAddedEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("added", handler, useCapture);
-	inline function removeAddedEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("added", handler, useCapture);
+	inline function removeAddedEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("added", handler, useCapture);
 	/**
 	 * Dispatched when the display object is removed from its parent container.
 	 */
 	inline function addRemovedEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("removed", handler, useCapture);
-	inline function removeRemovedEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("removed", handler, useCapture);
+	inline function removeRemovedEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("removed", handler, useCapture);
 	/**
 	 * Dispatched on each display object on a stage whenever the stage updates. This occurs immediately before the
 	 * rendering (draw) pass. When {{#crossLink "Stage/update"}}{{/crossLink}} is called, first all display objects on
@@ -518,5 +518,5 @@ extern class DisplayObject extends createjs.EventDispatcher
 	 * dispatched on their parent.
 	 */
 	inline function addTickEventListener(handler:DisplayObjectTickEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("tick", handler, useCapture);
-	inline function removeTickEventListener(handler:DisplayObjectTickEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("tick", handler, useCapture);
+	inline function removeTickEventListener(handler:DisplayObjectTickEvent->Void, ?useCapture:Bool) : Void removeEventListener("tick", handler, useCapture);
 }

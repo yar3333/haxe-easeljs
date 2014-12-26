@@ -119,10 +119,10 @@ extern class SpriteSheetBuilder extends createjs.EventDispatcher
 	 * Dispatched when a build completes.
 	 */
 	inline function addCompleteEventListener(handler:SpriteSheetBuilderCompleteEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("complete", handler, useCapture);
-	inline function removeCompleteEventListener(handler:SpriteSheetBuilderCompleteEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("complete", handler, useCapture);
+	inline function removeCompleteEventListener(handler:SpriteSheetBuilderCompleteEvent->Void, ?useCapture:Bool) : Void removeEventListener("complete", handler, useCapture);
 	/**
 	 * Dispatched when an asynchronous build has progress.
 	 */
 	inline function addProgressEventListener(handler:SpriteSheetBuilderProgressEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("progress", handler, useCapture);
-	inline function removeProgressEventListener(handler:SpriteSheetBuilderProgressEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("progress", handler, useCapture);
+	inline function removeProgressEventListener(handler:SpriteSheetBuilderProgressEvent->Void, ?useCapture:Bool) : Void removeEventListener("progress", handler, useCapture);
 }
