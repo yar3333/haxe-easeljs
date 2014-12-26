@@ -98,5 +98,5 @@ extern class DOMElement extends DisplayObject
 	 * are not full EaselJS display objects and do not participate in EaselJS mouse events.
 	 */
 	inline function addDblClickEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("dblClick", handler, useCapture);
-	inline function removeDblClickEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("dblClick", handler, useCapture);
+	inline function removeDblClickEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("dblClick", handler, useCapture);
 }

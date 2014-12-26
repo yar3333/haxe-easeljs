@@ -202,11 +202,11 @@ extern class SpriteSheet extends createjs.EventDispatcher
 	 * 	}
 	 */
 	inline function addCompleteEventListener(handler:SpriteSheetCompleteEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("complete", handler, useCapture);
-	inline function removeCompleteEventListener(handler:SpriteSheetCompleteEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("complete", handler, useCapture);
+	inline function removeCompleteEventListener(handler:SpriteSheetCompleteEvent->Void, ?useCapture:Bool) : Void removeEventListener("complete", handler, useCapture);
 	/**
 	 * Dispatched when getFrame is called with a valid frame index. This is primarily intended for use by {{#crossLink "SpriteSheetBuilder"}}{{/crossLink}}
 	 * when doing on-demand rendering.
 	 */
 	inline function addGetframeEventListener(handler:SpriteSheetGetframeEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("getframe", handler, useCapture);
-	inline function removeGetframeEventListener(handler:SpriteSheetGetframeEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("getframe", handler, useCapture);
+	inline function removeGetframeEventListener(handler:SpriteSheetGetframeEvent->Void, ?useCapture:Bool) : Void removeEventListener("getframe", handler, useCapture);
 }
