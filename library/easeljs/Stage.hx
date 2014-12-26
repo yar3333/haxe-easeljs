@@ -211,47 +211,56 @@ extern class Stage extends Container
 	 * Dispatched when the user moves the mouse over the canvas.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
-	inline function addStagemousemoveEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("stagemousemove", handler);
+	inline function addStagemousemoveEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("stagemousemove", handler, useCapture);
+	inline function removeStagemousemoveEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("stagemousemove", handler, useCapture);
 	/**
 	 * Dispatched when the user presses their left mouse button on the canvas. See the {{#crossLink "MouseEvent"}}{{/crossLink}}
 	 * class for a listing of event properties.
 	 */
-	inline function addStagemousedownEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("stagemousedown", handler);
+	inline function addStagemousedownEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("stagemousedown", handler, useCapture);
+	inline function removeStagemousedownEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("stagemousedown", handler, useCapture);
 	/**
 	 * Dispatched when the user the user presses somewhere on the stage, then releases the mouse button anywhere that the page can detect it (this varies slightly between browsers).
 	 * You can use {{#crossLink "Stage/mouseInBounds:property"}}{{/crossLink}} to check whether the mouse is currently within the stage bounds.
 	 * See the {{#crossLink "MouseEvent"}}{{/crossLink}} class for a listing of event properties.
 	 */
-	inline function addStagemouseupEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("stagemouseup", handler);
+	inline function addStagemouseupEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("stagemouseup", handler, useCapture);
+	inline function removeStagemouseupEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("stagemouseup", handler, useCapture);
 	/**
 	 * Dispatched when the mouse moves from within the canvas area (mouseInBounds == true) to outside it (mouseInBounds == false).
 	 * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
 	 * class for a listing of event properties.
 	 */
-	inline function addMouseleaveEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("mouseleave", handler);
+	inline function addMouseleaveEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("mouseleave", handler, useCapture);
+	inline function removeMouseleaveEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("mouseleave", handler, useCapture);
 	/**
 	 * Dispatched when the mouse moves into the canvas area (mouseInBounds == false) from outside it (mouseInBounds == true).
 	 * This is currently only dispatched for mouse input (not touch). See the {{#crossLink "MouseEvent"}}{{/crossLink}}
 	 * class for a listing of event properties.
 	 */
-	inline function addMouseenterEventListener(handler:MouseEvent->Void) : Dynamic return addEventListener("mouseenter", handler);
+	inline function addMouseenterEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("mouseenter", handler, useCapture);
+	inline function removeMouseenterEventListener(handler:MouseEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("mouseenter", handler, useCapture);
 	/**
 	 * Dispatched each update immediately before the tick event is propagated through the display list.
 	 * You can call preventDefault on the event object to cancel propagating the tick event.
 	 */
-	inline function addTickstartEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("tickstart", handler);
+	inline function addTickstartEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("tickstart", handler, useCapture);
+	inline function removeTickstartEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("tickstart", handler, useCapture);
 	/**
 	 * Dispatched each update immediately after the tick event is propagated through the display list. Does not fire if
 	 * tickOnUpdate is false. Precedes the "drawstart" event.
 	 */
-	inline function addTickendEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("tickend", handler);
+	inline function addTickendEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("tickend", handler, useCapture);
+	inline function removeTickendEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("tickend", handler, useCapture);
 	/**
 	 * Dispatched each update immediately before the canvas is cleared and the display list is drawn to it.
 	 * You can call preventDefault on the event object to cancel the draw.
 	 */
-	inline function addDrawstartEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("drawstart", handler);
+	inline function addDrawstartEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("drawstart", handler, useCapture);
+	inline function removeDrawstartEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("drawstart", handler, useCapture);
 	/**
 	 * Dispatched each update immediately after the display list is drawn to the canvas and the canvas context is restored.
 	 */
-	inline function addDrawendEventListener(handler:Dynamic->Void) : Dynamic return addEventListener("drawend", handler);
+	inline function addDrawendEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("drawend", handler, useCapture);
+	inline function removeDrawendEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return removeEventListener("drawend", handler, useCapture);
 }

@@ -245,5 +245,6 @@ extern class Ticker
 	 *          console.log("Paused:", event.paused, event.delta);
 	 *      }
 	 */
-	static inline function addTickEventListener(handler:TickerTickEvent->Void) : Dynamic return addEventListener("tick", handler);
+	static inline function addTickEventListener(handler:TickerTickEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("tick", handler, useCapture);
+	static inline function removeTickEventListener(handler:TickerTickEvent->Void, ?useCapture:Bool) : Dynamic return removeEventListener("tick", handler, useCapture);
 }
