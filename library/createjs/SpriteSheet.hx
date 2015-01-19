@@ -130,7 +130,7 @@ typedef SpriteSheetGetframeEvent =
  * using a mouse, using methods such as `getObjectUnderPoint`, using filters, or caching. You can get around this by
  * setting `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`
  */
-extern class SpriteSheet extends createjs.EventDispatcher
+extern class SpriteSheet extends EventDispatcher
 {
 	/**
 	 * Indicates whether all images are finished loading.

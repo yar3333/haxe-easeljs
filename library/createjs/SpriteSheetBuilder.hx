@@ -24,7 +24,7 @@ typedef SpriteSheetBuilderProgressEvent =
  * Note that the "images" used in the generated sprite sheet are actually canvas elements, and that they will be sized
  * to the nearest power of 2 up to the value of <code>maxWidth</code> or <code>maxHeight</code>.
  */
-extern class SpriteSheetBuilder extends createjs.EventDispatcher
+extern class SpriteSheetBuilder extends EventDispatcher
 {
 	/**
 	 * The maximum width for the images (not individual frames) in the generated sprite sheet. It is recommended to use
