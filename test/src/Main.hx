@@ -1,6 +1,6 @@
-import easeljs.Shape;
-import easeljs.Stage;
-import easeljs.Matrix2D;
+import createjs.Shape;
+import createjs.Stage;
+import createjs.Matrix2D;
 import haxe.Timer;
 import js.Browser;
 import js.html.CanvasElement;
