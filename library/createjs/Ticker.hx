@@ -28,7 +28,6 @@ typedef TickerTickEvent =
  *          }
  *      }
  */
-@:native("createjs.Ticker")
 extern class Ticker
 {
 	/**
