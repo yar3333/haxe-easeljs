@@ -4,8 +4,8 @@
   "tags": ["html","html5","js"],
   "description": "Haxe wrapper for EaselJS library. The aim of the project: auto-generate haxe classes from js to have a most recent EaselJS version.",
   "contributors": ["yar3333"],
-  "releasenote": "Upgrade easeljs to v0.8.0. Many fixes.",
-  "version": "1.1.0",
+  "releasenote": "All classes now in native package 'createjs'. Minor improvements.",
+  "version": "2.0.0",
   "url": "https://bitbucket.org/yar3333/haxe-easeljs",
   "dependencies": {}
 }
