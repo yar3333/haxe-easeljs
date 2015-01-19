@@ -14,7 +14,7 @@ typedef DisplayObjectTickEvent =
  * methods that are shared between all display objects, such as transformation properties (x, y, scaleX, scaleY, etc),
  * caching, and mouse handlers.
  */
-extern class DisplayObject extends createjs.EventDispatcher
+extern class DisplayObject extends EventDispatcher
 {
 	static function __init__() : Void
 	{

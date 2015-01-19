@@ -4,7 +4,7 @@ package createjs;
  * Passed as the parameter to all mouse/pointer/touch related events. For a listing of mouse events and their properties,
  * see the {{#crossLink "DisplayObject"}}{{/crossLink}} and {{#crossLink "Stage"}}{{/crossLink}} event listings.
  */
-extern class MouseEvent extends createjs.Event
+extern class MouseEvent extends Event
 {
 	/**
 	 * The normalized x position on the stage. This will always be within the range 0 to stage width.
@@ -58,7 +58,7 @@ extern class MouseEvent extends createjs.Event
 	/**
 	 * Returns a clone of the MouseEvent instance.
 	 */
-	override function clone() : createjs.Event;
+	override function clone() : Event;
 	/**
 	 * Returns a string representation of this object.
 	 */
