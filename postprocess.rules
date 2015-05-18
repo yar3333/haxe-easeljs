@@ -12,12 +12,15 @@ EVENT_DISPATCHER_METHODS = EVENT_DISPATCHER_METHODS|willTrigger
 
 METHODS_RETURN_INT =                    getChildIndex
 METHODS_RETURN_INT = METHODS_RETURN_INT|getNumChildren
+METHODS_RETURN_INT = METHODS_RETURN_INT|getNumFrames
 
 VARS_INT =          index
 VARS_INT = VARS_INT|mode
 VARS_INT = VARS_INT|cacheID
 VARS_INT = VARS_INT|id
 VARS_INT = VARS_INT|numChildren
+
+FUNCTION_AND_ARG_DELIMITER = [^\n]*[(,]\s*
 
 ANY = (?:(?:[\n]|[^\n])+?)
 
@@ -33,3 +36,5 @@ ANY = (?:(?:[\n]|[^\n])+?)
 /(function extend(?:ANY)function )extend/$1pad/m
 /(extern class Stage extends Container\s*{ANY\b)(var hitArea)/$1\/\/$2/
 /function decompose\(target/function decompose(?target/
+
+/(getNumFrames(?:FUNCTION_AND_ARG_DELIMITER))(animation)/$1?$2/
