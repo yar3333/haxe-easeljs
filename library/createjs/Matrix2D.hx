@@ -123,7 +123,7 @@ extern class Matrix2D
 	/**
 	 * Sets the properties of the matrix to those of an identity matrix (one that applies a null transformation).
 	 */
-	inline function identity_() : Matrix2D return Reflect.callMethod(this, "identity", [  ]);
+	inline function identity_() : Matrix2D return untyped this["identity"]();
 	/**
 	 * Inverts the matrix, causing it to perform the opposite transformation.
 	 */
