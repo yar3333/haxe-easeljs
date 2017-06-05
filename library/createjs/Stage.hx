@@ -41,7 +41,7 @@ extern class Stage extends Container
 	 *      myStage.canvas = anotherCanvas;
 	 *      myStage.enableDOMEvents(true);
 	 */
-	var canvas : Dynamic;
+	var canvas : js.html.CanvasElement;
 	/**
 	 * The current mouse X position on the canvas. If the mouse leaves the canvas, this will indicate the most recent
 	 * position over the canvas, and mouseInBounds will be set to false.
