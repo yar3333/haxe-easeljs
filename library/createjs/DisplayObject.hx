@@ -18,7 +18,7 @@ extern class DisplayObject extends EventDispatcher
 {
 	static function __init__() : Void
 	{
-		untyped __js__("createjs.DisplayObject.prototype.setBounds = function(x, y, width, height) { this._bounds = x != null ? (this._bounds || new createjs.Rectangle()).setValues(x, y, width, height) : null; };");
+		js.Syntax.code("createjs.DisplayObject.prototype.setBounds = function(x, y, width, height) { this._bounds = x != null ? (this._bounds || new createjs.Rectangle()).setValues(x, y, width, height) : null; };");
 	}
 	
 	/**
