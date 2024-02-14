@@ -48,7 +48,7 @@ this.createjs = this.createjs||{};
 	 *
 	 * @class Shadow
 	 * @constructor
-	 * @param {String} color The color of the shadow.
+	 * @param {String} color The color of the shadow. This can be any valid CSS color value.
 	 * @param {Number} offsetX The x offset of the shadow in pixels.
 	 * @param {Number} offsetY The y offset of the shadow in pixels.
 	 * @param {Number} blur The size of the blurring effect.
@@ -57,36 +57,36 @@ this.createjs = this.createjs||{};
 		
 		
 	// public properties:
-		/** The color of the shadow.
-		 * property color
+		/** 
+		 * The color of the shadow. This can be any valid CSS color value.
+		 * @property color
 		 * @type String
 		 * @default null
 		 */
 		this.color = color||"black";
 	
 		/** The x offset of the shadow.
-		 * property offsetX
+		 * @property offsetX
 		 * @type Number
 		 * @default 0
 		 */
 		this.offsetX = offsetX||0;
 	
 		/** The y offset of the shadow.
-		 * property offsetY
+		 * @property offsetY
 		 * @type Number
 		 * @default 0
 		 */
 		this.offsetY = offsetY||0;
 	
 		/** The blur of the shadow.
-		 * property blur
+		 * @property blur
 		 * @type Number
 		 * @default 0
 		 */
 		this.blur = blur||0;
 	}
 	var p = Shadow.prototype;
-
 
 // static public properties:
 	/**

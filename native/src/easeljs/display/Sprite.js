@@ -161,11 +161,23 @@ this.createjs = this.createjs||{};
 		 * @default false
 		 **/
 		this._skipAdvance = false;
-		
-		
-		if (frameOrAnimation) { this.gotoAndPlay(frameOrAnimation); }
+
+		/**
+		 * Docced in superclass.
+		 */
+		this._webGLRenderStyle = createjs.DisplayObject._StageGL_SPRITE;
+
+		if (frameOrAnimation != null) { this.gotoAndPlay(frameOrAnimation); }
 	}
 	var p = createjs.extend(Sprite, createjs.DisplayObject);
+
+	/**
+	 * Constructor alias for backwards compatibility. This method will be removed in future versions.
+	 * Subclasses should be updated to use {{#crossLink "Utility Methods/extends"}}{{/crossLink}}.
+	 * @method initialize
+	 * @deprecated in favour of `createjs.promote()`
+	 **/
+	p.initialize = Sprite; // TODO: Deprecated. This is for backwards support of Flash/Animate spritesheet export.
 
 
 // events:

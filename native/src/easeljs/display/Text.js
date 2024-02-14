@@ -148,6 +148,9 @@ this.createjs = this.createjs||{};
 	}
 	var p = createjs.extend(Text, createjs.DisplayObject);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 	
 // static properties:
 	/**
@@ -250,7 +253,7 @@ this.createjs = this.createjs||{};
 	p.getBounds = function() {
 		var rect = this.DisplayObject_getBounds();
 		if (rect) { return rect; }
-		if (this.text == null || this.text == "") { return null; }
+		if (this.text == null || this.text === "") { return null; }
 		var o = this._drawText(null, {});
 		var w = (this.maxWidth && this.maxWidth < o.width) ? this.maxWidth : o.width;
 		var x = w * Text.H_OFFSETS[this.textAlign||"left"];
@@ -321,6 +324,8 @@ this.createjs = this.createjs||{};
 		ctx.font = this.font||"10px sans-serif";
 		ctx.textAlign = this.textAlign||"left";
 		ctx.textBaseline = this.textBaseline||"top";
+		ctx.lineJoin = "miter";
+		ctx.miterLimit = 2.5;
 		return ctx;
 	};
 

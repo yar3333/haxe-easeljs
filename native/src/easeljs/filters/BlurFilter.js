@@ -41,8 +41,8 @@ this.createjs = this.createjs||{};
 
 // constructor:
 	/**
-	 * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
-	 * set higher than 1.
+	 * Applies a box blur to DisplayObjects in context 2D and a Gaussian blur in webgl. Note that this filter is fairly
+	 * intensive, particularly if the quality is set higher than 1.
 	 *
 	 * <h4>Example</h4>
 	 * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}
@@ -66,10 +66,7 @@ this.createjs = this.createjs||{};
 	 * @param {Number} [quality=1] The number of blur iterations.
 	 **/
 	function BlurFilter( blurX, blurY, quality) {
-		if ( isNaN(blurX) || blurX < 0 ) blurX = 0;
-		if ( isNaN(blurY) || blurY < 0 ) blurY = 0;
-		if ( isNaN(quality) || quality < 1  ) quality = 1;
-
+		this.Filter_constructor();
 
 		// public properties:
 		/**
@@ -78,7 +75,9 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 * @type Number
 		 **/
-		this.blurX = blurX | 0;
+		this._blurX = blurX;
+		this._blurXTable = [];
+		this._lastBlurX = null;
 
 		/**
 		 * Vertical blur radius in pixels
@@ -86,7 +85,9 @@ this.createjs = this.createjs||{};
 		 * @default 0
 		 * @type Number
 		 **/
-		this.blurY = blurY | 0;
+		this._blurY = blurY;
+		this._blurYTable = [];
+		this._lastBlurY = null;
 
 		/**
 		 * Number of blur iterations. For example, a value of 1 will produce a rough blur. A value of 2 will produce a
@@ -95,11 +96,136 @@ this.createjs = this.createjs||{};
 		 * @default 1
 		 * @type Number
 		 **/
-		this.quality = quality | 0;
+		this._quality;
+		this._lastQuality = null;
+
+		/**
+		 * This is a template to generate the shader for {{#crossLink FRAG_SHADER_BODY}}{{/crossLink}}
+		 */
+		this.FRAG_SHADER_TEMPLATE = (
+			"uniform float xWeight[{{blurX}}];" +
+			"uniform float yWeight[{{blurY}}];" +
+			"uniform vec2 textureOffset;" +
+			"void main(void) {" +
+				"vec4 color = vec4(0.0);" +
+
+				"float xAdj = ({{blurX}}.0-1.0)/2.0;" +
+				"float yAdj = ({{blurY}}.0-1.0)/2.0;" +
+				"vec2 sampleOffset;" +
+
+				"for(int i=0; i<{{blurX}}; i++) {" +
+					"for(int j=0; j<{{blurY}}; j++) {" +
+						"sampleOffset = vRenderCoord + (textureOffset * vec2(float(i)-xAdj, float(j)-yAdj));" +
+						"color += texture2D(uSampler, sampleOffset) * (xWeight[i] * yWeight[j]);" +
+					"}" +
+				"}" +
+
+				"gl_FragColor = color.rgba;" +
+			"}"
+		);
+
+		// update the filter using the setters
+		if(isNaN(quality) || quality < 1){ quality = 1; }
+		this.setQuality(quality|0);
 	}
 	var p = createjs.extend(BlurFilter, createjs.Filter);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
 
+	p.getBlurX = function() { return this._blurX; };
+	p.getBlurY = function() { return this._blurY; };
+	p.setBlurX = function(value) {
+		if(isNaN(value) || value < 0){ value = 0; }
+		this._blurX = value;
+	};
+	p.setBlurY = function(value) {
+		if(isNaN(value) || value < 0){ value = 0; }
+		this._blurY = value;
+	};
+	p.getQuality = function() { return this._quality; };
+	p.setQuality = function(value) {
+		if(isNaN(value) || value < 0){ value = 0; }
+		this._quality = value | 0;
+	};
+	p._getShader = function() {
+		var xChange = this._lastBlurX !== this._blurX;
+		var yChange = this._lastBlurY !== this._blurY;
+		var qChange = this._lastQuality !== this._quality;
+		if(xChange || yChange || qChange) {
+			if(xChange || qChange) { this._blurXTable = this._getTable(this._blurX * this._quality); }
+			if(yChange || qChange) { this._blurYTable = this._getTable(this._blurY * this._quality); }
+			this._updateShader();
+			this._lastBlurX = this._blurX;
+			this._lastBlurY = this._blurY;
+			this._lastQuality = this._quality;
+			return undefined; // force a rebuild
+		}
+		return this._compiledShader;
+	};
+	p._setShader = function() { this._compiledShader; };
+
+	try {
+		Object.defineProperties(p, {
+			blurX: { get: p.getBlurX, set: p.setBlurX },
+			blurY: { get: p.getBlurY, set: p.setBlurY },
+			quality: { get: p.getQuality, set: p.setQuality },
+			_builtShader: { get: p._getShader, set: p._setShader}
+		});
+	} catch (e) { console.log(e); }
+
+	/**
+	 * Internal lookup function to create gaussian distribution.
+	 * @method _getTable
+	 * @param {Number} spread How many steps in the curve.
+	 * @return {Array<Number>} An array with Math.ceil(spread*2) entries with appropriately distributed weights.
+	 */
+	p._getTable = function(spread) {
+		var EDGE = 4.2;
+		if(spread<=1) { return [1]; }
+
+		var result = [];
+		var count = Math.ceil(spread*2);
+		count += (count%2)?0:1;
+		var adjust = (count/2)|0;
+		for(var i = -adjust; i<=adjust; i++) {
+			var x = (i/adjust)*EDGE;
+			result.push(1/Math.sqrt(2*Math.PI) * Math.pow(Math.E, -(Math.pow(x,2)/4)));
+		}
+		var factor = result.reduce(function(a, b) { return a + b; });
+		return result.map(function(currentValue, index, array) { return currentValue/factor; });
+	};
+
+	/**
+	 * Internal update function to create shader properties.
+	 * @method _updateShader
+	 */
+	p._updateShader = function() {
+		if(this._blurX === undefined || this._blurY === undefined){ return; }
+		var result = this.FRAG_SHADER_TEMPLATE;
+		result = result.replace(/\{\{blurX\}\}/g, (this._blurXTable.length).toFixed(0));
+		result = result.replace(/\{\{blurY\}\}/g, (this._blurYTable.length).toFixed(0));
+		this.FRAG_SHADER_BODY = result;
+	};
+
+	/** docced in super class **/
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {
+		// load the normalized gaussian weight tables
+		gl.uniform1fv(
+			gl.getUniformLocation(shaderProgram, "xWeight"),
+			this._blurXTable
+		);
+		gl.uniform1fv(
+			gl.getUniformLocation(shaderProgram, "yWeight"),
+			this._blurYTable
+		);
+
+		// what is the size of a single pixel in -1, 1 (webGL) space
+		gl.uniform2f(
+			gl.getUniformLocation(shaderProgram, "textureOffset"),
+			2/(stage._viewportWidth*this._quality), 2/(stage._viewportHeight*this._quality)
+		);
+	};
 
 // constants:
 	/**
@@ -124,9 +250,9 @@ this.createjs = this.createjs||{};
 	/** docced in super class **/
 	p.getBounds = function (rect) {
 		var x = this.blurX|0, y = this.blurY| 0;
-		if (x <= 0 && y <= 0) { return rect; }
+		if(x <= 0 && y <= 0) { return rect; }
 		var q = Math.pow(this.quality, 0.2);
-		return (rect || new createjs.Rectangle()).pad(x*q+1,y*q+1,x*q+1,y*q+1);
+		return (rect || new createjs.Rectangle()).pad(y*q+1,x*q+1,y*q+1,x*q+1);
 	};
 
 	/** docced in super class **/
@@ -144,10 +270,9 @@ this.createjs = this.createjs||{};
 
 	/** docced in super class **/
 	p._applyFilter = function (imageData) {
-
-		var radiusX = this.blurX >> 1;
+		var radiusX = this._blurX >> 1;
 		if (isNaN(radiusX) || radiusX < 0) return false;
-		var radiusY = this.blurY >> 1;
+		var radiusY = this._blurY >> 1;
 		if (isNaN(radiusY) || radiusY < 0) return false;
 		if (radiusX == 0 && radiusY == 0) return false;
 

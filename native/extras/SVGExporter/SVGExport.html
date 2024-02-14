@@ -3,8 +3,8 @@
 <head lang="en">
 	<meta charset="UTF-8">
 	<title></title>
-	<script type="text/javascript" src="../../lib/easeljs-NEXT.combined.js"></script>
-	<script type="text/javascript" src="../../examples/assets/preloadjs-NEXT.min.js"></script>
+	<script type="text/javascript" src="../../lib/easeljs-NEXT.js"></script>
+	<script type="text/javascript" src="../../_assets/libs/preloadjs-NEXT.min.js"></script>
 	<script type="text/javascript" src="SVGExporter.js"></script>
 	<script type="text/javascript" src="../../src/easeljs/display/Graphics.js"></script>
 </head>
@@ -91,8 +91,8 @@
 		queue.on("complete", setup);
 		queue.loadManifest([
 			{id:"daisy", src:"daisy.png"},
-			{id:"bmpfont", src:"BitmapFont.png"}
-		], true, "../../examples/assets/");
+			{id:"bmpfont", src:"spritesheet_font.png"}
+		], true, "../../_assets/art/");
 		
 		function setup() {
 			stage = new c.Stage("test");
@@ -174,7 +174,7 @@
 			
 			// scale invariant strokes (aka ignoreScale):
 			var shape2 = new c.Shape();
-			shape2.graphics.f().s("green").ss(4, null, null, null, true).drawRect(0,0,10,10);
+			shape2.graphics.f().s("green").ss(4, null, null, null, true).setStrokeDash([5,2,10,2]).drawRect(0,0,10,10);
 			shape2.scaleX = shape2.scaleY = 10;
 			shape2.x = 350;
 			shape2.y = 50;

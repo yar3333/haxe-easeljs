@@ -65,6 +65,10 @@ this.createjs = this.createjs||{};
 	 *          console.log("clicked");
 	 *      }
 	 *
+	 * <strong>Important:</strong> This class needs to be notified it is about to be drawn, this will happen automatically
+	 * if you call stage.update, calling stage.draw or disabling tickEnabled will miss important steps and it will render
+	 * stale information.
+	 *
 	 * @class DOMElement
 	 * @extends DisplayObject
 	 * @constructor
@@ -97,9 +101,27 @@ this.createjs = this.createjs||{};
 		 * @protected
 		 */
 		this._oldProps = null;
+
+		/**
+		 * Used to track the object which this class attached listeners to, helps optimize listener attachment.
+		 * @property _oldStage
+		 * @type Stage
+		 * @protected
+		 */
+		this._oldStage = null;
+		/**
+		 * The event listener proxy triggered drawing draw for special circumstances.
+		 * @property _drawAction
+		 * @type function
+		 * @protected
+		 */
+		this._drawAction = null;
 	}
 	var p = createjs.extend(DOMElement, createjs.DisplayObject);
-	
+
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
 
 // public methods:
 	/**
@@ -227,8 +249,12 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 */
 	p._tick = function(evtObj) {
-		var stage = this.getStage();
-		stage&&stage.on("drawend", this._handleDrawEnd, this, true);
+		var stage = this.stage;
+		if(stage && stage !== this._oldStage) {
+			this._drawAction && stage.off("drawend", this._drawAction);
+			this._drawAction = stage.on("drawend", this._handleDrawEnd, this);
+			this._oldStage = stage;
+		}
 		this.DisplayObject__tick(evtObj);
 	};
 	
@@ -255,7 +281,7 @@ this.createjs = this.createjs||{};
 			var str = "matrix(" + (mtx.a*n|0)/n +","+ (mtx.b*n|0)/n +","+ (mtx.c*n|0)/n +","+ (mtx.d*n|0)/n +","+ (mtx.tx+0.5|0);
 			style.transform = style.WebkitTransform = style.OTransform = style.msTransform = str +","+ (mtx.ty+0.5|0) +")";
 			style.MozTransform = str +"px,"+ (mtx.ty+0.5|0) +"px)";
-			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, NaN); }
+			if (!oldProps) { oldProps = this._oldProps = new createjs.DisplayProps(true, null); }
 			oldProps.matrix.copy(mtx);
 		}
 		

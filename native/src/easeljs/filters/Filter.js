@@ -56,8 +56,7 @@ this.createjs = this.createjs||{};
 	 * will cause an object to feather outwards, resulting in a margin around the shape.
 	 *
 	 * <h4>EaselJS Filters</h4>
-	 * EaselJS comes with a number of pre-built filters. Note that individual filters are not compiled into the minified
-	 * version of EaselJS. To use them, you must include them manually in the HTML.
+	 * EaselJS comes with a number of pre-built filters:
 	 * <ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
 	 *      <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
 	 *      <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
@@ -68,9 +67,45 @@ this.createjs = this.createjs||{};
 	 * @class Filter
 	 * @constructor
 	 **/
-	function Filter() {}
+	function Filter() {
+		/**
+		 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
+		 * @property usesContext
+		 * @type {boolean}
+		 * @default false
+		 */
+		this.usesContext = false;
+
+		/**
+		 * Another filter that is required to act as part of this filter and created and managed under the hood.
+		 * @private
+		 * @property _multiPass
+		 * @type {Filter}
+		 * @default null
+		 */
+		this._multiPass = null;
+
+		/**
+		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
+		 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
+		 * @property VTX_SHADER
+		 * @virtual
+		 * @type {String}
+		 * @readonly
+		 */
+		this.VTX_SHADER_BODY = null;
+
+		/**
+		 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
+		 * This should be based upon StageGL.SHADER_FRAGMENT_BODY_REGULAR
+		 * @property FRAG_SHADER
+		 * @virtual
+		 * @type {String}
+		 * @readonly
+		 */
+		this.FRAG_SHADER_BODY = null;
+	}
 	var p = Filter.prototype;
-	
 
 // public methods:
 	/**
@@ -82,6 +117,16 @@ this.createjs = this.createjs||{};
 	p.getBounds = function(rect) {
 		return rect;
 	};
+
+	/**
+	 * Assign any unique uniforms or other setup functionality here.
+	 * @method shaderParamSetup
+	 * @virtual
+	 * @param {WebGLContext} gl The context associated with the stage performing the render.
+	 * @param {StageGL} stage The stage instance that will be rendering.
+	 * @param {ShaderProgram} shaderProgram The compiled shader that is going to be used to perform the render.
+	 */
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {};
 
 	/**
 	 * Applies the filter to the specified context.

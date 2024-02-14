@@ -1,4 +1,90 @@
-Version 0.8.0
+Version 1.0.0 (September 14, 2017)
+****************************************************************************************************
+CRITICAL (may break existing content):
+- significant WebGL updates:
+    * SpriteStage replaced with StageGL
+    * removed SpriteContainer (not needed for StageGL)
+    * better performance, less content restrictions, more features, easier to use
+- Deprecated get/set methods are now protect with an underscore (eg _setEnabled)
+	The deprecated methods and properties will still work, but will display a console warning when used.
+- Changed version naming to use easeljs.js, instead of containing the version number
+
+*****
+OTHER:
+- add Ticker._pausedTime in Ticker.reset() (thanks @abouthiroppy)
+- fixed Rectangle.pad parameter docs. (thanks @ruslan-simonenko)
+- fixed error when drawing DOMElement with SpriteStage (thanks @thammin)
+- added a few missing APIs on FauxCanvas helper
+- added VideoBuffer helper class that preserves the previous frame until the next one is drawn
+- fixed an issue where accessing performance throws an error in node webkit
+- updated EventDispatcher to dispatch to capture listeners in target event phase
+- fixed issue with miter limits on outlined text
+- fix for stroke styles getting dropped
+- fixed synched mode in MovieClip
+- fix for Timeline._tweens being renamed .tweens
+- fixed issue with clearing DisplayObject bounds
+- updated mechanism DOMElement and BitmapText used for pre-draw updates
+- updates to MovieClip and Container to support the TweenJS overhaul
+- updated and new unit tests
+- caching logic moved to new BitmapCache class to support StageGL
+- added `options` param to DisplayObject.cache()
+- changed SpriteSheets to also use `naturalWidth` on images (mostly to support IE)
+- updated documentation and examples
+    * fixed broken links
+    * change the YUI docs code examples to use whole width of the document (thanks @MannyC)
+    * changed Flash references to Adobe Animate
+    * fixed inheritance example to show proper parameter usage
+- added a shared createjs.deprecate() method, which wraps old methods and property getter/setters to display
+	a console warning when used.
+- added a DeprecatedMethods unit test
+
+
+Version 0.8.2 [November 26, 2015]
+****************************************************************************************************
+CRITICAL (may break existing content):
+- MovieClip has been added to the minified EaselJS source. The movieclip minified script has been removed.
+
+*****
+OTHER:
+- fixed compositeOperation value in DisplayProps.setValues (thanks @fumio)
+- documentation updates
+- upgraded tutorials to the latest EaselJS version, including content updates
+- fixed the SpriteSheetBuilder to support both SpriteSheet framerate and speed (instead of frequency)
+- fixed ignoreScale support in Graphic StrokeStyle command
+- bower updates: Removed bower.json from excludes
+- updated ScaleBitmap extra to the new extend/promote approach
+- changed SpriteSheet Array checks from instanceof to Array.isArray()
+- added StrokeDash support to SVGExporter
+- fixed issue with SVGExporter when the first lineTo has a zero-value for x or y
+- added image error handling to SpriteSheet
+- Grunt updates: Added shortcut "next" task
+
+
+Version 0.8.1 [May 21, 2015]
+****************************************************************************************************
+CRITICAL (may break existing content):
+- Graphics.command now returns null after empty fill / stroke calls.
+- dispatchEvent now returns false instead of true to indicate an event had preventDefault called (DOM level 2 compatibility)
+- cursor is now inherited properly (cursors on children override parents)
+
+*****
+OTHER:
+- added Graphics.StrokeDash and Graphics.setStrokeDash()
+- Graphics no longer appends redundant StrokeStyle commands
+- fixed an issue with preventDefault not working with drawstart and tickstart events
+- added bubbles and cancelable params to EventDispatcher.dispatchEvent()
+- reintroduced Sprite.initialize() for now, to support FlashCC spritesheet export
+- fixed an issue with stroke dash not being reset properly on Graphics.clear()
+- bitmap fills no longer throw RTEs when targeting an unloaded image
+- Sprite constructor now accepts 0 as frameOrAnimation param
+- added MouseEvent.relatedTarget
+- improved handling of Bitmap load errors
+- fixed Rectangle.pad
+- fixed issues with buttons playing on reset
+- added totalframes property and getDuration method to MovieClip
+
+
+Version 0.8.0 [December 12, 2014]
 ****************************************************************************************************
 CRITICAL (may break existing content):
 - modified behaviour of SpriteSheetBuilder.addFrame setupFunction, setupParams & setupScope params
@@ -14,7 +100,8 @@ CRITICAL (may break existing content):
 - renamed initialize on geom classes to "setValues()"
 - removed secondary properties (visible, alpha, compositeOperation, shadow) and related functionality from Matrix2D
 	- added DisplayProps to hold these properties + a matrix instance
-- some matrix methods were fixed to work properly
+- Matrix2D was updated to be internally consistent with regards to matrix orientation
+	- Matrix2D transform methods (ex. translate, rotate) now behave as append instead of prepend operations
 - renamed ColorMatrix.copyMatrix() to .copy() to reflect geom classes
 
 *****
@@ -88,7 +175,6 @@ OTHER:
 - BlurFilter provides higher quality results (thanks quasimondo)
 - added MouseEvent.isTouch
 - added support for margin and spacing in sprite sheet data (thanks renatopp)
-
 
 
 Version 0.7.1 [December 12, 2013]

@@ -6,34 +6,53 @@ module.exports = function (grunt) {
 			jasmine: {
 				run: {
 					src: [
-						'../lib/easeljs-NEXT.combined.js',
-						'../examples/assets/tweenjs-NEXT.min.js',
-						'../lib/movieclip-0.7.1.combined.js',
+						'../lib/easeljs-NEXT.js',
+						'../src/easeljs/display/DisplayObject.js',
+						'../src/easeljs/display/StageGL.js'
 					],
+
 					options: {
+						styles: 'styles/styles.css',
 						specs: 'spec/*Spec.js',
 						helpers: [
 							'spec/Helpers.js',
 							'lib/js-imagediff/imagediff.js'
-						]
+						],
+						vendor: [
+							'../_assets/libs/tweenjs-NEXT.min.js',
+							'../_assets/libs/preloadjs-NEXT.min.js'
+						],
+						host : 'http://127.0.0.1:<%=connect.phantom.options.port%>/',
+						styles: "styles.css"
 					}
 				}
 			},
 
 			connect: {
-				server: {
+				serve: {
 					options: {
 						keepalive: true,
-						base: ['../_assets/', '../lib/', '../', './']
+						base: [{
+							path: __dirname,
+							options:{
+								index: '_SpecRunner.html'
+							}
+						}, '..'],
+						useAvailablePort: true,
+						port: 8000,
+						open: true
 					}
-				}
-			},
-
-			findopenport: {
-				connect: {
+				},
+				phantom: {
 					options: {
-						ports: [8000, 8888, 9000, 9999, 9001, 8001],
-						configName: "connect.server.options.port"
+						base: [{
+							path: __dirname,
+							options:{
+								index: '_SpecRunner.html'
+							}
+						}, '..'],
+						useAvailablePort: true,
+						port: 8000
 					}
 				}
 			},
@@ -41,7 +60,6 @@ module.exports = function (grunt) {
 			listips: {
 				run: {
 					options: {
-						port: "<%=connect.server.options.port %>",
 						label: "Normal"
 					}
 				}
@@ -54,5 +72,8 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadTasks('tasks/');
 
-	grunt.registerTask("default", ["findopenport", "listips", "connect"]);
+	grunt.registerTask("default", "Launches browser-based tests","serve");
+	grunt.registerTask("serve", "Launches browser-based tests", ["jasmine:run:build", "listips", "connect"]);
+	grunt.registerTask("headless", "phantom");
+	grunt.registerTask("phantom", "Launches phantom-based tests", ["connect:phantom", "jasmine"]);
 };

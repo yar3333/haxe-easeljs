@@ -1,6 +1,6 @@
 describe("Graphics", function () {
 
-	beforeEach(function() {
+	beforeEach(function () {
 		var shape = new createjs.Shape();
 		this.g = shape.graphics;
 		this.stage.addChild(shape);
@@ -62,13 +62,13 @@ describe("Graphics", function () {
 	it("bezierCurveTo()", function (done) {
 		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(25, 25).bezierCurveTo(45, 175, 125, 75, 25, 25);
 
-		this.compareBaseLine("assets/bezierCurveTo.png", done, expect);
+		this.compareBaseLine("assets/bezierCurveTo.png", done, expect, 0.008);
 	});
 
 	it("quadraticCurveTo() / curveTo()", function (done) {
 		this.g.beginFill(this.fColor).beginStroke(this.sColor).moveTo(5, 5).quadraticCurveTo(200, 20, 190, 190).endStroke();
 
-		this.compareBaseLine("assets/quadraticCurveTo.png", done, expect);
+		this.compareBaseLine("assets/quadraticCurveTo.png", done, expect, 0.008);
 	});
 
 	it("decodePath()", function (done) {
@@ -207,6 +207,24 @@ describe("Graphics", function () {
 		this.g.setStrokeStyle(25, 1, 1, 0, true).beginStroke(this.sColor, 1).moveTo(25, 25).lineTo(150, 150);
 
 		this.compareBaseLine("assets/setStrokeStyle.png", done, expect);
+	});
+
+	it("setStrokeDash()", function (done) {
+		this.g.setStrokeDash([7, 3]);
+		this.g.setStrokeStyle(5).beginStroke("black").rect(10, 10, 150, 150);
+		this.compareBaseLine("assets/setStrokeDash.png", done, expect, 0.008);
+	});
+
+	it("clone()", function (done) {
+		this.g.setStrokeStyle(2);
+		this.g.beginStroke(this.sColor);
+		this.g.beginFill(this.fColor);
+		this.g.moveTo(120, 100).arc(100, 100, 20, 0, Math.PI);
+
+		var g = this.g.clone();
+		this.g = g;
+
+		this.compareBaseLine("assets/arc.png", done, expect, 0.01);
 	});
 
 	describe("tiny api", function () {

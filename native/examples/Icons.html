@@ -9,7 +9,7 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 	<script src="../_assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -86,7 +86,7 @@
 		icon6.gotoAndPlay(0);
 		stage.addChild(icon6);
 
-		createjs.Ticker.setFPS(3); // slow, so we can see the icons
+		createjs.Ticker.framerate = 3; // slow, so we can see the icons
 		createjs.Ticker.addEventListener("tick", stage);
 	}
 </script>

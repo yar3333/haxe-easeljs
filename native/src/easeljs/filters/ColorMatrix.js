@@ -60,7 +60,6 @@ this.createjs = this.createjs||{};
 	}
 	var p = ColorMatrix.prototype;
 
-
 // constants:
 	/**
 	 * Array of delta values for contrast calculations.
@@ -120,7 +119,7 @@ this.createjs = this.createjs||{};
 	 * @chainable
 	 */
 	p.setColor = function(brightness,contrast,saturation,hue) {
-		return this.reset().adjustColor(brightness,contrast,saturation,hue);;
+		return this.reset().adjustColor(brightness,contrast,saturation,hue);
 	};
 
 	/**

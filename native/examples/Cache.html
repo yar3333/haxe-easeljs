@@ -8,7 +8,7 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 	<script src="../_assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -59,7 +59,7 @@
 	function tick(event) {
 		var w = canvas.width + radius * 2;
 		var h = canvas.height + radius * 2;
-		var l = stage.getNumChildren() - 1;
+		var l = stage.numChildren - 1;
 
 		// iterate through all the children and move them according to their velocity:
 		for (var i = 1; i < l; i++) {
@@ -76,7 +76,7 @@
 
 	function toggleCache(value) {
 		// iterate all the children except the fpsLabel, and set up the cache:
-		var l = stage.getNumChildren() - 1;
+		var l = stage.numChildren - 1;
 
 		for (var i = 0; i < l; i++) {
 			var shape = stage.getChildAt(i);

@@ -84,7 +84,6 @@ this.createjs = this.createjs||{};
 	}
 	var p = Rectangle.prototype;
 
-
 // public methods:
 	/** 
 	 * Sets the specified values on this instance.
@@ -127,19 +126,19 @@ this.createjs = this.createjs||{};
 	
 	/** 
 	 * Adds the specified padding to the rectangle's bounds.
-	 * @method extend
-	 * @param {Number} [top=0]
-	 * @param {Number} [left=0]
-	 * @param {Number} [right=0]
-	 * @param {Number} [bottom=0]
+	 * @method pad
+	 * @param {Number} top
+	 * @param {Number} left
+	 * @param {Number} bottom
+	 * @param {Number} right
 	 * @return {Rectangle} This instance. Useful for chaining method calls.
 	 * @chainable
 	*/
 	p.pad = function(top, left, bottom, right) {
-		this.x -= top;
-		this.y -= left;
-		this.width += top+bottom;
-		this.height += left+right;
+		this.x -= left;
+		this.y -= top;
+		this.width += left+right;
+		this.height += top+bottom;
 		return this;
 	};
 	

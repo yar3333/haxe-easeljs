@@ -64,18 +64,18 @@ this.createjs = this.createjs || {};
 	 * @class AlphaMapFilter
 	 * @extends Filter
 	 * @constructor
-	 * @param {Image|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
+	 * @param {HTMLImageElement|HTMLCanvasElement} alphaMap The greyscale image (or canvas) to use as the alpha value for the
 	 * result. This should be exactly the same dimensions as the target.
 	 **/
 	function AlphaMapFilter(alphaMap) {
-	
+		this.Filter_constructor();
 	
 	// public properties:
 		/**
 		 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
 		 * dimensions as the target.
 		 * @property alphaMap
-		 * @type Image|HTMLCanvasElement
+		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
 		this.alphaMap = alphaMap;
 		
@@ -84,7 +84,7 @@ this.createjs = this.createjs || {};
 		/**
 		 * @property _alphaMap
 		 * @protected
-		 * @type Image|HTMLCanvasElement
+		 * @type HTMLImageElement|HTMLCanvasElement
 		 **/
 		this._alphaMap = null;
 		
@@ -94,9 +94,40 @@ this.createjs = this.createjs || {};
 		 * @type Uint8ClampedArray
 		 **/
 		this._mapData = null;
+		this._mapTexture = null;
+
+		this.FRAG_SHADER_BODY = (
+			"uniform sampler2D uAlphaSampler;"+
+
+			"void main(void) {" +
+				"vec4 color = texture2D(uSampler, vRenderCoord);" +
+				"vec4 alphaMap = texture2D(uAlphaSampler, vTextureCoord);" +
+
+				// some image formats can have transparent white rgba(1,1,1, 0) when put on the GPU, this means we need a slight tweak
+				// using ceil ensure that the colour will be used so long as it exists but pure transparency will be treated black
+				"gl_FragColor = vec4(color.rgb, color.a * (alphaMap.r * ceil(alphaMap.a)));" +
+			"}"
+		);
 	}
 	var p = createjs.extend(AlphaMapFilter, createjs.Filter);
 
+	// TODO: deprecated
+	// p.initialize = function() {}; // searchable for devs wondering where it is. REMOVED. See docs for details.
+
+	/** docced in super class **/
+	p.shaderParamSetup = function(gl, stage, shaderProgram) {
+		if(!this._mapTexture) { this._mapTexture = gl.createTexture(); }
+
+		gl.activeTexture(gl.TEXTURE1);
+		gl.bindTexture(gl.TEXTURE_2D, this._mapTexture);
+		stage.setTextureParams(gl);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.alphaMap);
+
+		gl.uniform1i(
+			gl.getUniformLocation(shaderProgram, "uAlphaSampler"),
+			1
+		);
+	};
 
 // public methods:
 	/** docced in super class **/

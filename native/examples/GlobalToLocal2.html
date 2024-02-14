@@ -10,7 +10,7 @@
 
 	<!-- Note: All core EaselJS classes are listed here: -->
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.js"></script>
 	<!-- We also provide hosted minified versions of all CreateJS libraries.
 	  http://code.createjs.com -->
 
@@ -79,7 +79,7 @@
 		stage.addChild(text);
 
 		//start ticking
-		createjs.Ticker.setInterval(20);		// 20ms = 50fps
+		createjs.Ticker.interval = 20;		// 20ms = 50fps
 		createjs.Ticker.addEventListener("tick", tick);
 
 		stage.update(); // Draw the stage once

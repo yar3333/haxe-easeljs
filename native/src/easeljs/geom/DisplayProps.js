@@ -40,7 +40,7 @@ this.createjs = this.createjs||{};
 	 * Used for calculating and encapsulating display related properties.
 	 * @class DisplayProps
 	 * @param {Number} [visible=true] Visible value.
-	 * @param {Number} [alpha=0] Alpha value.
+	 * @param {Number} [alpha=1] Alpha value.
 	 * @param {Number} [shadow=null] A Shadow instance or null.
 	 * @param {Number} [compositeOperation=null] A compositeOperation value or null.
 	 * @param {Number} [matrix] A transformation matrix. Defaults to a new identity matrix.
@@ -66,7 +66,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * Property representing the compositeOperation that will be applied to a display object.
 		 * You can find a list of valid composite operations at:
-		 * <a href="https://developer.mozilla.org/en/Canvas_tutorial/Compositing">https://developer.mozilla.org/en/Canvas_tutorial/Compositing</a>
+		 * <a href="https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing">https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Compositing</a>
 		 * @property compositeOperation
 		 * @type String
 		 **/
@@ -101,7 +101,7 @@ this.createjs = this.createjs||{};
 		this.visible = visible == null ? true : !!visible;
 		this.alpha = alpha == null ? 1 : alpha;
 		this.shadow = shadow;
-		this.compositeOperation = shadow;
+		this.compositeOperation = compositeOperation;
 		this.matrix = matrix || (this.matrix&&this.matrix.identity()) || new createjs.Matrix2D();
 		return this;
 	};

@@ -8,11 +8,48 @@ module.exports = function (grunt) {
 
 				// Default values
 				version: 'NEXT',
+				fileVersion: "-<%= version %>",
 				name: 'easeljs',
 
 				// Setup doc names / paths.
-				docsName: '<%= pkg.name %>_docs-<%= version %>',
+				docsName: '<%= pkg.name %>_docs<%= fileVersion %>',
 				docsZip: "<%= docsName %>.zip",
+
+				// Setup watch to watch the source and rebuild when it changes.  Also livereload
+				watch: {
+					js: {
+						files: [
+							getConfigValue('easel_source'),
+							getConfigValue('watch_exclude_files')
+						],
+						tasks: ['sourceBuild'],
+						options: {
+							livereload: '<%= connect.options.livereload %>'
+						}
+					},
+					livereload: {
+						files: getConfigValue('livereload_watch'),
+						options: {
+							livereload: '<%= connect.options.livereload %>'
+						}
+					}
+				},
+
+				// Setup the connect webserver with livereload
+				connect: {
+					options: {
+						port: 9000,
+						// Change this to '0.0.0.0' for non-local access.
+						hostname: '127.0.0.1',
+						livereload: 35729
+					},
+					test: {
+						options: {
+							base: getConfigValue('connect_root'),
+							open: true
+						}
+					}
+				},
 
 				// Setup Uglify for JS minification.
 				uglify: {
@@ -27,8 +64,7 @@ module.exports = function (grunt) {
 					},
 					build: {
 						files: {
-							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.min.js': getConfigValue('easel_source'),
-							'output/movieclip-<%= version %>.min.js': getConfigValue('movieclip_source')
+							'output/<%= pkg.name.toLowerCase() %><%= fileVersion %>.min.js': getConfigValue('easel_source')
 						}
 					}
 				},
@@ -67,16 +103,11 @@ module.exports = function (grunt) {
 					},
 					build: {
 						files: {
-							'output/<%= pkg.name.toLowerCase() %>-<%= version %>.combined.js': combineSource(
+							'output/<%= pkg.name.toLowerCase() %><%= fileVersion %>.js': combineSource(
 									[
 										{cwd: '', config:'config.json', source:'easel_source'}
 									]
-							),
-							'output/movieclip-<%= version %>.combined.js': combineSource(
-									[
-										{cwd: '', config:'config.json', source:'movieclip_source'}
-									]
-							),
+							)
 						}
 					}
 				},
@@ -145,7 +176,7 @@ module.exports = function (grunt) {
 					},
 					src: {
 						files: [
-							{expand: true, cwd:'./output/', src: '*<%=version %>*.js', dest: '../lib/'}
+							{expand: true, cwd:'./output/', src: '*<%=fileVersion %>*.js', dest: '../lib/'}
 						]
 					}
 				},
@@ -154,19 +185,12 @@ module.exports = function (grunt) {
 					easel: {
 						file: '../src/easeljs/version.js',
 						version: '<%= version %>'
-					},
-					movieclip: {
-						file: '../src/easeljs/version_movieclip.js',
-						version: '<%= version %>'
 					}
 				},
 
 				clearversion: {
 					easel: {
 						file: '../src/easeljs/version.js'
-					},
-					movieclip: {
-						file: '../src/easeljs/version_movieclip.js'
 					}
 				}
 			}
@@ -244,7 +268,9 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-compress');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-sass');
-	grunt.loadNpmTasks('grunt-contrib-clean')
+	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadTasks('tasks/');
 
 	grunt.registerTask('exportScriptTags', function() {
@@ -283,6 +309,7 @@ module.exports = function (grunt) {
 	 */
 	grunt.registerTask('setVersion', function () {
 		grunt.config.set('version', grunt.config.get('pkg').version);
+		grunt.config.set("fileVersion", "");
 	});
 
 	/**
@@ -300,8 +327,11 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('nextlib', [
-		"updateversion", "combine", "uglify", "clearversion", "copy:src"
+		"sourceBuild"
 	]);
+
+	/** Aliased task for WebStorm quick-run */
+	grunt.registerTask('_next_easel', ["next"]);
 
 	/**
 	 * Task for exporting a release build (version based on package.json)
@@ -322,8 +352,17 @@ module.exports = function (grunt) {
 	 *
 	 */
 	grunt.registerTask('coreBuild', [
-		"updateversion", "combine", "uglify", "clearversion", "docs", "copy:src"
+		"docs", "sourceBuild"
 	]);
+
+	/**
+	 * Main source build task
+	 *
+	 */
+	grunt.registerTask('sourceBuild', [
+		"updateversion", "combine", "uglify", "clearversion",  "copy:src"
+	]);
+
 
 	/**
 	 * Task for exporting combined view.
@@ -331,6 +370,16 @@ module.exports = function (grunt) {
 	 */
 	grunt.registerTask('combine', 'Combine all source into a single, un-minified file.', [
 		"concat"
+	]);
+
+	/**
+	 * Task for starting a webserver, watching source files and livereloading.
+	 *
+	 */
+	grunt.registerTask('serve', 'Start a webserver and watch the source files for changes.', [
+		"sourceBuild",
+		"connect:test",
+		"watch"
 	]);
 
 };

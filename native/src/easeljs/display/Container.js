@@ -96,13 +96,15 @@ this.createjs = this.createjs||{};
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "Container/numChildren:property"}}{{/crossLink}} property instead.
-	 * @method getNumChildren
+	 * @method _getNumChildren
+	 * @protected
 	 * @return {Number}
-	 * @deprecated
 	 **/
-	p.getNumChildren = function() {
+	p._getNumChildren = function() {
 		return this.children.length;
 	};
+	// Container.getNumChildren is @deprecated. Remove for 1.1+
+	p.getNumChildren = createjs.deprecate(p._getNumChildren, "Container.getNumChildren");
 
 	/**
 	 * Returns the number of children in the container.
@@ -112,7 +114,7 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			numChildren: { get: p.getNumChildren }
+			numChildren: { get: p._getNumChildren }
 		});
 	} catch (e) {}
 	
@@ -173,11 +175,11 @@ this.createjs = this.createjs||{};
 	 *
 	 * <h4>Example</h4>
 	 *
-	 *      container.addChild(bitmapInstance);
+	 * 		container.addChild(bitmapInstance);
 	 *
-	 *  You can also add multiple children at once:
+	 * You can also add multiple children at once:
 	 *
-	 *      container.addChild(bitmapInstance, shapeInstance, textInstance);
+	 * 		container.addChild(bitmapInstance, shapeInstance, textInstance);
 	 *
 	 * @method addChild
 	 * @param {DisplayObject} child The display object to add.
@@ -190,10 +192,12 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { this.addChild(arguments[i]); }
 			return arguments[l-1];
 		}
-		if (child.parent) { child.parent.removeChild(child); }
+		// Note: a lot of duplication with addChildAt, but push is WAY faster than splice.
+		var par=child.parent, silent = par === this;
+		par&&par._removeChildAt(createjs.indexOf(par.children, child), silent);
 		child.parent = this;
 		this.children.push(child);
-		child.dispatchEvent("added");
+		if (!silent) { child.dispatchEvent("added"); }
 		return child;
 	};
 
@@ -229,10 +233,11 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l-1; i++) { this.addChildAt(arguments[i], indx+i); }
 			return arguments[l-2];
 		}
-		if (child.parent) { child.parent.removeChild(child); }
+		var par=child.parent, silent = par === this;
+		par&&par._removeChildAt(createjs.indexOf(par.children, child), silent);
 		child.parent = this;
 		this.children.splice(index, 0, child);
-		child.dispatchEvent("added");
+		if (!silent) { child.dispatchEvent("added"); }
 		return child;
 	};
 
@@ -260,7 +265,7 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { good = good && this.removeChild(arguments[i]); }
 			return good;
 		}
-		return this.removeChildAt(createjs.indexOf(this.children, child));
+		return this._removeChildAt(createjs.indexOf(this.children, child));
 	};
 
 	/**
@@ -286,15 +291,10 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { a[i] = arguments[i]; }
 			a.sort(function(a, b) { return b-a; });
 			var good = true;
-			for (var i=0; i<l; i++) { good = good && this.removeChildAt(a[i]); }
+			for (var i=0; i<l; i++) { good = good && this._removeChildAt(a[i]); }
 			return good;
 		}
-		if (index < 0 || index > this.children.length-1) { return false; }
-		var child = this.children[index];
-		if (child) { child.parent = null; }
-		this.children.splice(index, 1);
-		child.dispatchEvent("removed");
-		return true;
+		return this._removeChildAt(index);
 	};
 
 	/**
@@ -302,13 +302,13 @@ this.createjs = this.createjs||{};
 	 *
 	 * <h4>Example</h4>
 	 *
-	 *      container.removeAlLChildren();
+	 * 	container.removeAllChildren();
 	 *
 	 * @method removeAllChildren
 	 **/
 	p.removeAllChildren = function() {
 		var kids = this.children;
-		while (kids.length) { this.removeChildAt(0); }
+		while (kids.length) { this._removeChildAt(0); }
 	};
 
 	/**
@@ -459,23 +459,27 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Returns an array of all display objects under the specified coordinates that are in this container's display
-	 * list. This routine ignores any display objects with mouseEnabled set to false. The array will be sorted in order
-	 * of visual depth, with the top-most display object at index 0. This uses shape based hit detection, and can be an
-	 * expensive operation to run, so it is best to use it carefully. For example, if testing for objects under the
-	 * mouse, test on tick (instead of on mousemove), and only if the mouse's position has changed.
+	 * list. This routine ignores any display objects with {{#crossLink "DisplayObject/mouseEnabled:property"}}{{/crossLink}}
+	 * set to `false`. The array will be sorted in order of visual depth, with the top-most display object at index 0.
+	 * This uses shape based hit detection, and can be an expensive operation to run, so it is best to use it carefully.
+	 * For example, if testing for objects under the mouse, test on tick (instead of on {{#crossLink "DisplayObject/mousemove:event"}}{{/crossLink}}),
+	 * and only if the mouse's position has changed.
 	 * 
-	 * By default this method evaluates all display objects. By setting the `mode` parameter to `1`, the `mouseEnabled`
-	 * and `mouseChildren` properties will be respected.
-	 * Setting it to `2` additionally excludes display objects that do not have active mouse event listeners
-	 * or a `cursor` property. That is, only objects that would normally intercept mouse interaction will be included.
-	 * This can significantly improve performance in some cases by reducing the number of
-	 * display objects that need to be tested.
+	 * <ul>
+	 *     <li>By default (mode=0) this method evaluates all display objects.</li>
+	 *     <li>By setting the `mode` parameter to `1`, the {{#crossLink "DisplayObject/mouseEnabled:property"}}{{/crossLink}}
+	 * 		and {{#crossLink "mouseChildren:property"}}{{/crossLink}} properties will be respected.</li>
+	 * 	   <li>Setting the `mode` to `2` additionally excludes display objects that do not have active mouse event
+	 * 	   	listeners or a {{#crossLink "DisplayObject:cursor:property"}}{{/crossLink}} property. That is, only objects
+	 * 	   	that would normally intercept mouse interaction will be included. This can significantly improve performance
+	 * 	   	in some cases by reducing the number of display objects that need to be tested.</li>
+	 * </li>
 	 * 
-	 * Accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
+	 * This method accounts for both {{#crossLink "DisplayObject/hitArea:property"}}{{/crossLink}} and {{#crossLink "DisplayObject/mask:property"}}{{/crossLink}}.
 	 * @method getObjectsUnderPoint
 	 * @param {Number} x The x position in the container to test.
 	 * @param {Number} y The y position in the container to test.
-	 * @param {Number} mode The mode to use to determine which display objects to include. 0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
+	 * @param {Number} [mode=0] The mode to use to determine which display objects to include. 0-all, 1-respect mouseEnabled/mouseChildren, 2-only mouse opaque objects.
 	 * @return {Array} An Array of DisplayObjects under the specified coordinates.
 	 **/
 	p.getObjectsUnderPoint = function(x, y, mode) {
@@ -519,7 +523,7 @@ this.createjs = this.createjs||{};
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent).
 	 * @method clone
-	 * @param {Boolean} recursive If true, all of the descendants of this container will be cloned recursively. If false, the
+	 * @param {Boolean} [recursive=false] If true, all of the descendants of this container will be cloned recursively. If false, the
 	 * properties of the container will be cloned, but the new instance will not have any children.
 	 * @return {Container} A clone of the current Container instance.
 	 **/
@@ -570,6 +574,24 @@ this.createjs = this.createjs||{};
 			arr.push(clone);
 		}
 	};
+	
+	/**
+	 * Removes the child at the specified index from the display list, and sets its parent to null.
+	 * Used by `removeChildAt`, `addChild`, and `addChildAt`.
+	 * @method removeChildAt
+	 * @protected
+	 * @param {Number} index The index of the child to remove.
+	 * @param {Boolean} [silent] Prevents dispatch of `removed` event if true.
+	 * @return {Boolean} true if the child (or children) was removed, or false if any index was out of range.
+	 **/
+	p._removeChildAt = function(index, silent) {
+		if (index < 0 || index > this.children.length-1) { return false; }
+		var child = this.children[index];
+		if (child) { child.parent = null; }
+		this.children.splice(index, 1);
+		if (!silent) { child.dispatchEvent("removed"); }
+		return true;
+	};
 
 	/**
 	 * @method _getObjectsUnderPoint
@@ -596,7 +618,7 @@ this.createjs = this.createjs||{};
 			if (!child.visible || (!hitArea && !child.isVisible()) || (mouse && !child.mouseEnabled)) { continue; }
 			if (!hitArea && !this._testMask(child, x, y)) { continue; }
 			
-			// if a child container has a hitArea then we only need to check its hitArea, so we can treat it as a normal DO:
+			// if a child container has a hitArea then we only need to check its hitAre2a, so we can treat it as a normal DO:
 			if (!hitArea && child instanceof Container) {
 				var result = child._getObjectsUnderPoint(x, y, arr, mouse, activeListener, currentDepth+1);
 				if (!arr && result) { return (mouse && !this.mouseChildren) ? this : result; }

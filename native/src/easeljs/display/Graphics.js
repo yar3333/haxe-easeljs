@@ -111,7 +111,7 @@ this.createjs = this.createjs||{};
 	 *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
 	 *     <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
 	 *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
-	 *     <td>ss</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} </td></tr>
+	 *     <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
 	 *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
 	 *     <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
 	 *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
@@ -140,9 +140,11 @@ this.createjs = this.createjs||{};
 		/**
 		 * Holds a reference to the last command that was created or appended. For example, you could retain a reference
 		 * to a Fill command in order to dynamically update the color later by using:
-		 * 		myFill = myGraphics.beginFill("red").command;
+		 *
+		 * 		var myFill = myGraphics.beginFill("red").command;
 		 * 		// update color later:
 		 * 		myFill.style = "yellow";
+		 *
 		 * @property command
 		 * @type Object
 		 **/
@@ -153,16 +155,37 @@ this.createjs = this.createjs||{};
 		/**
 		 * @property _stroke
 		 * @protected
-		 * @type {Array}
+		 * @type {Stroke}
 		 **/
 		this._stroke = null;
 
 		/**
 		 * @property _strokeStyle
 		 * @protected
-		 * @type {Array}
+		 * @type {StrokeStyle}
 		 **/
 		this._strokeStyle = null;
+		
+		/**
+		 * @property _oldStrokeStyle
+		 * @protected
+		 * @type {StrokeStyle}
+		 **/
+		this._oldStrokeStyle = null;
+		
+		/**
+		 * @property _strokeDash
+		 * @protected
+		 * @type {StrokeDash}
+		 **/
+		this._strokeDash = null;
+		
+		/**
+		 * @property _oldStrokeDash
+		 * @protected
+		 * @type {StrokeDash}
+		 **/
+		this._oldStrokeDash = null;
 
 		/**
 		 * @property _strokeIgnoreScale
@@ -174,7 +197,7 @@ this.createjs = this.createjs||{};
 		/**
 		 * @property _fill
 		 * @protected
-		 * @type {Array}
+		 * @type {Fill}
 		 **/
 		this._fill = null;
 
@@ -224,7 +247,6 @@ this.createjs = this.createjs||{};
 	}
 	var p = Graphics.prototype;
 	var G = Graphics; // shortcut
-
 
 // static public methods:
 	/**
@@ -308,7 +330,6 @@ this.createjs = this.createjs||{};
 	 **/
 	Graphics.BASE_64 = {"A":0,"B":1,"C":2,"D":3,"E":4,"F":5,"G":6,"H":7,"I":8,"J":9,"K":10,"L":11,"M":12,"N":13,"O":14,"P":15,"Q":16,"R":17,"S":18,"T":19,"U":20,"V":21,"W":22,"X":23,"Y":24,"Z":25,"a":26,"b":27,"c":28,"d":29,"e":30,"f":31,"g":32,"h":33,"i":34,"j":35,"k":36,"l":37,"m":38,"n":39,"o":40,"p":41,"q":42,"r":43,"s":44,"t":45,"u":46,"v":47,"w":48,"x":49,"y":50,"z":51,"0":52,"1":53,"2":54,"3":55,"4":56,"5":57,"6":58,"7":59,"8":60,"9":61,"+":62,"/":63};
 
-
 	/**
 	 * Maps numeric values for the caps parameter of {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} to
 	 * corresponding string values. This is primarily for use with the tiny API. The mappings are as follows: 0 to
@@ -357,14 +378,16 @@ this.createjs = this.createjs||{};
 // getter / setters:
 	/**
 	 * Use the {{#crossLink "Graphics/instructions:property"}}{{/crossLink}} property instead.
-	 * @method getInstructions
-	 * @return {Array}
-	 * @deprecated
+	 * @method _getInstructions
+	 * @protected
+	 * @return {Array} The instructions array, useful for chaining
 	 **/
-	p.getInstructions = function() {
+	p._getInstructions = function() {
 		this._updateInstructions();
 		return this._instructions;
 	};
+	// Graphics.getInstructions is @deprecated. Remove for 1.1+
+	p.getInstructions = createjs.deprecate(p._getInstructions, "Graphics.getInstructions");
 
 	/**
 	 * Returns the graphics instructions array. Each entry is a graphics command object (ex. Graphics.Fill, Graphics.Rect)
@@ -377,7 +400,7 @@ this.createjs = this.createjs||{};
 	 **/
 	try {
 		Object.defineProperties(p, {
-			instructions: { get: p.getInstructions }
+			instructions: { get: p._getInstructions }
 		});
 	} catch (e) {}
 
@@ -442,7 +465,8 @@ this.createjs = this.createjs||{};
 
 	/**
 	 * Draws a line from the current drawing point to the specified position, which become the new current drawing
-	 * point. A tiny API method "lt" also exists.
+	 * point. Note that you *must* call {{#crossLink "Graphics/moveTo"}}{{/crossLink}} before the first `lineTo()`.
+	 * A tiny API method "lt" also exists.
 	 *
 	 * For detailed information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
@@ -561,7 +585,7 @@ this.createjs = this.createjs||{};
 	};
 
 
-// public methods that roughly map to Flash graphics APIs:
+// public methods that roughly map to Adobe Flash/Animate graphics APIs:
 	/**
 	 * Clears all drawing instructions, effectively resetting this Graphics instance. Any line and fill styles will need
 	 * to be redefined to draw shapes following a clear call. A tiny API method "c" also exists.
@@ -571,7 +595,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p.clear = function() {
 		this._instructions.length = this._activeInstructions.length = this._commitIndex = 0;
-		this._strokeStyle = this._stroke = this._fill = null;
+		this._strokeStyle = this._oldStrokeStyle = this._stroke = this._fill = this._strokeDash = this._oldStrokeDash = null;
 		this._dirty = this._strokeIgnoreScale = false;
 		return this;
 	};
@@ -642,7 +666,7 @@ this.createjs = this.createjs||{};
 	 * exists.
 	 * @method beginBitmapFill
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-	 * as the pattern.
+	 * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	 * @param {String} repetition Optional. Indicates whether to repeat the image in the fill area. One of "repeat",
 	 * "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat". Note that Firefox does not support "repeat-x" or
 	 * "repeat-y" (latest tests were in FF 20.0), and will default to "repeat".
@@ -667,10 +691,10 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Sets the stroke style for the current sub-path. Like all drawing methods, this can be chained, so you can define
+	 * Sets the stroke style. Like all drawing methods, this can be chained, so you can define
 	 * the stroke style and color in a single line of code like so:
 	 *
-	 *      myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
+	 * 	myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
 	 *
 	 * A tiny API method "ss" also exists.
 	 * @method setStrokeStyle
@@ -695,6 +719,26 @@ this.createjs = this.createjs||{};
 		// ignoreScale lives on Stroke, not StrokeStyle, so we do a little trickery:
 		if (this._stroke) { this._stroke.ignoreScale = ignoreScale; }
 		this._strokeIgnoreScale = ignoreScale;
+		return this;
+	};
+	
+	/**
+	 * Sets or clears the stroke dash pattern.
+	 *
+	 * 	myGraphics.setStrokeDash([20, 10], 0);
+	 *
+	 * A tiny API method `sd` also exists.
+	 * @method setStrokeDash
+	 * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
+	 * For example, `[20,10]` would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+	 * Passing null or an empty array will clear the existing stroke dash.
+	 * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 **/
+	p.setStrokeDash = function(segments, offset) {
+		this._updateInstructions(true);
+		this._strokeDash = this.command = new G.StrokeDash(segments, offset);
 		return this;
 	};
 
@@ -769,7 +813,7 @@ this.createjs = this.createjs||{};
 	 * also exists.
 	 * @method beginBitmapStroke
 	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image The Image, Canvas, or Video object to use
-	 * as the pattern.
+	 * as the pattern. Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	 * @param {String} [repetition=repeat] Optional. Indicates whether to repeat the image in the fill area. One of
 	 * "repeat", "repeat-x", "repeat-y", or "no-repeat". Defaults to "repeat".
 	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
@@ -791,12 +835,10 @@ this.createjs = this.createjs||{};
 		return this.beginStroke();
 	};
 
-
-
 	/**
 	 * Maps the familiar ActionScript <code>curveTo()</code> method to the functionally similar {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}}
 	 * method.
-	 * @method quadraticCurveTo
+	 * @method curveTo
 	 * @param {Number} cpx
 	 * @param {Number} cpy
 	 * @param {Number} x
@@ -926,13 +968,6 @@ this.createjs = this.createjs||{};
 		return this.append(new G.PolyStar(x, y, radius, sides, pointSize, angle));
 	};
 
-	// TODO: deprecated.
-	/**
-	 * Removed in favour of using custom command objects with {{#crossLink "Graphics/append"}}{{/crossLink}}.
-	 * @method inject
-	 * @deprecated
-	 **/
-
 	/**
 	 * Appends a graphics command object to the graphics queue. Command objects expose an "exec" method
 	 * that accepts two parameters: the Context2D to operate on, and an arbitrary data object passed into
@@ -945,7 +980,7 @@ this.createjs = this.createjs||{};
 	 * 		myShape.color = "red";
 	 *
 	 * 		// append a Circle command object:
-	 * 		myShape.graphics.append(new Graphics.Circle(50, 50, 30));
+	 * 		myShape.graphics.append(new createjs.Graphics.Circle(50, 50, 30));
 	 *
 	 * 		// append a custom command object with an exec method that sets the fill style
 	 * 		// based on the shape's data, and then fills the circle.
@@ -1105,6 +1140,7 @@ this.createjs = this.createjs||{};
 		o.command = this.command;
 		o._stroke = this._stroke;
 		o._strokeStyle = this._strokeStyle;
+		o._strokeDash = this._strokeDash;
 		o._strokeIgnoreScale = this._strokeIgnoreScale;
 		o._fill = this._fill;
 		o._instructions = this._instructions.slice();
@@ -1326,6 +1362,19 @@ this.createjs = this.createjs||{};
 	 * @protected
 	 **/
 	p.ss = p.setStrokeStyle;
+	
+	/**
+	 * Shortcut to setStrokeDash.
+	 * @method sd
+	 * @param {Array} [segments] An array specifying the dash pattern, alternating between line and gap.
+	 * For example, [20,10] would create a pattern of 20 pixel lines with 10 pixel gaps between them.
+	 * Passing null or an empty array will clear any existing dash.
+	 * @param {Number} [offset=0] The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+	 * @return {Graphics} The Graphics instance the method is called on (useful for chaining calls.)
+	 * @chainable
+	 * @protected
+	 **/
+	p.sd = p.setStrokeDash;
 
 	/**
 	 * Shortcut to beginStroke.
@@ -1515,8 +1564,20 @@ this.createjs = this.createjs||{};
 			for (var i=0; i<l; i++) { instr[i+ll] = active[i]; }
 
 			if (this._fill) { instr.push(this._fill); }
-			if (this._stroke && this._strokeStyle) { instr.push(this._strokeStyle); }
-			if (this._stroke) { instr.push(this._stroke); }
+			if (this._stroke) {
+				// doesn't need to be re-applied if it hasn't changed.
+				if (this._strokeDash !== this._oldStrokeDash) {
+					instr.push(this._strokeDash);
+				}
+				if (this._strokeStyle !== this._oldStrokeStyle) {
+					instr.push(this._strokeStyle);
+				}
+				if (commit) {
+					this._oldStrokeStyle = this._strokeStyle;
+					this._oldStrokeDash = this._strokeDash;
+				}
+				instr.push(this._stroke);
+			}
 
 			this._dirty = false;
 		}
@@ -1534,7 +1595,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p._setFill = function(fill) {
 		this._updateInstructions(true);
-		if (this._fill = fill) { this.command = fill; }
+		this.command = this._fill = fill;
 		return this;
 	};
 
@@ -1545,8 +1606,7 @@ this.createjs = this.createjs||{};
 	 **/
 	p._setStroke = function(stroke) {
 		this._updateInstructions(true);
-		if (this._stroke = stroke) {
-			this.command = stroke;
+		if (this.command = this._stroke = stroke) {
 			stroke.ignoreScale = this._strokeIgnoreScale;
 		}
 		return this;
@@ -1557,26 +1617,7 @@ this.createjs = this.createjs||{};
 	 * @namespace Graphics
 	 */
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
-	 * @class MoveTo
-	 * @constructor
-	 * @param {Number} x
-	 * @param {Number} y
-	 **/
-	/**
-	 * @property x
-	 * @type Number
-	 */
-	/**
-	 * @property y
-	 * @type Number
-	 */
-	(G.LineTo = function(x, y) {
-		this.x = x; this.y = y;
-	}).prototype.exec = function(ctx) { ctx.lineTo(this.x,this.y); };
-
-	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/lineTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class LineTo
 	 * @constructor
 	 * @param {Number} x
@@ -1590,13 +1631,41 @@ this.createjs = this.createjs||{};
 	 * @property y
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
+	(G.LineTo = function(x, y) {
+		this.x = x; this.y = y;
+	}).prototype.exec = function(ctx) { ctx.lineTo(this.x,this.y); };
+
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics/moveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class MoveTo
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx
+	 */
 	(G.MoveTo = function(x, y) {
 		this.x = x; this.y = y;
 	}).prototype.exec = function(ctx) { ctx.moveTo(this.x, this.y); };
 
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/arcTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class ArcTo
 	 * @constructor
 	 * @param {Number} x1
@@ -1625,6 +1694,11 @@ this.createjs = this.createjs||{};
 	 * @property radius
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.ArcTo = function(x1, y1, x2, y2, radius) {
 		this.x1 = x1; this.y1 = y1;
 		this.x2 = x2; this.y2 = y2;
@@ -1632,7 +1706,7 @@ this.createjs = this.createjs||{};
 	}).prototype.exec = function(ctx) { ctx.arcTo(this.x1, this.y1, this.x2, this.y2, this.radius); };
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/arc"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Arc
 	 * @constructor
 	 * @param {Number} x
@@ -1666,6 +1740,11 @@ this.createjs = this.createjs||{};
 	 * @property anticlockwise
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.Arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 		this.x = x; this.y = y;
 		this.radius = radius;
@@ -1674,7 +1753,7 @@ this.createjs = this.createjs||{};
 	}).prototype.exec = function(ctx) { ctx.arc(this.x, this.y, this.radius, this.startAngle, this.endAngle, this.anticlockwise); };
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/quadraticCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class QuadraticCurveTo
 	 * @constructor
 	 * @param {Number} cpx
@@ -1698,13 +1777,18 @@ this.createjs = this.createjs||{};
 	 * @property y
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.QuadraticCurveTo = function(cpx, cpy, x, y) {
 		this.cpx = cpx; this.cpy = cpy;
 		this.x = x; this.y = y;
 	}).prototype.exec = function(ctx) { ctx.quadraticCurveTo(this.cpx, this.cpy, this.x, this.y); };
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/bezierCurveTo"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class BezierCurveTo
 	 * @constructor
 	 * @param {Number} cp1x
@@ -1738,6 +1822,11 @@ this.createjs = this.createjs||{};
 	 * @property y
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.BezierCurveTo = function(cp1x, cp1y, cp2x, cp2y, x, y) {
 		this.cp1x = cp1x; this.cp1y = cp1y;
 		this.cp2x = cp2x; this.cp2y = cp2y;
@@ -1745,7 +1834,7 @@ this.createjs = this.createjs||{};
 	}).prototype.exec = function(ctx) { ctx.bezierCurveTo(this.cp1x, this.cp1y, this.cp2x, this.cp2y, this.x, this.y); };
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/rect"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Rect
 	 * @constructor
 	 * @param {Number} x
@@ -1769,29 +1858,44 @@ this.createjs = this.createjs||{};
 	 * @property h
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.Rect = function(x, y, w, h) {
 		this.x = x; this.y = y;
 		this.w = w; this.h = h;
 	}).prototype.exec = function(ctx) { ctx.rect(this.x, this.y, this.w, this.h); };
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/closePath"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class ClosePath
 	 * @constructor
 	 **/
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.ClosePath = function() {
 	}).prototype.exec = function(ctx) { ctx.closePath(); };
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object to begin a new path. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class BeginPath
 	 * @constructor
 	 **/
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.BeginPath = function() {
 	}).prototype.exec = function(ctx) { ctx.beginPath(); };
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/beginFill"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Fill
 	 * @constructor
 	 * @param {Object} style A valid Context2D fillStyle.
@@ -1805,6 +1909,11 @@ this.createjs = this.createjs||{};
 	/**
 	 * @property matrix
 	 * @type Matrix2D
+	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	p = (G.Fill = function(style, matrix) {
 		this.style = style;
@@ -1820,8 +1929,10 @@ this.createjs = this.createjs||{};
 	};
 	/**
 	 * Creates a linear gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * See {{#crossLink "Graphics/beginLinearGradientFill"}}{{/crossLink}} for more information.
 	 * @method linearGradient
 	 * @param {Array} colors
+	 *
 	 * @param {Array} ratios
 	 * @param {Number} x0
 	 * @param {Number} y0
@@ -1837,6 +1948,7 @@ this.createjs = this.createjs||{};
 	};
 	/**
 	 * Creates a radial gradient style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * See {{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} for more information.
 	 * @method radialGradient
 	 * @param {Array} colors
 	 * @param {Array} ratios
@@ -1855,21 +1967,24 @@ this.createjs = this.createjs||{};
 		return this;
 	};
 	/**
-	 * Creates a bitmap fill style and assigns it to {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * Creates a bitmap fill style and assigns it to the {{#crossLink "Fill/style:property"}}{{/crossLink}}.
+	 * See {{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} for more information.
 	 * @method bitmap
-	 * @param {Image} image
+	 * @param {HTMLImageElement | HTMLCanvasElement | HTMLVideoElement} image  Must be loaded prior to creating a bitmap fill, or the fill will be empty.
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
 	 * @return {Fill} Returns this Fill object for chaining or assignment.
 	 */
 	p.bitmap = function(image, repetition) {
-		var o = this.style = Graphics._ctx.createPattern(image, repetition||"");
-		o.props = {image:image, repetition:repetition, type:"bitmap"};
+		if (image.naturalWidth || image.getContext || image.readyState >= 2) {
+			var o = this.style = Graphics._ctx.createPattern(image, repetition || "");
+			o.props = {image: image, repetition: repetition, type: "bitmap"};
+		}
 		return this;
 	};
 	p.path = false;
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/beginStroke"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Stroke
 	 * @constructor
 	 * @param {Object} style A valid Context2D fillStyle.
@@ -1884,6 +1999,11 @@ this.createjs = this.createjs||{};
 	 * @property ignoreScale
 	 * @type Boolean
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	p = (G.Stroke = function(style, ignoreScale) {
 		this.style = style;
 		this.ignoreScale = ignoreScale;
@@ -1897,6 +2017,7 @@ this.createjs = this.createjs||{};
 	};
 	/**
 	 * Creates a linear gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+	 * See {{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} for more information.
 	 * @method linearGradient
 	 * @param {Array} colors
 	 * @param {Array} ratios
@@ -1909,6 +2030,7 @@ this.createjs = this.createjs||{};
 	p.linearGradient = G.Fill.prototype.linearGradient;
 	/**
 	 * Creates a radial gradient style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+	 * See {{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} for more information.
 	 * @method radialGradient
 	 * @param {Array} colors
 	 * @param {Array} ratios
@@ -1923,8 +2045,9 @@ this.createjs = this.createjs||{};
 	p.radialGradient = G.Fill.prototype.radialGradient;
 	/**
 	 * Creates a bitmap fill style and assigns it to {{#crossLink "Stroke/style:property"}}{{/crossLink}}.
+	 * See {{#crossLink "Graphics/beginBitmapStroke"}}{{/crossLink}} for more information.
 	 * @method bitmap
-	 * @param {Image} image
+	 * @param {HTMLImageElement} image
 	 * @param {String} [repetition] One of: repeat, repeat-x, repeat-y, or no-repeat.
 	 * @return {Fill} Returns this Stroke object for chaining or assignment.
 	 */
@@ -1932,13 +2055,14 @@ this.createjs = this.createjs||{};
 	p.path = false;
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class StrokeStyle
 	 * @constructor
 	 * @param {Number} width
-	 * @param {String} caps
-	 * @param {String} joints
-	 * @param {Number} miterLimit
+	 * @param {String} [caps=butt]
+	 * @param {String} [joints=miter]
+	 * @param {Number} [miterLimit=10]
+	 * @param {Boolean} [ignoreScale=false]
 	 **/
 	/**
 	 * @property width
@@ -1958,22 +2082,69 @@ this.createjs = this.createjs||{};
 	 * @property miterLimit
 	 * @type Number
 	 */
-	p = (G.StrokeStyle = function(width, caps, joints, miterLimit) {
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
+	p = (G.StrokeStyle = function(width, caps, joints, miterLimit, ignoreScale) {
 		this.width = width;
 		this.caps = caps;
 		this.joints = joints;
 		this.miterLimit = miterLimit;
+		this.ignoreScale = ignoreScale;
 	}).prototype;
 	p.exec = function(ctx) {
 		ctx.lineWidth = (this.width == null ? "1" : this.width);
 		ctx.lineCap = (this.caps == null ? "butt" : (isNaN(this.caps) ? this.caps : Graphics.STROKE_CAPS_MAP[this.caps]));
 		ctx.lineJoin = (this.joints == null ? "miter" : (isNaN(this.joints) ? this.joints : Graphics.STROKE_JOINTS_MAP[this.joints]));
 		ctx.miterLimit = (this.miterLimit == null ? "10" : this.miterLimit);
+		ctx.ignoreScale = (this.ignoreScale == null ? false : this.ignoreScale);
 	};
 	p.path = false;
+	
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class StrokeDash
+	 * @constructor
+	 * @param {Array} [segments]
+	 * @param {Number} [offset=0]
+	 **/
+	/**
+	 * @property segments
+	 * @type Array
+	 */
+	/**
+	 * @property offset
+	 * @type Number
+	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
+	(G.StrokeDash = function(segments, offset) {
+		this.segments = segments;
+		this.offset = offset||0;
+	}).prototype.exec = function(ctx) {
+		if (ctx.setLineDash) { // feature detection.
+			ctx.setLineDash(this.segments|| G.StrokeDash.EMPTY_SEGMENTS); // instead of [] to reduce churn.
+			ctx.lineDashOffset = this.offset||0;
+		}
+	};
+	/**
+	 * The default value for segments (ie. no dash).
+	 * @property EMPTY_SEGMENTS
+	 * @static
+	 * @final
+	 * @readonly
+	 * @protected
+	 * @type {Array}
+	 **/
+	G.StrokeDash.EMPTY_SEGMENTS = [];
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/drawRoundRectComplex"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class RoundRect
 	 * @constructor
 	 * @param {Number} x
@@ -2017,6 +2188,11 @@ this.createjs = this.createjs||{};
 	 * @property radiusBL
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.RoundRect = function(x, y, w, h, radiusTL, radiusTR, radiusBR, radiusBL) {
 		this.x = x; this.y = y;
 		this.w = w; this.h = h;
@@ -2049,7 +2225,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/drawCircle"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class Circle
 	 * @constructor
 	 * @param {Number} x
@@ -2068,11 +2244,46 @@ this.createjs = this.createjs||{};
 	 * @property radius
 	 * @type Number
 	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.Circle = function(x, y, radius) {
 		this.x = x; this.y = y;
 		this.radius = radius;
 	}).prototype.exec = function(ctx) { ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); };
 
+	/**
+	 * Graphics command object. See {{#crossLink "Graphics/drawEllipse"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * @class Ellipse
+	 * @constructor
+	 * @param {Number} x
+	 * @param {Number} y
+	 * @param {Number} w
+	 * @param {Number} h
+	 **/
+	/**
+	 * @property x
+	 * @type Number
+	 */
+	/**
+	 * @property y
+	 * @type Number
+	 */
+	/**
+	 * @property w
+	 * @type Number
+	 */
+	/**
+	 * @property h
+	 * @type Number
+	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
+	 */
 	(G.Ellipse = function(x, y, w, h) {
 		this.x = x; this.y = y;
 		this.w = w; this.h = h;
@@ -2096,7 +2307,7 @@ this.createjs = this.createjs||{};
 	};
 
 	/**
-	 * Graphics command object. See {{#crossLink "Graphics"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
+	 * Graphics command object. See {{#crossLink "Graphics/drawPolyStar"}}{{/crossLink}} and {{#crossLink "Graphics/append"}}{{/crossLink}} for more information.
 	 * @class PolyStar
 	 * @constructor
 	 * @param {Number} x
@@ -2129,6 +2340,11 @@ this.createjs = this.createjs||{};
 	/**
 	 * @property angle
 	 * @type Number
+	 */
+	/**
+	 * Execute the Graphics command in the provided Canvas context.
+	 * @method exec
+	 * @param {CanvasRenderingContext2D} ctx The canvas rendering context
 	 */
 	(G.PolyStar = function(x, y, radius, sides, pointSize, angle) {
 		this.x = x; this.y = y;

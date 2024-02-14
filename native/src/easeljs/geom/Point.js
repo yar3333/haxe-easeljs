@@ -70,7 +70,6 @@ this.createjs = this.createjs||{};
 	}
 	var p = Point.prototype;
 	
-	
 // public methods:
 	/** 
 	 * Sets the specified values on this instance.

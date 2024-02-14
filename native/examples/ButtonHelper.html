@@ -8,21 +8,15 @@
 	<link href="../_assets/css/examples.css" rel="stylesheet" type="text/css"/>
 	<script src="../_assets/js/examples.js"></script>
 
-	<script src="../lib/easeljs-NEXT.combined.js"></script>
+	<script src="../lib/easeljs-NEXT.js"></script>
 
 	<script src="../_assets/libs/tweenjs-NEXT.min.js"></script>
-	<script src="../src/easeljs/display/MovieClip.js"></script>
 
 	<script src="../_assets/art/VectorButton.js"></script>
 
 <script id="editable">
 
-	var canvas, stage;
-
-	var mouseTarget;	// the display object currently under the mouse, or being dragged
-	var dragStarted;	// indicates whether we are currently in a drag operation
-	var offset;
-	var update = true;
+	var stage;
 
 	function init() {
 		examples.showDistractor();
