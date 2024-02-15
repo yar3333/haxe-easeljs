@@ -1,5 +1,9 @@
 package createjs;
 
+import js.html.CanvasElement;
+import js.html.ImageElement;
+import haxe.extern.EitherType;
+
 /**
  * Applies the alpha from the mask image (or canvas) to the target, such that the alpha channel of the result will
  * be derived from the mask, and the RGB channels will be copied from the target. This can be used, for example, to
@@ -29,9 +33,9 @@ extern class AlphaMaskFilter extends Filter
 	/**
 	 * The image (or canvas) to use as the mask.
 	 */
-	var mask : Dynamic;
+	var mask : EitherType<ImageElement, CanvasElement>;
 
-	function new(mask:Dynamic) : Void;
+	function new(mask:EitherType<ImageElement, CanvasElement>) : Void;
 
 	/**
 	 * Applies the filter to the specified context.
@@ -39,5 +43,5 @@ extern class AlphaMaskFilter extends Filter
 	 * <strong>IMPORTANT NOTE: This filter currently does not support the targetCtx, or targetX/Y parameters
 	 * correctly.</strong>
 	 */
-	override function applyFilter(ctx:js.html.CanvasRenderingContext2D, x:Float, y:Float, width:Float, height:Float, ?targetCtx:js.html.CanvasRenderingContext2D, ?targetX:Float, ?targetY:Float) : Bool;
+	override function applyFilter(ctx:js.html.CanvasRenderingContext2D, x:Int, y:Int, width:Int, height:Int, ?targetCtx:js.html.CanvasRenderingContext2D, ?targetX:Int, ?targetY:Int) : Bool;
 }

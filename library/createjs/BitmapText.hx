@@ -14,6 +14,7 @@ extern class BitmapText extends DisplayObject
 	 * The text to display.
 	 */
 	var text : String;
+
 	/**
 	 * A SpriteSheet instance that defines the glyphs for this bitmap text. Each glyph/character
 	 * should have a single frame animation defined in the sprite sheet named the same as
@@ -32,6 +33,7 @@ extern class BitmapText extends DisplayObject
 	 * See SpriteSheet for more information on defining sprite sheet data.
 	 */
 	var spriteSheet : SpriteSheet;
+
 	/**
 	 * The height of each line of text. If 0, then it will use a line height calculated
 	 * by checking for the height of the "1", "T", or "L" character (in that order). If
@@ -39,10 +41,12 @@ extern class BitmapText extends DisplayObject
 	 * sprite sheet.
 	 */
 	var lineHeight : Float;
+
 	/**
 	 * This spacing (in pixels) will be added after each character in the output.
 	 */
 	var letterSpacing : Float;
+
 	/**
 	 * If a space character is not defined in the sprite sheet, then empty pixels equal to
 	 * spaceWidth will be inserted instead. If 0, then it will use a value calculated
@@ -51,6 +55,7 @@ extern class BitmapText extends DisplayObject
 	 * sprite sheet.
 	 */
 	var spaceWidth : Float;
+
 	/**
 	 * BitmapText uses Sprite instances to draw text. To reduce the creation and destruction of instances (and thus garbage collection), it maintains
 	 * an internal object pool of sprite instances to reuse. Increasing this value can cause more sprites to be
@@ -66,24 +71,4 @@ extern class BitmapText extends DisplayObject
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	override function isVisible() : Bool;
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	function addChild() : Void;
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	function addChildAt() : Void;
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	function removeChild() : Void;
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	function removeChildAt() : Void;
-	/**
-	 * <strong>Disabled in BitmapText.</strong>
-	 */
-	function removeAllChildren() : Void;
 }

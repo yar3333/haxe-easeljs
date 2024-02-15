@@ -13,6 +13,7 @@ extern class Point
 	 * X position.
 	 */
 	var x : Float;
+
 	/**
 	 * Y position.
 	 */
@@ -24,14 +25,17 @@ extern class Point
 	 * Sets the specified values on this instance.
 	 */
 	function setValues(?x:Float, ?y:Float) : Point;
+
 	/**
 	 * Copies all properties from the specified point to this point.
 	 */
 	function copy(point:Point) : Point;
+
 	/**
 	 * Returns a clone of the Point instance.
 	 */
 	function clone() : Point;
+    
 	/**
 	 * Returns a string representation of this object.
 	 */

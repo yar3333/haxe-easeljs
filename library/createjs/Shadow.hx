@@ -17,6 +17,7 @@ extern class Shadow
 	var offsetX : Float;
 	var offsetY : Float;
 	var blur : Float;
+
 	/**
 	 * An identity shadow object (all properties are set to 0).
 	 */
@@ -28,6 +29,7 @@ extern class Shadow
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;
+    
 	/**
 	 * Returns a clone of this Shadow instance.
 	 */

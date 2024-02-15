@@ -51,18 +51,22 @@ extern class Filter
 	 * Provides padding values for this filter. That is, how much the filter will extend the visual bounds of an object it is applied to.
 	 */
 	function getBounds(?rect:Rectangle) : Rectangle;
+
 	/**
 	 * Assign any unique uniforms or other setup functionality here.
 	 */
 	function shaderParamSetup(gl:WebGL2RenderingContext, stage:StageGL, shaderProgram:Dynamic) : Void;
+
 	/**
 	 * Applies the filter to the specified context.
 	 */
-	function applyFilter(ctx:js.html.CanvasRenderingContext2D, x:Float, y:Float, width:Float, height:Float, ?targetCtx:js.html.CanvasRenderingContext2D, ?targetX:Float, ?targetY:Float) : Bool;
+	function applyFilter(ctx:js.html.CanvasRenderingContext2D, x:Int, y:Int, width:Int, height:Int, ?targetCtx:js.html.CanvasRenderingContext2D, ?targetX:Int, ?targetY:Int) : Bool;
+
 	/**
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;
+    
 	/**
 	 * Returns a clone of this Filter instance.
 	 */

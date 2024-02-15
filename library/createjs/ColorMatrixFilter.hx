@@ -1,5 +1,7 @@
 package createjs;
 
+import haxe.extern.EitherType;
+
 /**
  * Allows you to carry out complex color operations such as modifying saturation, brightness, or inverting. See the
  * {{#crossLink "ColorMatrix"}}{{/crossLink}} for more information on changing colors. For an easier color transform,
@@ -25,7 +27,7 @@ extern class ColorMatrixFilter extends Filter
 	/**
 	 * A 4x5 matrix describing the color operation to perform. See also the {{#crossLink "ColorMatrix"}}{{/crossLink}}
 	 */
-	var matrix : Dynamic;
+	var matrix : EitherType<Array<Float>, ColorMatrix>;
 
-	function new(matrix:Dynamic) : Void;
+	function new(matrix:EitherType<Array<Float>, ColorMatrix>) : Void;
 }

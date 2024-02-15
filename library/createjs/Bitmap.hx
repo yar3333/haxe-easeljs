@@ -1,5 +1,9 @@
 package createjs;
 
+import js.html.CanvasElement;
+import js.html.ImageElement;
+import haxe.extern.EitherType;
+
 /**
  * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
  * HTML element, or a string.
@@ -30,7 +34,8 @@ extern class Bitmap extends DisplayObject
 	 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
 	 * If the latter, a new Image instance with the URL as its src will be used.
 	 */
-	var image : Dynamic;
+	var image : EitherType<String, EitherType<ImageElement, CanvasElement>>;
+
 	/**
 	 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
 	 * Notes:
@@ -41,7 +46,7 @@ extern class Bitmap extends DisplayObject
 	 */
 	var sourceRect : Rectangle;
 
-	function new(imageOrUri:Dynamic) : Void;
+	function new(imageOrUri:EitherType<String, EitherType<ImageElement, CanvasElement>>) : Void;
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -50,6 +55,7 @@ extern class Bitmap extends DisplayObject
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	override function isVisible() : Bool;
+
 	/**
 	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
@@ -57,6 +63,7 @@ extern class Bitmap extends DisplayObject
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
+
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
@@ -66,6 +73,7 @@ extern class Bitmap extends DisplayObject
 	 * method.
 	 */
 	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float, ?options:Dynamic) : Void;
+
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
@@ -75,6 +83,7 @@ extern class Bitmap extends DisplayObject
 	 * method.
 	 */
 	override function updateCache(compositeOperation:String) : Void;
+
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.
@@ -84,10 +93,12 @@ extern class Bitmap extends DisplayObject
 	 * method.
 	 */
 	override function uncache() : Void;
+
 	/**
 	 * Returns a clone of the Bitmap instance.
 	 */
 	override function clone(?recursive:Bool) : DisplayObject;
+    
 	/**
 	 * Returns a string representation of this object.
 	 */

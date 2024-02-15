@@ -1,5 +1,9 @@
 package createjs;
 
+import js.html.CanvasElement;
+import js.html.ImageElement;
+import haxe.extern.EitherType;
+
 /**
  * Applies a greyscale alpha map image (or canvas) to the target, such that the alpha channel of the result will
  * be copied from the red channel of the map, and the RGB channels will be copied from the target.
@@ -30,7 +34,7 @@ extern class AlphaMapFilter extends Filter
 	 * The greyscale image (or canvas) to use as the alpha value for the result. This should be exactly the same
 	 * dimensions as the target.
 	 */
-	var alphaMap : Dynamic;
+	var alphaMap : EitherType<ImageElement, CanvasElement>;
 
-	function new(alphaMap:Dynamic) : Void;
+	function new(alphaMap:EitherType<ImageElement, CanvasElement>) : Void;
 }

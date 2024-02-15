@@ -25,22 +25,27 @@ extern class ButtonHelper
 	 * The target for this button helper.
 	 */
 	var target : Dynamic;
+
 	/**
 	 * The label name or frame number to display when the user mouses out of the target. Defaults to "over".
 	 */
 	var overLabel : Dynamic;
+
 	/**
 	 * The label name or frame number to display when the user mouses over the target. Defaults to "out".
 	 */
 	var outLabel : Dynamic;
+
 	/**
 	 * The label name or frame number to display when the user presses on the target. Defaults to "down".
 	 */
 	var downLabel : Dynamic;
+
 	/**
 	 * If true, then ButtonHelper will call gotoAndPlay, if false, it will use gotoAndStop. Default is false.
 	 */
 	var play : Bool;
+    
 	/**
 	 * Enables or disables the button functionality on the target.
 	 */

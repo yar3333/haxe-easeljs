@@ -48,6 +48,7 @@ extern class BitmapCache
 	 * Returns a string representation of this object.
 	 */
 	function toString() : String;
+
 	/**
 	 * Actually create the correct cache surface and properties associated with it. Caching and it's benefits are discussed
 	 * by the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} function and this class description. Here are the detailed
@@ -95,7 +96,8 @@ extern class BitmapCache
 	 * {{#crossLink "StageGL/isCacheControlled"}}{{/crossLink}} to true on your instance. This will trigger it to behave
 	 * correctly, and not assume your main context is WebGL.
 	 */
-	function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float, ?options:Dynamic) : Void;
+	function cache(x:Int, y:Int, width:Int, height:Int, ?scale:Float, ?options:Dynamic) : Void;
+
 	/**
 	 * Directly called via {{#crossLink "DisplayObject/updateCache:method"}}{{/crossLink}}, but also internally. This
 	 * has the dual responsibility of making sure the surface is ready to be drawn to, and performing the draw. For
@@ -103,16 +105,19 @@ extern class BitmapCache
 	 * and {{#crossLink "BitmapCache/_drawToCache"}}{{/crossLink}} respectively.
 	 */
 	function update(?compositeOperation:String) : Void;
+
 	/**
 	 * Reset and release all the properties and memory associated with this cache.
 	 */
 	function release() : Void;
+
 	/**
 	 * Returns a data URL for the cache, or `null` if this display object is not cached.
 	 * Uses {{#crossLink "BitmapCache/cacheID:property"}}{{/crossLink}} to ensure a new data URL is not generated if the
 	 * cache has not changed.
 	 */
 	function getCacheDataURL() : String;
+    
 	/**
 	 * Use context2D drawing commands to display the cache canvas being used.
 	 */

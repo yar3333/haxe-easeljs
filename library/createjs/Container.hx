@@ -25,19 +25,22 @@ extern class Container extends DisplayObject
 	 * {{#crossLink "Container/swapChildren"}}{{/crossLink}}, etc, rather than accessing this directly, but it is
 	 * included for advanced uses.
 	 */
-	var children : Array<Dynamic>;
+	var children : Array<DisplayObject>;
+
 	/**
 	 * Indicates whether the children of this container are independently enabled for mouse/pointer interaction.
 	 * If false, the children will be aggregated under the container - for example, a click on a child shape would
 	 * trigger a click event on the container.
 	 */
 	var mouseChildren : Bool;
+
 	/**
 	 * If false, the tick will not be propagated to children of this Container. This can provide some performance benefits.
 	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
 	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
 	 */
 	var tickChildren : Bool;
+
 	/**
 	 * Returns the number of children in the container.
 	 */
@@ -52,6 +55,7 @@ extern class Container extends DisplayObject
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	override function isVisible() : Bool;
+
 	/**
 	 * Draws the display object into the specified context ignoring its visible, alpha, shadow, and transform.
 	 * Returns true if the draw was handled (useful for overriding functionality).
@@ -59,6 +63,7 @@ extern class Container extends DisplayObject
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
+
 	/**
 	 * Adds a child to the top of the display list.
 	 * 
@@ -71,6 +76,7 @@ extern class Container extends DisplayObject
 	 * 		container.addChild(bitmapInstance, shapeInstance, textInstance);
 	 */
 	function addChild(child:DisplayObject) : DisplayObject;
+
 	/**
 	 * Adds a child to the display list at the specified index, bumping children at equal or greater indexes up one, and
 	 * setting its parent to this Container.
@@ -91,6 +97,7 @@ extern class Container extends DisplayObject
 	 * This would also bump otherShape's index up by one. Fails silently if the index is out of range.
 	 */
 	function addChildAt(child:DisplayObject, index:Int) : DisplayObject;
+
 	/**
 	 * Removes the specified child from the display list. Note that it is faster to use removeChildAt() if the index is
 	 * already known.
@@ -106,6 +113,7 @@ extern class Container extends DisplayObject
 	 * Returns true if the child (or children) was removed, or false if it was not in the display list.
 	 */
 	function removeChild(child:DisplayObject) : Bool;
+
 	/**
 	 * Removes the child at the specified index from the display list, and sets its parent to null.
 	 * 
@@ -120,6 +128,7 @@ extern class Container extends DisplayObject
 	 * Returns true if the child (or children) was removed, or false if any index was out of range.
 	 */
 	function removeChildAt(index:Int) : Bool;
+
 	/**
 	 * Removes all children from the display list.
 	 * 
@@ -128,6 +137,7 @@ extern class Container extends DisplayObject
 	 * 	container.removeAllChildren();
 	 */
 	function removeAllChildren() : Void;
+
 	/**
 	 * Returns the child at the specified index.
 	 * 
@@ -136,10 +146,12 @@ extern class Container extends DisplayObject
 	 *      container.getChildAt(2);
 	 */
 	function getChildAt(index:Int) : DisplayObject;
+
 	/**
 	 * Returns the child with the specified name.
 	 */
 	function getChildByName(name:String) : DisplayObject;
+
 	/**
 	 * Performs an array sort operation on the child list.
 	 * 
@@ -153,6 +165,7 @@ extern class Container extends DisplayObject
 	 *      container.sortChildren(sortFunction);
 	 */
 	function sortChildren(sortFunction:Dynamic) : Void;
+
 	/**
 	 * Returns the index of the specified child in the display list, or -1 if it is not in the display list.
 	 * 
@@ -161,30 +174,36 @@ extern class Container extends DisplayObject
 	 *      var index = container.getChildIndex(child);
 	 */
 	function getChildIndex(child:DisplayObject) : Int;
+
 	/**
 	 * Swaps the children at the specified indexes. Fails silently if either index is out of range.
 	 */
 	function swapChildrenAt(index1:Float, index2:Float) : Void;
+
 	/**
 	 * Swaps the specified children's depth in the display list. Fails silently if either child is not a child of this
 	 * Container.
 	 */
 	function swapChildren(child1:DisplayObject, child2:DisplayObject) : Void;
+
 	/**
 	 * Changes the depth of the specified child. Fails silently if the child is not a child of this container, or the index is out of range.
 	 */
 	function setChildIndex(child:DisplayObject, index:Int) : Void;
+
 	/**
 	 * Returns true if the specified display object either is this container or is a descendent (child, grandchild, etc)
 	 * of this container.
 	 */
 	function contains(child:DisplayObject) : Bool;
+
 	/**
 	 * Tests whether the display object intersects the specified local point (ie. draws a pixel with alpha > 0 at the
 	 * specified position). This ignores the alpha, shadow and compositeOperation of the display object, and all
 	 * transform properties including regX/Y.
 	 */
 	override function hitTest(x:Float, y:Float) : Bool;
+
 	/**
 	 * Returns an array of all display objects under the specified coordinates that are in this container's display
 	function getObjectsUnderPoint(x:Float, y:Float, mode:Int=0) : Array<DisplayObject>;
@@ -212,11 +231,13 @@ extern class Container extends DisplayObject
 	 * operation. See {{#crossLink "Container/getObjectsUnderPoint"}}{{/crossLink}} for more information.
 	 */
 	function getObjectUnderPoint(x:Float, y:Float, mode:Int=0) : DisplayObject;
+
 	/**
 	 * Returns a clone of this Container. Some properties that are specific to this instance's current context are
 	 * reverted to their defaults (for example .parent).
 	 */
 	override function clone(?recursive:Bool) : DisplayObject;
+    
 	/**
 	 * Returns a string representation of this object.
 	 */

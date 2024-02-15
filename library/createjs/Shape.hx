@@ -33,6 +33,7 @@ extern class Shape extends DisplayObject
 	 * NOTE: This method is mainly for internal use, though it may be useful for advanced uses.
 	 */
 	override function isVisible() : Bool;
+    
 	/**
 	 * Draws the Shape into the specified context ignoring its visible, alpha, shadow, and transform. Returns true if
 	 * the draw was handled (useful for overriding functionality).
@@ -40,11 +41,13 @@ extern class Shape extends DisplayObject
 	 * <i>NOTE: This method is mainly for internal use, though it may be useful for advanced uses.</i>
 	 */
 	override function draw(ctx:js.html.CanvasRenderingContext2D, ?ignoreCache:Bool) : Bool;
+
 	/**
 	 * Returns a clone of this Shape. Some properties that are specific to this instance's current context are reverted to
 	 * their defaults (for example .parent).
 	 */
 	override function clone(?recursive:Bool) : DisplayObject;
+
 	/**
 	 * Returns a string representation of this object.
 	 */

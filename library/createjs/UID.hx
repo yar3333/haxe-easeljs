@@ -9,5 +9,5 @@ extern class UID
 	/**
 	 * Returns the next unique id.
 	 */
-	static function get() : Float;
+	static function get() : Int;
 }
