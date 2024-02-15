@@ -1,5 +1,7 @@
 --js test/bin/index.js
+--library tweenjs
 --class-path library
 --class-path test/src
 --macro include('createjs')
+--macro include('easeljs')
 --main Main

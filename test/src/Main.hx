@@ -1,10 +1,9 @@
-import createjs.Shape;
-import createjs.Stage;
-import createjs.Matrix2D;
 import haxe.Timer;
 import js.Browser;
 import js.html.CanvasElement;
-import js.html.CanvasRenderingContext2D;
+import easeljs.geom.Matrix2D;
+import easeljs.display.Shape;
+import easeljs.display.Stage;
 
 class Main
 {
