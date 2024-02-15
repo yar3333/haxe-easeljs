@@ -33,6 +33,10 @@ typedef DOMElementTickEvent =
  *      domElement.htmlElement.onclick = function() {
  *          console.log("clicked");
  *      }
+ * 
+ * <strong>Important:</strong> This class needs to be notified it is about to be drawn, this will happen automatically
+ * if you call stage.update, calling stage.draw or disabling tickEnabled will miss important steps and it will render
+ * stale information.
  */
 extern class DOMElement extends DisplayObject
 {
@@ -58,7 +62,7 @@ extern class DOMElement extends DisplayObject
 	/**
 	 * Not applicable to DOMElement.
 	 */
-	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float) : Void;
+	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float, ?options:Dynamic) : Void;
 	/**
 	 * Not applicable to DOMElement.
 	 */

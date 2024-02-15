@@ -1,8 +1,8 @@
 package createjs;
 
 /**
- * Applies a box blur to DisplayObjects. Note that this filter is fairly CPU intensive, particularly if the quality is
- * set higher than 1.
+ * Applies a box blur to DisplayObjects in context 2D and a Gaussian blur in webgl. Note that this filter is fairly
+ * intensive, particularly if the quality is set higher than 1.
  * 
  * <h4>Example</h4>
  * This example creates a red circle, and then applies a 5 pixel blur to it. It uses the {{#crossLink "Filter/getBounds"}}{{/crossLink}}

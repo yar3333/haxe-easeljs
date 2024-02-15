@@ -1,5 +1,7 @@
 package createjs;
 
+import js.html.webgl.WebGL2RenderingContext;
+
 /**
  * Base class that all filters should inherit from. Filters need to be applied to objects that have been cached using
  * the {{#crossLink "DisplayObject/cache"}}{{/crossLink}} method. If an object changes, please cache it again, or use
@@ -18,8 +20,7 @@ package createjs;
  * will cause an object to feather outwards, resulting in a margin around the shape.
  * 
  * <h4>EaselJS Filters</h4>
- * EaselJS comes with a number of pre-built filters. Note that individual filters are not compiled into the minified
- * version of EaselJS. To use them, you must include them manually in the HTML.
+ * EaselJS comes with a number of pre-built filters:
  * <ul><li>{{#crossLink "AlphaMapFilter"}}{{/crossLink}} : Map a greyscale image to the alpha channel of a display object</li>
  *      <li>{{#crossLink "AlphaMaskFilter"}}{{/crossLink}}: Map an image's alpha channel to the alpha channel of a display object</li>
  *      <li>{{#crossLink "BlurFilter"}}{{/crossLink}}: Apply vertical and horizontal blur to a display object</li>
@@ -29,12 +30,31 @@ package createjs;
  */
 extern class Filter
 {
+	/**
+	 * A flag stating that this filter uses a context draw mode and cannot be batched into imageData processing.
+	 */
+	var usesContext : Bool;
+	/**
+	 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
+	 * This should be based upon StageGL.SHADER_VERTEX_BODY_REGULAR
+	 */
+	var VTX_SHADER : String;
+	/**
+	 * Pre-processed template shader code. It will be parsed before being fed in into the shader compiler.
+	 * This should be based upon StageGL.SHADER_FRAGMENT_BODY_REGULAR
+	 */
+	var FRAG_SHADER : String;
+
 	function new() : Void;
 
 	/**
 	 * Provides padding values for this filter. That is, how much the filter will extend the visual bounds of an object it is applied to.
 	 */
 	function getBounds(?rect:Rectangle) : Rectangle;
+	/**
+	 * Assign any unique uniforms or other setup functionality here.
+	 */
+	function shaderParamSetup(gl:WebGL2RenderingContext, stage:StageGL, shaderProgram:Dynamic) : Void;
 	/**
 	 * Applies the filter to the specified context.
 	 */

@@ -26,15 +26,15 @@ extern class DisplayObject extends EventDispatcher
 	 */
 	var alpha : Float;
 	/**
-	 * If a cache is active, this returns the canvas that holds the cached version of this display object. See {{#crossLink "cache"}}{{/crossLink}}
-	 * for more information.
+	 * If a cache is active, this returns the canvas that holds the image of this display object. See {{#crossLink "DisplayObject/cache:method"}}{{/crossLink}}
+	 * for more information. Use this to display the result of a cache. This will be a HTMLCanvasElement unless special cache rules have been deliberately enabled for this cache.
 	 */
 	var cacheCanvas : js.html.CanvasElement;
 	/**
-	 * Returns an ID number that uniquely identifies the current cache for this display object. This can be used to
-	 * determine if the cache has changed since a previous check.
+	 * If a cache has been made, this returns the class that is managing the cacheCanvas and its properties. See {{#crossLink "BitmapCache"}}{{/crossLink}}
+	 * for more information. Use this to control, inspect, and change the cache. In special circumstances this may be a modified or subclassed BitmapCache.
 	 */
-	var cacheID : Int;
+	var bitmapCache : BitmapCache;
 	/**
 	 * Unique ID for this display object. Makes display objects easier for some uses.
 	 */
@@ -53,7 +53,7 @@ extern class DisplayObject extends EventDispatcher
 	/**
 	 * If false, the tick will not run on this display object (or its children). This can provide some performance benefits.
 	 * In addition to preventing the "tick" event from being dispatched, it will also prevent tick related updates
-	 * on some display objects (ex. Sprite & MovieClip frame advancing, DOMElement visibility handling).
+	 * on some display objects (ex. Sprite & MovieClip frame advancing, and DOMElement display properties).
 	 */
 	var tickEnabled : Bool;
 	/**
@@ -70,11 +70,13 @@ extern class DisplayObject extends EventDispatcher
 	/**
 	 * The left offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate
 	 * around its center, you would set regX and {{#crossLink "DisplayObject/regY:property"}}{{/crossLink}} to 50.
+	 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 	 */
 	var regX : Float;
 	/**
 	 * The y offset for this display object's registration point. For example, to make a 100x100px Bitmap rotate around
 	 * its center, you would set {{#crossLink "DisplayObject/regX:property"}}{{/crossLink}} and regY to 50.
+	 * Cached object's registration points should be set based on pre-cache conditions, not cached size.
 	 */
 	var regY : Float;
 	/**
@@ -122,8 +124,9 @@ extern class DisplayObject extends EventDispatcher
 	/**
 	 * The composite operation indicates how the pixels of this display object will be composited with the elements
 	 * behind it. If `null`, this property is inherited from the parent container. For more information, read the
-	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#compositing">
-	 * whatwg spec on compositing</a>.
+	 * <a href="https://html.spec.whatwg.org/multipage/scripting.html#dom-context-2d-globalcompositeoperation">
+	 * whatwg spec on compositing</a>. For a list of supported compositeOperation value, visit
+	 * <a href="https://drafts.fxtf.org/compositing/">the W3C draft on Compositing and Blending</a>.
 	 */
 	var compositeOperation : String;
 	/**
@@ -194,28 +197,32 @@ extern class DisplayObject extends EventDispatcher
 	 */
 	function updateContext(ctx:js.html.CanvasRenderingContext2D) : Void;
 	/**
-	 * Draws the display object into a new canvas, which is then used for subsequent draws. For complex content
+	 * Draws the display object into a new element, which is then used for subsequent draws. Intended for complex content
 	 * that does not change frequently (ex. a Container with many children that do not move, or a complex vector Shape),
 	 * this can provide for much faster rendering because the content does not need to be re-rendered each tick. The
-	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must
-	 * manually update the cache by calling <code>updateCache()</code> or <code>cache()</code> again. You must specify
-	 * the cache area via the x, y, w, and h parameters. This defines the rectangle that will be rendered and cached
-	 * using this display object's coordinates.
+	 * cached display object can be moved, rotated, faded, etc freely, however if its content changes, you must manually
+	 * update the cache by calling <code>updateCache()</code> again. You must specify the cached area via the x, y, w,
+	 * and h parameters. This defines the rectangle that will be rendered and cached using this display object's coordinates.
 	 * 
 	 * <h4>Example</h4>
 	 * For example if you defined a Shape that drew a circle at 0, 0 with a radius of 25:
 	 * 
 	 *      var shape = new createjs.Shape();
 	 *      shape.graphics.beginFill("#ff0000").drawCircle(0, 0, 25);
-	 *      myShape.cache(-25, -25, 50, 50);
+	 *      shape.cache(-25, -25, 50, 50);
 	 * 
-	 * Note that filters need to be defined <em>before</em> the cache is applied. Check out the {{#crossLink "Filter"}}{{/crossLink}}
-	 * class for more information. Some filters (ex. BlurFilter) will not work as expected in conjunction with the scale param.
+	 * Note that filters need to be defined <em>before</em> the cache is applied or you will have to call updateCache after
+	 * application. Check out the {{#crossLink "Filter"}}{{/crossLink}} class for more information. Some filters
+	 * (ex. BlurFilter) may not work as expected in conjunction with the scale param.
 	 * 
-	 * Usually, the resulting cacheCanvas will have the dimensions width*scale by height*scale, however some filters (ex. BlurFilter)
+	 * Usually, the resulting cacheCanvas will have the dimensions width * scale, height * scale, however some filters (ex. BlurFilter)
 	 * will add padding to the canvas dimensions.
+	 * 
+	 * In previous versions caching was handled on DisplayObject but has since been moved to {{#crossLink "BitmapCache"}}{{/crossLink}}.
+	 * This allows for easier interaction and alternate cache methods like WebGL with {{#crossLink "StageGL"}}{{/crossLink}}.
+	 * For more information on the options object, see the BitmapCache {{#crossLink "BitmapCache/define"}}{{/crossLink}}.
 	 */
-	function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float) : Void;
+	function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float, ?options:Dynamic) : Void;
 	/**
 	 * Redraws the display object to its cache. Calling updateCache without an active cache will throw an error.
 	 * If compositeOperation is null the current cache will be cleared prior to drawing. Otherwise the display object
@@ -229,6 +236,9 @@ extern class DisplayObject extends EventDispatcher
 	 *      shapeInstance.clear();
 	 *      shapeInstance.setStrokeStyle(3).beginStroke("#ff0000").moveTo(100, 100).lineTo(200,200);
 	 *      shapeInstance.updateCache();
+	 * 
+	 * In previous versions caching was handled on DisplayObject but has since been moved to {{#crossLink "BitmapCache"}}{{/crossLink}}.
+	 * This allows for easier interaction and alternate cache methods like WebGL and {{#crossLink "StageGL"}}{{/crossLink}}.
 	 */
 	function updateCache(compositeOperation:String) : Void;
 	/**
@@ -237,7 +247,7 @@ extern class DisplayObject extends EventDispatcher
 	function uncache() : Void;
 	/**
 	 * Returns a data URL for the cache, or null if this display object is not cached.
-	 * Uses cacheID to ensure a new data URL is not generated if the cache has not changed.
+	 * Only generated if the cache has changed, otherwise returns last result.
 	 */
 	function getCacheDataURL() : String;
 	/**
@@ -251,7 +261,7 @@ extern class DisplayObject extends EventDispatcher
 	 *      displayObject.x = 300;
 	 *      displayObject.y = 200;
 	 *      stage.addChild(displayObject);
-	 *      var point = myDisplayObject.localToGlobal(100, 100);
+	 *      var point = displayObject.localToGlobal(100, 100);
 	 *      // Results in x=400, y=300
 	 */
 	function localToGlobal(x:Float, y:Float, ?pt:Dynamic) : Point;
@@ -266,7 +276,7 @@ extern class DisplayObject extends EventDispatcher
 	 *      displayObject.x = 300;
 	 *      displayObject.y = 200;
 	 *      stage.addChild(displayObject);
-	 *      var point = myDisplayObject.globalToLocal(100, 100);
+	 *      var point = displayObject.globalToLocal(100, 100);
 	 *      // Results in x=-200, y=-100
 	 */
 	function globalToLocal(x:Float, y:Float, ?pt:Dynamic) : Point;
@@ -489,6 +499,13 @@ extern class DisplayObject extends EventDispatcher
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressmove
 	 * event will be generated on that object whenever the mouse moves until the mouse press is released. This can be
 	 * useful for dragging and similar operations.
+	 * 
+	 * **Please note** that if the initial mouse target from a `mousedown` event is removed from the stage after being pressed
+	 * (e.g. during a `pressmove` event), a `pressmove` event is still generated. However since it is no longer in the
+	 * display list, the event can not bubble. This means that previous ancestors (parent containers) will not receive
+	 * the event, and therefore can not re-dispatch it. If you intend to listen for `{{#crossLink "DisplayObject/pressup:event"}}{{/crossLink}}`
+	 * or `pressmove` on a dynamic object (such as a {{#crossLink "MovieClip"}}{{/crossLink}} or {{#crossLink "Container"}}{{/crossLink}}),
+	 * then ensure you set {{#crossLink "Container/mouseChildren:property"}}{{/crossLink}} to `false`.
 	 */
 	inline function addPressmoveEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("pressmove", handler, useCapture);
 	inline function removePressmoveEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("pressmove", handler, useCapture);
@@ -496,6 +513,13 @@ extern class DisplayObject extends EventDispatcher
 	 * After a {{#crossLink "DisplayObject/mousedown:event"}}{{/crossLink}} occurs on a display object, a pressup event
 	 * will be generated on that object when that mouse press is released. This can be useful for dragging and similar
 	 * operations.
+	 * 
+	 * **Please note** that if the initial mouse target from a `mousedown` event is removed from the stage after being pressed
+	 * (e.g. during a `pressmove` event), a `pressup` event is still generated. However since it is no longer in the
+	 * display list, the event can not bubble. This means that previous ancestors (parent containers) will not receive
+	 * the event, and therefore can not re-dispatch it. If you intend to listen for `{{#crossLink "DisplayObject/pressmove:event"}}{{/crossLink}}`
+	 * or `pressup` on a dynamic object (such as a {{#crossLink "MovieClip"}}{{/crossLink}} or {{#crossLink "Container"}}{{/crossLink}}),
+	 * then ensure you set {{#crossLink "Container/mouseChildren:property"}}{{/crossLink}} to `false`.
 	 */
 	inline function addPressupEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("pressup", handler, useCapture);
 	inline function removePressupEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("pressup", handler, useCapture);

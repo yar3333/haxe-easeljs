@@ -1,5 +1,7 @@
 package createjs;
 
+import js.html.ImageElement;
+
 /**
  * The SpriteSheetUtils class is a collection of static methods for working with {{#crossLink "SpriteSheet"}}{{/crossLink}}s.
  * A sprite sheet is a series of images (usually animation frames) combined into a single image on a regular grid. For
@@ -19,5 +21,5 @@ extern class SpriteSheetUtils
 	 * 
 	 * The extractFrame method may cause cross-domain warnings since it accesses pixels directly on the canvas.
 	 */
-	static function extractFrame(spriteSheet:Dynamic, frameOrAnimation:Dynamic) : Dynamic;
+	static function extractFrame(spriteSheet:SpriteSheet, frameOrAnimation:Dynamic) : ImageElement;
 }

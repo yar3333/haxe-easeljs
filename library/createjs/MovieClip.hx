@@ -2,9 +2,8 @@ package createjs;
 
 /**
  * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
- * you to create objects which encapsulate timeline animations, state changes, and synched actions. Due to the
- * complexities inherent in correctly setting up a MovieClip, it is largely intended for tool output and is not included
- * in the main EaselJS library.
+ * you to create objects which encapsulate timeline animations, state changes, and synched actions. The MovieClip
+ * class has been included in the EaselJS minified file since 0.7.0.
  * 
  * Currently MovieClip only works properly if it is tick based (as opposed to time based) though some concessions have
  * been made to support time-based timelines in the future.
@@ -16,7 +15,7 @@ package createjs;
  *      var stage = new createjs.Stage("canvas");
  *      createjs.Ticker.addEventListener("tick", stage);
  * 
- *      var mc = new createjs.MovieClip(null, 0, true, {start:20});
+ *      var mc = new createjs.MovieClip({loop:-1, labels:{myLabel:20}});
  *      stage.addChild(mc);
  * 
  *      var child1 = new createjs.Shape(
@@ -45,40 +44,20 @@ extern class MovieClip extends Container
 	 * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
 	 * See each constant for a description of the behaviour.
 	 */
-	var mode : String;
+	var mode : MovieClipMode;
 	/**
 	 * Specifies what the first frame to play in this movieclip, or the only frame to display if mode is SINGLE_FRAME.
 	 */
-	var startPosition : Float;
+	var startPosition : Int;
 	/**
-	 * Indicates whether this MovieClip should loop when it reaches the end of its timeline.
+	 * Specifies how many times this MovieClip should loop. A value of -1 indicates it should loop indefinitely. A value of
+	 * 1 would cause it to loop once (ie. play a total of twice).
 	 */
-	var loop : Bool;
+	var loop : Int;
 	/**
 	 * The current frame of the movieclip.
 	 */
-	var currentFrame : Float;
-	/**
-	 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
-	 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
-	 * instances to the timeline.
-	 * 
-	 * <h4>Example</h4>
-	 * 
-	 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
-	 *      var mc = new createjs.MovieClip();
-	 *      mc.timeline.addTween(tween);
-	 * 
-	 * Elements can be added and removed from the timeline by toggling an "_off" property
-	 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
-	 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
-	 * frame 1. You can use the "visible" property to achieve the same effect.
-	 * 
-	 *      var tween = createjs.Tween.get(target).to({_off:false})
-	 *          .wait(1).to({_off:true})
-	 *          .wait(1).to({_off:false});
-	 */
-	var timeline : Timeline;
+	var currentFrame : Int;
 	/**
 	 * If true, the MovieClip's position will not advance when ticked.
 	 */
@@ -115,31 +94,44 @@ extern class MovieClip extends Container
 	 */
 	var framerate : Float;
 	/**
-	 * The MovieClip will advance independently of its parent, even if its parent is paused.
-	 * This is the default mode.
+	 * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
+	 * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+	 * instances to the timeline.
+	 * 
+	 * <h4>Example</h4>
+	 * 
+	 *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+	 *      var mc = new createjs.MovieClip();
+	 *      mc.timeline.addTween(tween);
+	 * 
+	 * Elements can be added and removed from the timeline by toggling an "_off" property
+	 * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
+	 * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
+	 * frame 1. You can use the "visible" property to achieve the same effect.
+	 * 
+	 *      var tween = createjs.Tween.get(target).to({_off:false})
+	 *          .wait(1).to({_off:true})
+	 *          .wait(1).to({_off:false});
 	 */
-	static var INDEPENDENT : String;
-	/**
-	 * The MovieClip will only display a single frame (as determined by the startPosition property).
-	 */
-	static var SINGLE_FRAME : String;
-	/**
-	 * The MovieClip will be advanced only when its parent advances and will be synched to the position of
-	 * the parent MovieClip.
-	 */
-	static var SYNCHED : String;
+	var timeline : Timeline;
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
-	 * Shortcut to TweenJS: Timeline.getLabels();
 	 */
 	var labels : Array<Dynamic>;
 	/**
-	 * Returns the name of the label on or immediately before the current frame. See TweenJS: Timeline.getCurrentLabel()
-	 * for more information.
+	 * Returns the name of the label on or immediately before the current frame.
 	 */
 	var currentLabel : String;
+	/**
+	 * Returns the duration of this MovieClip in frames.
+	 */
+     var totalFrames : Int;
+	/**
+	 * Returns the duration of this MovieClip in seconds or ticks.
+	 */
+	var duration : Float;
 
-	function new(?mode:String, ?startPosition:Float, ?loop:Bool, ?labels:Dynamic) : Void;
+	function new(?props:MovieClipInitProps) : Void;
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
@@ -181,4 +173,117 @@ extern class MovieClip extends Container
 	 * Returns a string representation of this object.
 	 */
 	override function toString() : String;
+}
+
+typedef MovieClipInitProps =
+{
+	/**
+	 * Controls how this MovieClip advances its time. Must be one of 0 (INDEPENDENT), 1 (SINGLE_FRAME), or 2 (SYNCHED).
+	 * See each constant for a description of the behaviour.
+	 */
+    @:optional var mode : MovieClipMode;
+    /**
+     * Specifies what the first frame to play in this movieclip, or the only frame to display if mode is SINGLE_FRAME.
+     */
+    @:optional var startPosition : Int;
+    /**
+     * Specifies how many times this MovieClip should loop. A value of -1 indicates it should loop indefinitely. A value of
+     * 1 would cause it to loop once (ie. play a total of twice).
+     */
+    @:optional var loop : Int;
+    /**
+     * The current frame of the movieclip.
+     */
+    @:optional var currentFrame : Int;
+    /**
+     * If true, the MovieClip's position will not advance when ticked.
+     */
+    @:optional var paused : Bool;
+    /**
+     * If true, actions in this MovieClip's tweens will be run when the playhead advances.
+     */
+    @:optional var actionsEnabled : Bool;
+    /**
+     * If true, the MovieClip will automatically be reset to its first frame whenever the timeline adds
+     * it back onto the display list. This only applies to MovieClip instances with mode=INDEPENDENT.
+     * <br><br>
+     * For example, if you had a character animation with a "body" child MovieClip instance
+     * with different costumes on each frame, you could set body.autoReset = false, so that
+     * you can manually change the frame it is on, without worrying that it will be reset
+     * automatically.
+     */
+    @:optional var autoReset : Bool;
+    /**
+     * An array of bounds for each frame in the MovieClip. This is mainly intended for tool output.
+     */
+    @:optional var frameBounds : Array<Dynamic>;
+    /**
+     * By default MovieClip instances advance one frame per tick. Specifying a framerate for the MovieClip
+     * will cause it to advance based on elapsed time between ticks as appropriate to maintain the target
+     * framerate.
+     * 
+     * For example, if a MovieClip with a framerate of 10 is placed on a Stage being updated at 40fps, then the MovieClip will
+     * advance roughly one frame every 4 ticks. This will not be exact, because the time between each tick will
+     * vary slightly between frames.
+     * 
+     * This feature is dependent on the tick event object (or an object with an appropriate "delta" property) being
+     * passed into {{#crossLink "Stage/update"}}{{/crossLink}}.
+     */
+    @:optional var framerate : Float;
+    /**
+     * The TweenJS Timeline that is associated with this MovieClip. This is created automatically when the MovieClip
+     * instance is initialized. Animations are created by adding <a href="http://tweenjs.com">TweenJS</a> Tween
+     * instances to the timeline.
+     * 
+     * <h4>Example</h4>
+     * 
+     *      var tween = createjs.Tween.get(target).to({x:0}).to({x:100}, 30);
+     *      var mc = new createjs.MovieClip();
+     *      mc.timeline.addTween(tween);
+     * 
+     * Elements can be added and removed from the timeline by toggling an "_off" property
+     * using the <code>tweenInstance.to()</code> method. Note that using <code>Tween.set</code> is not recommended to
+     * create MovieClip animations. The following example will toggle the target off on frame 0, and then back on for
+     * frame 1. You can use the "visible" property to achieve the same effect.
+     * 
+     *      var tween = createjs.Tween.get(target).to({_off:false})
+     *          .wait(1).to({_off:true})
+     *          .wait(1).to({_off:false});
+     */
+    @:optional var timeline : Timeline;
+    /**
+     * Returns an array of objects with label and position (aka frame) properties, sorted by position.
+     */
+    @:optional var labels : Array<Dynamic>;
+    /**
+     * Returns the name of the label on or immediately before the current frame.
+     */
+    @:optional var currentLabel : String;
+    /**
+     * Returns the duration of this MovieClip in frames.
+     */
+    @:optional var totalFrames : Int;
+    /**
+     * Returns the duration of this MovieClip in seconds or ticks.
+     */
+    @:optional var duration : Float;
+}
+
+@:native("createjs.MovieClip")
+enum abstract MovieClipMode(Int)
+{
+	/**
+	 * The MovieClip will advance independently of its parent, even if its parent is paused.
+	 * This is the default mode.
+	 */
+     var INDEPENDENT;
+     /**
+      * The MovieClip will only display a single frame (as determined by the startPosition property).
+      */
+     var SINGLE_FRAME;
+     /**
+      * The MovieClip will be advanced only when its parent advances and will be synched to the position of
+      * the parent MovieClip.
+      */
+     var SYNCHED;
 }

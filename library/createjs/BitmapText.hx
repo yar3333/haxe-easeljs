@@ -1,12 +1,11 @@
 package createjs;
 
 /**
- * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported
- * using new line characters, but automatic wrapping is not supported. See the 
- * {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
+ * Displays text using bitmap glyphs defined in a sprite sheet. Multi-line text is supported using new line characters,
+ * but automatic wrapping is not supported. See the {{#crossLink "BitmapText/spriteSheet:property"}}{{/crossLink}}
  * property for more information on defining glyphs.
  * 
- * <strong>Important:</strong> BitmapText extends Container, but is not designed to be used as one.
+ * <strong>Important:</strong> While BitmapText extends Container, it is not designed to be used as one.
  * As such, methods like addChild and removeChild are disabled.
  */
 extern class BitmapText extends DisplayObject
@@ -32,7 +31,7 @@ extern class BitmapText extends DisplayObject
 	 * 
 	 * See SpriteSheet for more information on defining sprite sheet data.
 	 */
-	var spriteSheet : String;
+	var spriteSheet : SpriteSheet;
 	/**
 	 * The height of each line of text. If 0, then it will use a line height calculated
 	 * by checking for the height of the "1", "T", or "L" character (in that order). If

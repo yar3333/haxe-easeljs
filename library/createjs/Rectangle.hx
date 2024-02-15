@@ -39,7 +39,7 @@ extern class Rectangle
 	/**
 	 * Adds the specified padding to the rectangle's bounds.
 	 */
-	function pad(?top:Float, ?left:Float, ?right:Float, ?bottom:Float) : Rectangle;
+	function pad(top:Float, left:Float, bottom:Float, right:Float) : Rectangle;
 	/**
 	 * Copies all properties from the specified rectangle to this rectangle.
 	 */

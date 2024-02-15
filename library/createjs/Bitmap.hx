@@ -6,31 +6,38 @@ package createjs;
  * 
  * <h4>Example</h4>
  * 
- *      var bitmap = new createjs.Bitmap("imagePath.jpg");
+ * 	var bitmap = new createjs.Bitmap("imagePath.jpg");
  * 
  * <strong>Notes:</strong>
  * <ol>
- *     <li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
- *      will be displayed.</li>
- *     <li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
- *     the Bitmap can be cached.</li>
- *     <li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
- *     happens in all browsers except recent Firefox builds.</li>
- *     <li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
- *     methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
- *     `crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
+ * 	<li>When using a video source that may loop or seek, use a {{#crossLink "VideoBuffer"}}{{/crossLink}} object to
+ * 	 prevent blinking / flashing.
+ * 	<li>When a string path or image tag that is not yet loaded is used, the stage may need to be redrawn before it
+ * 	 will be displayed.</li>
+ * 	<li>Bitmaps with an SVG source currently will not respect an alpha value other than 0 or 1. To get around this,
+ * 	the Bitmap can be cached.</li>
+ * 	<li>Bitmaps with an SVG source will taint the canvas with cross-origin data, which prevents interactivity. This
+ * 	happens in all browsers except recent Firefox builds.</li>
+ * 	<li>Images loaded cross-origin will throw cross-origin security errors when interacted with using a mouse, using
+ * 	methods such as `getObjectUnderPoint`, or using filters, or caching. You can get around this by setting
+ * 	`crossOrigin` flags on your images before passing them to EaselJS, eg: `img.crossOrigin="Anonymous";`</li>
  * </ol>
  */
 extern class Bitmap extends DisplayObject
 {
 	/**
-	 * The image to render. This can be an Image, a Canvas, or a Video. Not all browsers (especially
-	 * mobile browsers) support drawing video to a canvas.
+	 * The source image to display. This can be a CanvasImageSource
+	 * (image, video, canvas), an object with a `getImage` method that returns a CanvasImageSource, or a string URL to an image.
+	 * If the latter, a new Image instance with the URL as its src will be used.
 	 */
 	var image : Dynamic;
 	/**
 	 * Specifies an area of the source image to draw. If omitted, the whole image will be drawn.
-	 * Note that video sources must have a width / height set to work correctly with `sourceRect`.
+	 * Notes:
+	 * <ul>
+	 *     <li>that video sources must have a width / height set to work correctly with `sourceRect`</li>
+	 *     <li>Cached objects will ignore the `sourceRect` property</li>
+	 * </ul>
 	 */
 	var sourceRect : Rectangle;
 
@@ -58,7 +65,7 @@ extern class Bitmap extends DisplayObject
 	 * To see the API for caching, please visit the DisplayObject {{#crossLink "DisplayObject/cache"}}{{/crossLink}}
 	 * method.
 	 */
-	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float) : Void;
+	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float, ?options:Dynamic) : Void;
 	/**
 	 * Because the content of a Bitmap is already in a simple format, cache is unnecessary for Bitmap instances.
 	 * You should <b>not</b> cache Bitmap instances as it can degrade performance.

@@ -41,6 +41,14 @@ extern class MouseEvent extends Event
 	 */
 	var primary : Bool;
 	/**
+	 * The secondary target for the event, if applicable. This is used for mouseout/rollout
+	 * events to indicate the object that the mouse entered from, mouseover/rollover for the object the mouse exited,
+	 * and stagemousedown/stagemouseup events for the object that was the under the cursor, if any.
+	 * 
+	 * Only valid interaction targets will be returned (ie. objects with mouse listeners or a cursor set).
+	 */
+	var relatedTarget : DisplayObject;
+	/**
 	 * Returns the x position of the mouse in the local coordinate system of the current target (ie. the dispatcher).
 	 */
 	var localX : Float;
@@ -53,7 +61,7 @@ extern class MouseEvent extends Event
 	 */
 	var isTouch : Bool;
 
-	function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float) : Void;
+	function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float, ?relatedTarget:DisplayObject) : Void;
 
 	/**
 	 * Returns a clone of the MouseEvent instance.

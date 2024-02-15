@@ -73,7 +73,7 @@ package createjs;
  *     <tr><td>rf</td><td>{{#crossLink "Graphics/beginRadialGradientFill"}}{{/crossLink}} </td>
  *     <td>bf</td><td>{{#crossLink "Graphics/beginBitmapFill"}}{{/crossLink}} </td></tr>
  *     <tr><td>ef</td><td>{{#crossLink "Graphics/endFill"}}{{/crossLink}} </td>
- *     <td>ss</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} </td></tr>
+ *     <td>ss / sd</td><td>{{#crossLink "Graphics/setStrokeStyle"}}{{/crossLink}} / {{#crossLink "Graphics/setStrokeDash"}}{{/crossLink}} </td></tr>
  *     <tr><td>s</td><td>{{#crossLink "Graphics/beginStroke"}}{{/crossLink}} </td>
  *     <td>ls</td><td>{{#crossLink "Graphics/beginLinearGradientStroke"}}{{/crossLink}} </td></tr>
  *     <tr><td>rs</td><td>{{#crossLink "Graphics/beginRadialGradientStroke"}}{{/crossLink}} </td>
@@ -97,7 +97,8 @@ extern class Graphics
 	/**
 	 * Holds a reference to the last command that was created or appended. For example, you could retain a reference
 	 * to a Fill command in order to dynamically update the color later by using:
-	 * 		myFill = myGraphics.beginFill("red").command;
+	 * 
+	 * 		var myFill = myGraphics.beginFill("red").command;
 	 * 		// update color later:
 	 * 		myFill.style = "yellow";
 	 */
@@ -185,7 +186,8 @@ extern class Graphics
 	function moveTo(x:Float, y:Float) : Graphics;
 	/**
 	 * Draws a line from the current drawing point to the specified position, which become the new current drawing
-	 * point. A tiny API method "lt" also exists.
+	 * point. Note that you *must* call {{#crossLink "Graphics/moveTo"}}{{/crossLink}} before the first `lineTo()`.
+	 * A tiny API method "lt" also exists.
 	 * 
 	 * For detailed information, read the
 	 * <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#complex-shapes-(paths)">
@@ -273,14 +275,25 @@ extern class Graphics
 	 */
 	function endFill() : Graphics;
 	/**
-	 * Sets the stroke style for the current sub-path. Like all drawing methods, this can be chained, so you can define
+	 * Sets the stroke style. Like all drawing methods, this can be chained, so you can define
 	 * the stroke style and color in a single line of code like so:
 	 * 
-	 *      myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
+	 * 	myGraphics.setStrokeStyle(8,"round").beginStroke("#F00");
 	 * 
 	 * A tiny API method "ss" also exists.
 	 */
 	function setStrokeStyle(thickness:Float, ?caps:Dynamic, ?joints:Dynamic, ?miterLimit:Float, ?ignoreScale:Bool) : Graphics;
+	/**
+	 * Sets or clears the stroke dash pattern.
+     *  
+     * segments - An array specifying the dash pattern, alternating between line and gap. For example, [20,10] would create a pattern of 20 pixel lines with 10 pixel gaps between them. Passing null or an empty array will clear the existing stroke dash.
+	 * offset - The offset of the dash pattern. For example, you could increment this value to create a "marching ants" effect.
+     *
+	 * 	myGraphics.setStrokeDash([20, 10], 0);
+	 * 
+	 * A tiny API method `sd` also exists.
+	 */
+	function setStrokeDash(segments:Array<Float>, offset:Float=0) : Graphics; 
 	/**
 	 * Begins a stroke with the specified color. This ends the current sub-path. A tiny API method "s" also exists.
 	 */
@@ -384,7 +397,7 @@ extern class Graphics
 	 * 		myShape.color = "red";
 	 * 
 	 * 		// append a Circle command object:
-	 * 		myShape.graphics.append(new Graphics.Circle(50, 50, 30));
+	 * 		myShape.graphics.append(new createjs.Graphics.Circle(50, 50, 30));
 	 * 
 	 * 		// append a custom command object with an exec method that sets the fill style
 	 * 		// based on the shape's data, and then fills the circle.

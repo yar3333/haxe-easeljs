@@ -92,7 +92,7 @@ extern class Sprite extends DisplayObject
 	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
 	 * You should not cache Sprite instances as it can degrade performance.
 	 */
-	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float) : Void;
+	override function cache(x:Float, y:Float, width:Float, height:Float, ?scale:Float, ?options:Dynamic) : Void;
 	/**
 	 * Because the content of a Sprite is already in a raster format, cache is unnecessary for Sprite instances.
 	 * You should not cache Sprite instances as it can degrade performance.

@@ -11,20 +11,11 @@ package createjs;
 extern class Shadow
 {
 	/**
-	 * property color
+	 * The color of the shadow. This can be any valid CSS color value.
 	 */
 	var color : String;
-	/**
-	 * property offsetX
-	 */
 	var offsetX : Float;
-	/**
-	 * property offsetY
-	 */
 	var offsetY : Float;
-	/**
-	 * property blur
-	 */
 	var blur : Float;
 	/**
 	 * An identity shadow object (all properties are set to 0).
