@@ -56,6 +56,13 @@ extern class EventDispatcher
 	function new() : Void;
 
 	/**
+	 * Static initializer to mix EventDispatcher methods into a target object or prototype.
+	 * 
+	 * 		EventDispatcher.initialize(MyClass.prototype); // add to the prototype of the class
+	 * 		EventDispatcher.initialize(myObject); // add to a specific instance
+	 */
+	static function initialize(target:Dynamic) : Void;
+	/**
 	 * Adds the specified event listener. Note that adding multiple listeners to the same function will result in
 	 * multiple callbacks getting fired.
 	 * 
