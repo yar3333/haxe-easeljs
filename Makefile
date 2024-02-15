@@ -1,5 +1,5 @@
 OPTIONS+= -src out/data.json
-OPTIONS+= --remove-path-prefix native/src
+OPTIONS+= --remove-path-prefix native
 OPTIONS+= --native-package createjs
 OPTIONS+= --apply-native-package
 
@@ -20,7 +20,7 @@ OPTIONS+= --type-map Image-Dynamic
 OPTIONS+= --type-map HtmlMouseEvent-js.html.MouseEvent
 
 convert:
-	yuidoc -p -o out native/src
+	yuidoc -p -o out native
 	haxelib run yuidoc2haxe $(OPTIONS) library
 	rm -r out
 	haxelib run refactor process library *.hx postprocess.rules
