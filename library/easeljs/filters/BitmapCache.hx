@@ -33,7 +33,94 @@ extern class BitmapCache
 	 */
 	var cacheID : Int;
 
-	function new() : Void;
+    /**
+     * Width of the cache relative to the target object.
+     * @property width
+     * @protected
+     * @type {Number}
+     * @default undefined
+     */
+    var width : Float;
+
+    /**
+     * Height of the cache relative to the target object.
+     * @property height
+     * @protected
+     * @type {Number}
+     * @default undefined
+     * @todo Should the width and height be protected?
+     */
+    var height : Float;
+
+    /**
+     * Horizontal position of the cache relative to the target's origin.
+     * @property x
+     * @protected
+     * @type {Number}
+     * @default undefined
+     */
+    var x : Float;
+
+    /**
+     * Vertical position of the cache relative to target's origin.
+     * @property y
+     * @protected
+     * @type {Number}
+     * @default undefined
+     */
+    var y : Float; 
+
+
+    /**
+     * The internal scale of the cache image, does not affects display size. This is useful to both increase and
+     * decrease render quality. Objects with increased scales are more likely to look good when scaled up or rotated.
+     * Objects with decreased scales can save on rendering performance.
+     * @property scale
+     * @protected
+     * @type {Number}
+     * @default 1
+     */
+    var scale : Float;
+
+    /**
+     * The x offset used for drawing into the cache itself, accounts for both transforms applied.
+     * @property offX
+     * @protected
+     * @type {Number}
+     * @default 0
+     */
+    var offX : Float;
+
+    /**
+     * The y offset used for drawing into the cache itself, accounts for both transforms applied.
+     * @property offY
+     * @protected
+     * @type {Number}
+     * @default 0
+     */
+    var offY : Float;
+
+    /**
+     * The relative offset of the filter's x position, used for drawing the cache onto its container.
+     * Re-calculated every update call before drawing.
+     * @property _filterOffY
+     * @protected
+     * @type {Number}
+     * @default 0
+     */
+    var _filterOffX : Float;
+
+    /**
+     * The relative offset of the filter's y position, used for drawing the cache onto its container.
+     * Re-calculated every update call before drawing.
+     * @property _filterOffY
+     * @protected
+     * @type {Number}
+     * @default 0
+     */
+    var _filterOffY : Float;
+
+    function new() : Void;
 
 	/**
 	 * Returns the bounds that surround all applied filters, relies on each filter to describe how it changes bounds.
