@@ -185,17 +185,19 @@ extern class SpriteSheet extends EventDispatcher
 	 * Indicates whether all images are finished loading.
 	 */
 	var complete : Bool;
+
 	/**
 	 * Specifies the framerate to use by default for Sprite instances using the SpriteSheet. See the Sprite class
 	 * {{#crossLink "Sprite/framerate:property"}}{{/crossLink}} for more information.
 	 */
 	var framerate : Float;
+
 	/**
 	 * Returns an array of all available animation names available on this sprite sheet as strings.
 	 */
-	var animations : Array<Dynamic>;
+	var animations : Array<String>;
 
-	function new(data:Dynamic) : Void;
+	function new(data:SpriteSheetData) : Void;
 
 	/**
 	 * Returns the total number of frames in the specified animation, or in the whole sprite
@@ -203,6 +205,7 @@ extern class SpriteSheet extends EventDispatcher
 	 * the images have not been fully loaded.
 	 */
 	function getNumFrames(?animation:String) : Int;
+
 	/**
 	 * Returns an object defining the specified animation. The returned object contains:<UL>
 	 * 	<li>frames: an array of the frame ids in the animation</li>
@@ -213,6 +216,7 @@ extern class SpriteSheet extends EventDispatcher
 	 * </UL>
 	 */
 	function getAnimation(name:String) : Dynamic;
+
 	/**
 	 * Returns an object specifying the image and source rect of the specified frame. The returned object has:<UL>
 	 * 	<li>an image property holding a reference to the image object in which the frame is found</li>
@@ -222,6 +226,7 @@ extern class SpriteSheet extends EventDispatcher
 	 * </UL>
 	 */
 	function getFrame(frameIndex:Float) : Dynamic;
+    
 	/**
 	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the specified frame relative
 	 * to the origin. For example, a 90 x 70 frame with a regX of 50 and a regY of 40 would return:
