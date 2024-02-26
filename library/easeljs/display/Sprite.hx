@@ -151,8 +151,9 @@ extern class Sprite extends DisplayObject
 	/**
 	 * Dispatched when an animation reaches its ends.
 	 */
-	inline function addAnimationendEventListener(handler:SpriteAnimationendEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("animationend", handler, useCapture);
-	inline function removeAnimationendEventListener(handler:SpriteAnimationendEvent->Void, ?useCapture:Bool) : Void removeEventListener("animationend", handler, useCapture);
+	inline function addAnimationEndEventListener(handler:SpriteAnimationendEvent->Void, ?useCapture:Bool) : Dynamic return addEventListener("animationend", handler, useCapture);
+	inline function removeAnimationEndEventListener(handler:SpriteAnimationendEvent->Void, ?useCapture:Bool) : Void removeEventListener("animationend", handler, useCapture);
+    
 	/**
 	 * Dispatched any time the current frame changes. For example, this could be due to automatic advancement on a tick,
 	 * or calling gotoAndPlay() or gotoAndStop().

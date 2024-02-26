@@ -65,7 +65,7 @@ extern class MouseEvent extends Event
 	 */
 	var isTouch : Bool;
 
-	function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float, ?relatedTarget:DisplayObject) : Void;
+	function new(type:String, bubbles:Bool, cancelable:Bool, stageX:Float, stageY:Float, nativeEvent:js.html.MouseEvent, pointerID:Float, primary:Bool, rawX:Float, rawY:Float, ?relatedTarget:DisplayObject) : Void;
 
 	/**
 	 * Returns a clone of the MouseEvent instance.

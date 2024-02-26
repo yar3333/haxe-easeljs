@@ -1,7 +1,5 @@
 package easeljs.display;
 
-import tweenjs.Timeline;
-
 /**
  * The MovieClip class associates a TweenJS Timeline with an EaselJS {{#crossLink "Container"}}{{/crossLink}}. It allows
  * you to create objects which encapsulate timeline animations, state changes, and synched actions. The MovieClip
@@ -116,7 +114,9 @@ extern class MovieClip extends Container
 	 *          .wait(1).to({_off:true})
 	 *          .wait(1).to({_off:false});
 	 */
-	var timeline : Timeline;
+    #if tweenjs
+	var timeline : tweenjs.Timeline;
+    #end
 	/**
 	 * Returns an array of objects with label and position (aka frame) properties, sorted by position.
 	 */
@@ -253,7 +253,9 @@ typedef MovieClipInitProps =
      *          .wait(1).to({_off:true})
      *          .wait(1).to({_off:false});
      */
-    @:optional var timeline : Timeline;
+    #if tweenjs
+    @:optional var timeline : tweenjs.Timeline;
+    #end
     /**
      * Returns an array of objects with label and position (aka frame) properties, sorted by position.
      */

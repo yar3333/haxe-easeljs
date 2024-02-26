@@ -98,11 +98,4 @@ extern class DOMElement extends DisplayObject
 	 * Returns a string representation of this object.
 	 */
 	override function toString() : String;
-
-	/**
-	 * Interaction events should be added to `htmlElement`, and not the DOMElement instance, since DOMElement instances
-	 * are not full EaselJS display objects and do not participate in EaselJS mouse events.
-	 */
-	inline function addDblClickEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Dynamic return addEventListener("dblClick", handler, useCapture);
-	inline function removeDblClickEventListener(handler:Dynamic->Void, ?useCapture:Bool) : Void removeEventListener("dblClick", handler, useCapture);
 }

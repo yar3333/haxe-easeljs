@@ -1,9 +1,9 @@
 package easeljs.display;
 
+#if tweenjs
+
 import tweenjs.Tween;
 import tweenjs.TweenStep;
-
-#if tweenjs
 
 /**
  * This plugin works with <a href="http://tweenjs.com" target="_blank">TweenJS</a> to prevent the startPosition
