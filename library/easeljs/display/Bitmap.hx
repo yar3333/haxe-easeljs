@@ -4,6 +4,7 @@ import js.html.CanvasElement;
 import js.html.ImageElement;
 import haxe.extern.EitherType;
 import easeljs.geom.Rectangle;
+import easeljs.utils.VideoBuffer;
 
 /**
  * A Bitmap represents an Image, Canvas, or Video in the display list. A Bitmap can be instantiated using an existing
@@ -48,7 +49,7 @@ extern class Bitmap extends DisplayObject
 	 */
 	var sourceRect : Rectangle;
 
-	function new(imageOrUri:EitherType<String, EitherType<ImageElement, CanvasElement>>) : Void;
+	function new(imageOrUri:EitherType<String, EitherType<ImageElement, EitherType<CanvasElement, VideoBuffer>>>) : Void;
 
 	/**
 	 * Returns true or false indicating whether the display object would be visible if drawn to a canvas.
