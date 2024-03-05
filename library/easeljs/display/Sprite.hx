@@ -129,8 +129,7 @@ extern class Sprite extends DisplayObject
 	/**
 	 * Advances the playhead. This occurs automatically each tick by default.
 	 */
-	@:native("advance")
-    function advanceNative(?time:Float) : Void;
+    function advance(?time:Float) : Void;
 	/**
 	 * Returns a {{#crossLink "Rectangle"}}{{/crossLink}} instance defining the bounds of the current frame relative to
 	 * the origin. For example, a 90 x 70 frame with <code>regX=50</code> and <code>regY=40</code> would return a
